@@ -29,13 +29,13 @@ async def cmd_admin(message: Message, state: FSMContext):
     ])
     
     text = (
-        "🚀 **لوحة تحكم الإدارة (Web Panel)**\n\n"
+        "🚀 <b>لوحة تحكم الإدارة (Web Panel)</b>\n\n"
         "اضغط على الزر أدناه للانتقال للموقع والتحكم بالبوت بالكامل.\n\n"
-        "👤 **اليوزر:** `admin`\n"
-        "🔑 **الباسورد:** `admin123`\n\n"
-        "*(تنبيه: زر الدخول يتطلب وضع رابط موقعك كقيمة لـ WEB_URL في Railway)*"
+        "👤 <b>اليوزر:</b> <code>admin</code>\n"
+        "🔑 <b>الباسورد:</b> <code>admin123</code>\n\n"
+        "<i>(تنبيه: زر الدخول يتطلب وضع رابط موقعك في اعدادات Railway)</i>"
     )
-    await message.answer(text, reply_markup=keyboard, parse_mode="Markdown")
+    await message.answer(text, reply_markup=keyboard, parse_mode="HTML")
 
 @router.callback_query(F.data == "admin_main")
 async def cq_admin_main(call: CallbackQuery, state: FSMContext):
@@ -55,13 +55,13 @@ async def cq_admin_stats(call: CallbackQuery):
         sold_count = (await session.execute(select(func.count(Account.id)).where(Account.status == AccountStatus.SOLD))).scalar()
         
     text = (
-        "📊 **الإحصائيات العامة للمتجر:**\n\n"
-        f"👥 **إجمالي المستخدمين:** {users_count}\n"
-        f"💰 **إجمالي الأرصدة المودعة:** ${total_balance:.2f}\n\n"
-        f"📱 **الأرقام المتاحة للبيع:** {avail_count}\n"
-        f"✅ **الأرقام المباعة:** {sold_count}"
+        "📊 <b>الإحصائيات العامة للمتجر:</b>\n\n"
+        f"👥 <b>إجمالي المستخدمين:</b> {users_count}\n"
+        f"💰 <b>إجمالي الأرصدة المودعة:</b> ${total_balance:.2f}\n\n"
+        f"📱 <b>الأرقام المتاحة للبيع:</b> {avail_count}\n"
+        f"✅ <b>الأرقام المباعة:</b> {sold_count}"
     )
-    await call.message.edit_text(text, reply_markup=admin_back_keyboard(), parse_mode="Markdown")
+    await call.message.edit_text(text, reply_markup=admin_back_keyboard(), parse_mode="HTML")
 
 @router.callback_query(F.data == "admin_users")
 async def cq_admin_users(call: CallbackQuery, state: FSMContext):
@@ -86,12 +86,12 @@ async def process_user_id(message: Message, state: FSMContext):
         return
         
     text = (
-        f"👤 **بيانات المستخدم:**\n"
-        f"**ID:** `{user.id}`\n"
-        f"**الرصيد الكلي:** `${user.balance:.2f}`\n"
-        f"**تاريخ الانضمام:** {user.join_date.strftime('%Y-%m-%d')}"
+        f"👤 <b>بيانات المستخدم:</b>\n"
+        f"<b>ID:</b> <code>{user.id}</code>\n"
+        f"<b>الرصيد الكلي:</b> <code>${user.balance:.2f}</code>\n"
+        f"<b>تاريخ الانضمام:</b> {user.join_date.strftime('%Y-%m-%d')}"
     )
-    await message.answer(text, reply_markup=admin_user_keyboard(user.id), parse_mode="Markdown")
+    await message.answer(text, reply_markup=admin_user_keyboard(user.id), parse_mode="HTML")
     await state.clear()
 
 # Add / Sub Balance callbacks
