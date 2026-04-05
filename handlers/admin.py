@@ -16,6 +16,10 @@ router = Router()
 def is_admin(user_id: int) -> bool:
     return user_id in ADMIN_IDS
 
+@router.message(Command("id"))
+async def cmd_id(message: Message):
+    await message.reply(f"هذا هو الايدي الحقيقي الخاص بحسابك: <code>{message.from_user.id}</code>\nقم بنسخه ووضعه في ADMIN_IDS في ملف .env", parse_mode="HTML")
+
 @router.message(Command("admin"))
 async def cmd_admin(message: Message, state: FSMContext):
     if not is_admin(message.from_user.id):
