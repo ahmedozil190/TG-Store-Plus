@@ -90,7 +90,7 @@ async def seller_coin_cmd(message: Message):
             f"⏰ This post was taken in {now}"
         )
         
-        withdraw_text = "سحب الأموال" if lang == "ar" else "☑️ Withdraw funds ✅"
+        withdraw_text = "☑️ سحب الأموال ✅" if lang == "ar" else "☑️ Withdraw funds ✅"
         markup = InlineKeyboardMarkup(inline_keyboard=[
             [InlineKeyboardButton(text=withdraw_text, callback_data="seller_withdraw")]
         ])
