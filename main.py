@@ -133,10 +133,10 @@ async def main():
     tasks = [web_task]
     
     # 5. Main Polling (Buyer Bot)
-    buyer_commands = [
-        BotCommand(command="start", description="Start Store 🛒")
-    ]
+    # 5. Set Bot Commands (Side Menu)
+    from aiogram.types import BotCommandScopeAllPrivateChats
     
+    buyer_commands = [BotCommand(command="start", description="Start Store 🛒")]
     seller_commands = [
         BotCommand(command="start", description="start"),
         BotCommand(command="coin", description="coin"),
@@ -145,21 +145,21 @@ async def main():
         BotCommand(command="cap", description="cap")
     ]
 
-    from aiogram.types import BotCommandScopeAllPrivateChats
-
-    async def start_buyer():
+    try:
         await bot_buyer.set_my_commands(buyer_commands, scope=BotCommandScopeAllPrivateChats())
-        await start_bot_service(dp_buyer, bot_buyer, "Store/Buyer")
-
-    async def start_seller():
+        logger.info("Buyer Bot commands set.")
         if bot_seller:
             await bot_seller.set_my_commands(seller_commands, scope=BotCommandScopeAllPrivateChats())
-            await start_bot_service(dp_seller, bot_seller, "Seller/Sourcing")
+            logger.info("Seller Bot commands set.")
+    except Exception as e:
+        logger.error(f"Failed to set commands: {e}")
 
-    tasks.append(asyncio.create_task(start_buyer()))
+    # 6. Start Polling Tasks
+    tasks.append(asyncio.create_task(start_bot_service(dp_buyer, bot_buyer, "Store/Buyer")))
+    
     if bot_seller:
         tasks.append(asyncio.create_task(auto_approve_task(bot_seller)))
-        tasks.append(asyncio.create_task(start_seller()))
+        tasks.append(asyncio.create_task(start_bot_service(dp_seller, bot_seller, "Seller/Sourcing")))
 
     # Wait for completion or keep running
     await asyncio.gather(*tasks)
