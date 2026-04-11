@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="en" dir="ltr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>إدارة المتجر | Store Dashboard</title>
+    <title>Store Dashboard</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
@@ -20,96 +20,46 @@
             --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        * {
-            margin: 0; padding: 0; box-sizing: border-box;
-            font-family: 'Cairo', sans-serif;
-            -webkit-tap-highlight-color: transparent;
-        }
+        [dir="rtl"] { font-family: 'Cairo', sans-serif; }
+        [dir="ltr"] { font-family: 'Inter', sans-serif; }
 
-        body {
-            background: var(--bg-color);
-            color: var(--text-main);
-            min-height: 100vh;
-            display: flex;
-            overflow-x: hidden;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { background: var(--bg-color); color: var(--text-main); min-height: 100vh; display: flex; overflow-x: hidden; }
 
-        /* Sidebar Styling */
         .sidebar {
-            width: 280px;
-            background: var(--sidebar-bg);
-            border-left: 1px solid var(--border);
-            height: 100vh;
-            position: fixed;
-            right: -280px; 
-            top: 0;
-            z-index: 2000;
-            padding: 30px 20px;
-            transition: var(--transition);
-            display: flex;
-            flex-direction: column;
-            box-shadow: -10px 0 30px rgba(0,0,0,0.5);
+            width: 280px; background: var(--sidebar-bg); border-right: 1px solid var(--border);
+            height: 100vh; position: fixed; left: -280px; top: 0; z-index: 2000; padding: 30px 20px;
+            transition: var(--transition); display: flex; flex-direction: column; box-shadow: 10px 0 30px rgba(0,0,0,0.5);
         }
+        [dir="rtl"] .sidebar { left: auto; right: -280px; border-right: none; border-left: 1px solid var(--border); box-shadow: -10px 0 30px rgba(0,0,0,0.5); }
+        .sidebar.active { left: 0; }
+        [dir="rtl"] .sidebar.active { right: 0; left: auto; }
 
-        .sidebar.active { right: 0; }
-
-        .sidebar-header {
-            padding-bottom: 30px;
-            border-bottom: 1px solid var(--border);
-            margin-bottom: 30px;
-            text-align: center;
-        }
-
-        .sidebar-logo {
-            font-size: 1.5rem;
-            font-weight: 800;
-            background: linear-gradient(45deg, #FFD700, #ffec8b);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
+        .sidebar-header { padding-bottom: 30px; border-bottom: 1px solid var(--border); margin-bottom: 30px; text-align: center; }
+        .sidebar-logo { font-size: 1.5rem; font-weight: 800; color: var(--gold-primary); }
 
         .menu-list { list-style: none; flex: 1; }
         .menu-item {
             display: flex; align-items: center; gap: 15px; padding: 15px; border-radius: 12px;
-            color: var(--text-dim); text-decoration: none; margin-bottom: 10px; transition: var(--transition);
-            cursor: pointer;
+            color: var(--text-dim); text-decoration: none; margin-bottom: 10px; transition: var(--transition); cursor: pointer;
         }
+        .menu-item:hover, .menu-item.active { background: rgba(255, 215, 0, 0.05); color: var(--gold-primary); }
 
-        .menu-item i { font-size: 1.2rem; }
-        .menu-item:hover, .menu-item.active {
-            background: rgba(255, 215, 0, 0.05);
-            color: var(--gold-primary);
-        }
-
-        /* Top Bar Styling */
         .topbar {
             position: fixed; top: 20px; left: 20px; right: 20px; height: 65px;
             background: var(--glass-bg); backdrop-filter: blur(15px); border: 1px solid var(--border);
-            border-radius: 20px; display: flex; align-items: center; justify-content: space-between;
-            padding: 0 20px; z-index: 1000;
+            border-radius: 20px; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; z-index: 1000;
         }
 
         .hamburger { font-size: 1.5rem; color: var(--gold-primary); cursor: pointer; }
         .page-title { font-size: 1.1rem; font-weight: 700; color: var(--gold-primary); }
 
-        /* Main Content */
-        main {
-            flex: 1; padding: 105px 20px 40px; max-width: 900px;
-            margin: 0 auto; width: 100%;
-        }
-
-        .overlay {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(3px);
-            z-index: 1500; display: none;
-        }
+        main { flex: 1; padding: 105px 20px 40px; max-width: 900px; margin: 0 auto; width: 100%; transition: var(--transition); }
+        .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(3px); z-index: 1500; display: none; }
         .overlay.active { display: block; }
 
-        /* Stats Cards */
         .grid-stats { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 30px; }
-        .stat-card {
-            background: var(--glass-bg); border: 1px solid var(--border); border-radius: 24px;
-            padding: 25px 15px; text-align: center; transition: var(--transition);
-        }
+        .stat-card { background: var(--glass-bg); border: 1px solid var(--border); border-radius: 24px; padding: 25px 15px; text-align: center; }
         .stat-card i { font-size: 2rem; color: var(--gold-primary); margin-bottom: 12px; }
         .stat-value { font-size: 1.8rem; font-weight: 800; color: #fff; }
         .stat-label { font-size: 0.8rem; color: var(--text-dim); }
@@ -123,23 +73,23 @@
             background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05);
             border-radius: 18px; padding: 18px; display: flex; justify-content: space-between; align-items: center;
         }
-
         .item-info h4 { font-size: 0.95rem; margin-bottom: 4px; }
         .item-info p { font-size: 0.8rem; color: var(--text-dim); }
 
-        .badge { padding: 4px 10px; border-radius: 8px; font-size: 0.7rem; font-weight: 700; }
-        .badge-success { background: rgba(34, 197, 94, 0.1); color: #22c55e; }
+        .badge { padding: 4px 10px; border-radius: 8px; font-size: 0.7rem; font-weight: 700; background: rgba(34, 197, 94, 0.1); color: #22c55e; }
 
-        /* Loader */
         #loader { position: fixed; inset: 0; background: var(--bg-color); display: flex; justify-content: center; align-items: center; z-index: 9999; }
         .spinner { width: 40px; height: 40px; border: 3px solid rgba(255, 215, 0, 0.2); border-top-color: var(--gold-primary); border-radius: 50%; animation: spin 0.8s linear infinite; }
         @keyframes spin { 100% { transform: rotate(360deg); } }
 
         @media (min-width: 1024px) {
-            .sidebar { right: 0; }
-            main { padding-right: 300px; padding-left: 20px; margin: 0; max-width: 1200px; }
+            .sidebar { left: 0; }
+            [dir="rtl"] .sidebar { left: auto; right: 0; }
+            main { padding-left: 300px; padding-right: 20px; margin: 0; max-width: 1200px; }
+            [dir="rtl"] main { padding-right: 300px; padding-left: 20px; }
             .hamburger { display: none; }
-            .topbar { right: 300px; }
+            .topbar { left: 300px; }
+            [dir="rtl"] .topbar { left: 20px; right: 300px; }
         }
     </style>
 </head>
@@ -150,26 +100,30 @@
     <!-- Sidebar -->
     <div id="sidebar" class="sidebar">
         <div class="sidebar-header">
-            <h2 class="sidebar-logo">STORE DASHBOARD</h2>
+            <h2 class="sidebar-logo"><i class="fa-solid fa-crown"></i></h2>
         </div>
         <div class="menu-list">
-            <div class="menu-item active" onclick="switchSection('home', this)">
+            <div id="menu-dashboard" class="menu-item active" onclick="switchSection('home', this)">
                 <i class="fa-solid fa-house"></i>
-                <span>الرئيسية</span>
+                <span data-i18n="nav_dashboard">Dashboard</span>
             </div>
-            <div class="menu-item" onclick="switchSection('users', this)">
+            <div id="menu-users" class="menu-item" onclick="switchSection('users', this)">
                 <i class="fa-solid fa-users"></i>
-                <span>إدارة العملاء</span>
+                <span data-i18n="nav_users">Customers</span>
             </div>
-            <div class="menu-item" onclick="switchSection('sales', this)">
+            <div id="menu-sales" class="menu-item" onclick="switchSection('sales', this)">
                 <i class="fa-solid fa-cart-shopping"></i>
-                <span>المبيعات</span>
+                <span data-i18n="nav_sales">Sales History</span>
             </div>
         </div>
         <div style="margin-top: auto;">
+            <div class="menu-item" onclick="toggleLanguage()">
+                <i class="fa-solid fa-language"></i>
+                <span id="lang-text">العربية</span>
+            </div>
             <div class="menu-item" style="color: #ef4444;" onclick="window.Telegram.WebApp.close()">
                 <i class="fa-solid fa-right-from-bracket"></i>
-                <span>إغلاق اللوحة</span>
+                <span data-i18n="nav_close">Close Panel</span>
             </div>
         </div>
     </div>
@@ -179,7 +133,7 @@
         <div class="hamburger" onclick="toggleSidebar()">
             <i class="fa-solid fa-bars-staggered"></i>
         </div>
-        <div class="page-title" id="page-title">الرئيسية</div>
+        <div class="page-title" id="page-title" data-i18n="nav_dashboard">Dashboard</div>
         <div class="user-profile">
             <i class="fa-solid fa-crown" style="font-size: 1.5rem; color: var(--gold-primary);"></i>
         </div>
@@ -192,40 +146,34 @@
                 <div class="stat-card">
                     <i class="fa-solid fa-users"></i>
                     <div class="stat-value" id="stat-total-users">0</div>
-                    <div class="stat-label">إجمالي العملاء</div>
+                    <div class="stat-label" data-i18n="stat_users">Total Clients</div>
                 </div>
                 <div class="stat-card">
                     <i class="fa-solid fa-money-bill-trend-up"></i>
                     <div class="stat-value" id="stat-sales-count">0</div>
-                    <div class="stat-label">إجمالي المبيعات</div>
+                    <div class="stat-label" data-i18n="stat_sales">Total Sales</div>
                 </div>
             </div>
 
             <div class="section-header">
-                <h3>آخر المبيعات</h3>
+                <h3 data-i18n="recent_sales">Recent Sales</h3>
             </div>
             <div class="card">
-                <div class="list-container" id="recent-sales">
-                    <!-- Dynamic Content -->
-                </div>
+                <div class="list-container" id="recent-sales"></div>
             </div>
         </div>
 
-        <!-- Users Section -->
         <div id="section-users" class="content-section" style="display: none;">
             <div class="section-header">
-                <h3>قائمة المستخدمين</h3>
+                <h3 data-i18n="customers_list">Customers List</h3>
             </div>
-            <div class="list-container" id="user-list">
-                <!-- Dynamic Content -->
-            </div>
+            <div class="list-container" id="user-list"></div>
         </div>
 
-        <!-- Sales Section (Placeholder) -->
         <div id="section-sales" class="content-section" style="display: none;">
             <div class="card" style="text-align: center; color: var(--text-dim);">
                 <i class="fa-solid fa-chart-line" style="font-size: 3rem; margin-bottom: 15px;"></i>
-                <p>قسـم المبيعات التفصيلي سيتم برمجته قريباً...</p>
+                <p data-i18n="coming_soon">Coming Soon...</p>
             </div>
         </div>
     </main>
@@ -234,6 +182,56 @@
         const tg = window.Telegram.WebApp;
         tg.expand();
         tg.headerColor = '#050505';
+
+        const translations = {
+            en: {
+                nav_dashboard: "Dashboard",
+                nav_users: "Customers",
+                nav_sales: "Sales History",
+                nav_close: "Close Panel",
+                stat_users: "Total Clients",
+                stat_sales: "Total Sales",
+                recent_sales: "Recent Sales",
+                customers_list: "Customers List",
+                coming_soon: "Full Analytics Coming Soon...",
+                no_sales: "No sales recorded yet",
+                service_lbl: "Account for",
+                by_user: "By User"
+            },
+            ar: {
+                nav_dashboard: "الرئيسية",
+                nav_users: "إدارة العملاء",
+                nav_sales: "سجل المبيعات",
+                nav_close: "إغلاق اللوحة",
+                stat_users: "إجمالي العملاء",
+                stat_sales: "إجمالي المبيعات",
+                recent_sales: "آخر المبيعات",
+                customers_list: "قائمة العملاء",
+                coming_soon: "التقارير التفصيلية قريباً...",
+                no_sales: "لا توجد مبيعات حالياً",
+                service_lbl: "حساب",
+                by_user: "بواسطة"
+            }
+        };
+
+        let currentLang = localStorage.getItem('admin_lang') || 'en';
+
+        function updateUI() {
+            document.documentElement.lang = currentLang;
+            document.documentElement.dir = currentLang === 'ar' ? 'rtl' : 'ltr';
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (translations[currentLang][key]) el.innerText = translations[currentLang][key];
+            });
+            document.getElementById('lang-text').innerText = currentLang === 'en' ? 'العربية' : 'English';
+            init();
+        }
+
+        function toggleLanguage() {
+            currentLang = currentLang === 'en' ? 'ar' : 'en';
+            localStorage.setItem('admin_lang', currentLang);
+            updateUI();
+        }
 
         function toggleSidebar() {
             document.getElementById('sidebar').classList.toggle('active');
@@ -245,7 +243,7 @@
             document.getElementById('section-' + id).style.display = 'block';
             document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active'));
             btn.classList.add('active');
-            document.getElementById('page-title').innerText = btn.querySelector('span').innerText;
+            updateUI();
             if (window.innerWidth < 1024) toggleSidebar();
         }
 
@@ -253,29 +251,24 @@
             try {
                 const res = await fetch('/api/admin/store/data');
                 const data = await res.json();
-                
                 document.getElementById('stat-total-users').innerText = data.stats.total_users;
                 document.getElementById('stat-sales-count').innerText = data.stats.sales_count;
-                
                 renderSales(data.recent_sales);
                 renderUsers(data.users);
-            } catch (e) {
-                console.error(e);
-            } finally {
-                document.getElementById('loader').style.display = 'none';
-            }
+            } catch (e) { console.error(e); }
+            finally { document.getElementById('loader').style.display = 'none'; }
         }
 
         function renderSales(list) {
             const container = document.getElementById('recent-sales');
-            if (!list.length) { container.innerHTML = '<p style="text-align: center; color: var(--text-dim);">لا توجد مبيعات</p>'; return; }
+            if (!list.length) { container.innerHTML = `<p style="text-align: center; color: var(--text-dim);">${translations[currentLang].no_sales}</p>`; return; }
             container.innerHTML = list.map(item => `
                 <div class="list-item">
                     <div class="item-info">
-                        <h4>بيع حساب: ${item.service}</h4>
-                        <p>بواسطة: ${item.user_id} | <span style="color: var(--gold-primary)">$${item.price}</span></p>
+                        <h4>${translations[currentLang].service_lbl}: ${item.service}</h4>
+                        <p>${translations[currentLang].by_user}: ${item.user_id} | <span style="color: var(--gold-primary)">$${item.price}</span></p>
                     </div>
-                    <span class="badge badge-success">مكتمل</span>
+                    <span class="badge">Completed</span>
                 </div>
             `).join('');
         }
@@ -286,13 +279,13 @@
                 <div class="list-item">
                     <div class="item-info">
                         <h4>${u.username || u.user_id}</h4>
-                        <p>الرصيد: <span style="color: var(--gold-primary)">$${u.balance}</span></p>
+                        <p>Balance: <span style="color: var(--gold-primary)">$${u.balance}</span></p>
                     </div>
                 </div>
             `).join('');
         }
 
-        init();
+        updateUI();
     </script>
 </body>
 </html>
