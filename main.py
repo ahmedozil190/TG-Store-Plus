@@ -7,8 +7,8 @@ if sys.platform == 'win32':
 
 from aiogram import Bot, Dispatcher
 from aiogram.types import BotCommand
-from config import BOT_TOKEN
-from database.engine import init_db
+from config import BOT_TOKEN, SELLER_BOT_TOKEN
+from database.engine import init_db, async_session
 from handlers import main_router
 
 logging.basicConfig(level=logging.INFO)
