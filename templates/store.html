@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Numbers Store - متجر الأرقام</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Noto+Kufi+Arabic:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --gold: #D4AF37;
+            --gold-light: #FFDF00;
+            --black: #050505;
+            --dark-grey: #121212;
+            --glass: rgba(255, 255, 255, 0.05);
+            --text-main: #FFFFFF;
+            --text-dim: #A0A0A0;
+            --gold-gradient: linear-gradient(135deg, #D4AF37 0%, #F5D76E 50%, #B8860B 100%);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--black);
+            color: var(--text-main);
+            font-family: 'Outfit', 'Noto Kufi Arabic', sans-serif;
+            overflow-x: hidden;
+            padding-bottom: 20px;
+        }
+
+        /* Luxury Background Header */
+        .header {
+            background: linear-gradient(to bottom, rgba(212, 175, 55, 0.1) 0%, transparent 100%);
+            padding: 40px 20px 30px;
+            text-align: center;
+            border-bottom: 1px solid rgba(212, 175, 55, 0.1);
+        }
+
+        .logo {
+            font-size: 2.2rem;
+            font-weight: 800;
+            background: var(--gold-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 15px;
+            letter-spacing: -1px;
+        }
+
+        .balance-card {
+            background: var(--glass);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            padding: 12px 25px;
+            border-radius: 50px;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 5px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .balance-card i {
+            color: var(--gold);
+            font-size: 1.2rem;
+        }
+
+        .balance-val {
+            font-weight: 700;
+            font-size: 1.3rem;
+        }
+
+        /* Search Section */
+        .search-area {
+            padding: 20px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(5, 5, 5, 0.8);
+            backdrop-filter: blur(15px);
+        }
+
+        .search-container {
+            position: relative;
+            width: 100%;
+        }
+
+        .search-container input {
+            width: 100%;
+            background: var(--dark-grey);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 15px 50px 15px 20px;
+            border-radius: 15px;
+            color: white;
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .search-container input:focus {
+            border-color: var(--gold);
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.1);
+        }
+
+        .search-container i {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-dim);
+        }
+
+        /* Countries List */
+        .catalog {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+            padding: 0 20px;
+        }
+
+        .country-card {
+            background: var(--dark-grey);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: transform 0.2s, background 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .country-card:active {
+            transform: scale(0.97);
+            background: rgba(212, 175, 55, 0.05);
+        }
+
+        .card-main {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+
+        .flag-box {
+            font-size: 2.5rem;
+            filter: drop-shadow(0 2px 5px rgba(0,0,0,0.5));
+        }
+
+        .info h3 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .info p {
+            color: var(--text-dim);
+            font-size: 0.85rem;
+        }
+
+        .price-badge {
+            background: var(--gold-gradient);
+            padding: 10px 20px;
+            border-radius: 12px;
+            color: #000;
+            font-weight: 800;
+            font-size: 1rem;
+            box-shadow: 0 4px 10px rgba(184, 134, 11, 0.3);
+        }
+
+        /* Loading Spinner */
+        #loader {
+            position: fixed;
+            inset: 0;
+            background: var(--black);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            transition: opacity 0.5s;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(212, 175, 55, 0.1);
+            border-top: 3px solid var(--gold);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+
+        /* No results */
+        #no-results {
+            text-align: center;
+            padding: 50px 20px;
+            color: var(--text-dim);
+            display: none;
+        }
+
+        /* Bottom Status bar for feedback */
+        .status-bar {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.9);
+            border: 1px solid var(--gold);
+            padding: 15px;
+            border-radius: 15px;
+            display: none;
+            justify-content: center;
+            animation: slideUp 0.3s ease-out;
+            z-index: 500;
+        }
+
+        @keyframes slideUp { from { transform: translateY(100px); } to { transform: translateY(0); } }
+
+    </style>
+</head>
+<body>
+
+    <div id="loader">
+        <div class="spinner"></div>
+        <p style="margin-top: 20px; color: var(--gold); font-size: 0.9rem;">جاري دخول المتجر الفاخر...</p>
+    </div>
+
+    <div class="header">
+        <div class="logo">NUMBERS STORE</div>
+        <div class="balance-card">
+            <i class="fa-solid fa-wallet"></i>
+            <span class="balance-val" id="user-balance">0.00$</span>
+        </div>
+    </div>
+
+    <div class="search-area">
+        <div class="search-container">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" id="search-input" placeholder="ابحث عن دولة أو مفتاح..." oninput="filterCountries()">
+        </div>
+    </div>
+
+    <div class="catalog" id="countries-catalog">
+        <!-- Countries will be injected here -->
+    </div>
+
+    <div id="no-results">
+        <i class="fa-solid fa-face-frown" style="font-size: 3rem; margin-bottom: 15px;"></i>
+        <p>عذراً، لا توجد دول متوفرة بهذا الاسم حالياً.</p>
+    </div>
+
+    <div id="status-bar" class="status-bar">
+        <span id="status-text"></span>
+    </div>
+
+    <script>
+        const tg = window.Telegram.WebApp;
+        tg.expand();
+        tg.headerColor = '#050505';
+        tg.backgroundColor = '#050505';
+
+        const userId = tg.initDataUnsafe?.user?.id || 0;
+        let countriesData = [];
+
+        async function fetchStoreData() {
+            try {
+                const response = await fetch(`/api/store/data?user_id=${userId}`);
+                const data = await response.json();
+                
+                document.getElementById('user-balance').innerText = `${data.user.balance.toFixed(2)}$`;
+                countriesData = data.countries;
+                renderCountries(countriesData);
+            } catch (error) {
+                console.error("Error fetching store data:", error);
+                tg.showAlert("حدث خطأ في الاتصال بالسيرفر.");
+            } finally {
+                hideLoader();
+            }
+        }
+
+        function renderCountries(list) {
+            const catalog = document.getElementById('countries-catalog');
+            const noResults = document.getElementById('no-results');
+            
+            if (list.length === 0) {
+                catalog.innerHTML = '';
+                noResults.style.display = 'block';
+                return;
+            }
+
+            noResults.style.display = 'none';
+            catalog.innerHTML = list.map(c => `
+                <div class="country-card" onclick="confirmPurchase('${c.name}', ${c.price})">
+                    <div class="card-main">
+                        <div class="flag-box">${c.flag}</div>
+                        <div class="info">
+                            <h3>${c.name}</h3>
+                            <p>المتوفر: ${c.count} أرقام</p>
+                        </div>
+                    </div>
+                    <div class="price-badge">${c.price}$</div>
+                </div>
+            `).join('');
+        }
+
+        function filterCountries() {
+            const query = document.getElementById('search-input').value.toLowerCase();
+            const filtered = countriesData.filter(c => 
+                c.name.toLowerCase().includes(query)
+            );
+            renderCountries(filtered);
+        }
+
+        function confirmPurchase(country, price) {
+            tg.HapticFeedback.impactOccurred('medium');
+            tg.showConfirm(`هل تود شراء رقم من ${country} بقيمة $${price}؟`, async (confirmed) => {
+                if (confirmed) {
+                    processPurchase(country);
+                }
+            });
+        }
+
+        async function processPurchase(country) {
+            showStatus("جاري معالجة الطلب...");
+            try {
+                const response = await fetch('/api/store/buy', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ user_id: userId, country: country })
+                });
+                
+                const result = await response.json();
+                if (response.ok) {
+                    tg.HapticFeedback.notificationOccurred('success');
+                    tg.showAlert(`✅ تم الشراء بنجاح!\nالرقم: ${result.phone}\nتم خصم الرصيد. يمكنك الآن جلب الكود من البوت.`);
+                    fetchStoreData(); // Refresh balance and stock
+                } else {
+                    tg.HapticFeedback.notificationOccurred('error');
+                    tg.showAlert(`❌ فشل: ${result.detail}`);
+                }
+            } catch (err) {
+                tg.showAlert("❌ حدث خطأ غير متوقع.");
+            } finally {
+                hideStatus();
+            }
+        }
+
+        function hideLoader() {
+            const loader = document.getElementById('loader');
+            loader.style.opacity = '0';
+            setTimeout(() => loader.style.display = 'none', 500);
+        }
+
+        function showStatus(text) {
+            const bar = document.getElementById('status-bar');
+            document.getElementById('status-text').innerText = text;
+            bar.style.display = 'flex';
+        }
+
+        function hideStatus() {
+            document.getElementById('status-bar').style.display = 'none';
+        }
+
+        window.onload = fetchStoreData;
+    </script>
+</body>
+</html>

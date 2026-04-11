@@ -51,6 +51,10 @@ class PriceUpdate(BaseModel):
     country_name: str
     price: float
 
+class StoreBuy(BaseModel):
+    user_id: int
+    country: str
+
 @app.get("/admin", response_class=HTMLResponse)
 async def admin_dashboard(request: Request):
     try:
@@ -60,8 +64,106 @@ async def admin_dashboard(request: Request):
         logger.error(traceback.format_exc())
         return HTMLResponse(content=f"<h1>Internal Server Error</h1><pre>{e}</pre>", status_code=500)
 
-@app.get("/api/admin/data")
-async def get_admin_data():
+@app.get("/store", response_class=HTMLResponse)
+async def client_store(request: Request):
+    try:
+        return templates.TemplateResponse(request=request, name="store.html", context={})
+    except Exception as e:
+        logger.error(f"Error rendering store: {e}")
+        return HTMLResponse(content=f"<h1>Internal Server Error</h1><pre>{e}</pre>", status_code=500)
+
+@app.get("/api/store/data")
+async def get_store_data(user_id: int = None):
+    try:
+        async with async_session() as session:
+            # Group available accounts by country
+            stmt = select(Account.country, Account.price, func.count(Account.id).label('cnt')).where(
+                Account.status == AccountStatus.AVAILABLE
+            ).group_by(Account.country, Account.price)
+            
+            results = (await session.execute(stmt)).all()
+            
+            countries = []
+            for row in results:
+                name, price, count = row
+                # Get flag
+                flag = "🌐"
+                try:
+                    # Look up by name or find a region
+                    # For simplicity, we can parse a dummy number if we had one, 
+                    # but let's just find the price entry or name match
+                    cp = (await session.execute(select(CountryPrice).where(CountryPrice.country_name == name))).scalar()
+                    if cp:
+                        region = phonenumbers.region_code_for_country_code(int(cp.country_code))
+                        flag = get_flag_emoji(region)
+                except: pass
+                
+                countries.append({
+                    "name": name,
+                    "flag": flag,
+                    "price": price,
+                    "count": count
+                })
+            
+            # User balance
+            balance = 0.0
+            if user_id:
+                user = await session.get(User, user_id)
+                if user:
+                    balance = user.balance
+
+        return {
+            "countries": countries,
+            "user": {"balance": balance}
+        }
+    except Exception as e:
+        logger.error(f"Store Data Error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/store/buy")
+async def store_buy(data: StoreBuy):
+    try:
+        async with async_session() as session:
+            user = await session.get(User, data.user_id)
+            if not user:
+                raise HTTPException(status_code=404, detail="User not found")
+                
+            # Get one available account from this country
+            stmt = select(Account).where(
+                Account.country == data.country,
+                Account.status == AccountStatus.AVAILABLE
+            ).limit(1)
+            
+            account = (await session.execute(stmt)).scalar_one_or_none()
+            if not account:
+                raise HTTPException(status_code=400, detail="عذراً، نفدت الأرقام!")
+                
+            if user.balance < account.price:
+                raise HTTPException(status_code=400, detail="رصيدك غير كافٍ")
+                
+            # Deduct and mark
+            user.balance -= account.price
+            account.status = AccountStatus.SOLD
+            account.buyer_id = user.id
+            
+            txn = Transaction(
+                user_id=user.id,
+                type=TransactionType.BUY,
+                amount=-account.price
+            )
+            session.add(txn)
+            await session.commit()
+            
+            return {
+                "status": "success",
+                "phone": account.phone_number,
+                "id": account.id
+            }
+    except HTTPException as e:
+        raise e
+    except Exception as e:
+        logger.error(f"Store Buy Error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
     try:
         async with async_session() as session:
             # Stats (with fallbacks)

@@ -48,12 +48,13 @@ def chunk_list(lst, n):
 async def cq_buy_number(call: CallbackQuery, state: FSMContext):
     await state.clear()
     markup = InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text="Supplier The main.", callback_data="supplier_main")],
-        [InlineKeyboardButton(text="- Return.", callback_data="back_main")]
+        [InlineKeyboardButton(text="🛍️ فتح متجر الأرقام", web_app=WebAppInfo(url=STORE_URL))],
+        [InlineKeyboardButton(text="- عودة.", callback_data="back_main")]
     ])
     
     await call.message.edit_text(
-        "- Well choose the resource you want to buy from:",
+        "✨ **مرحباً بك في المتجر الفاخر**\n\n- اضغط على الزر أدناه لاختيار دولتك والشراء بلمسة واحدة بجودة عالية.",
+        parse_mode="Markdown",
         reply_markup=markup
     )
 
