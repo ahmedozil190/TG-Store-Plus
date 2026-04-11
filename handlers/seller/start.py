@@ -7,6 +7,10 @@ from sqlalchemy.future import select
 
 router = Router()
 
+@router.message(Command("ping"))
+async def seller_ping(message: Message):
+    await message.answer("Sourcing Bot is Ready! 🚀")
+
 @router.message(Command("start"))
 async def seller_start_cmd(message: Message):
     async with async_session() as session:
