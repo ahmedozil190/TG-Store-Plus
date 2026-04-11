@@ -305,12 +305,13 @@ async def update_sourcing_price(data: dict):
     delay = int(data.get("approve_delay", 0))
 
     # Auto-detect name and flag
-    country_name = f"Code {code}"
+    name_only = f"Country {code}"
+    iso_code = "ZZ"
     try:
         iso_code = phonenumbers.region_code_for_country_code(int(code))
-        # Use geocoder with a dummy number for that region to get the name
-        dummy_num = phonenumbers.parse(f"+{code}00000000")
-        country_name = geocoder.description_for_number(dummy_num, "en") or f"Country {code}"
+        # Get a valid example number for this region to get the name
+        example_num = phonenumbers.example_number(iso_code)
+        name_only = geocoder.description_for_number(example_num, "en") or f"Country {code}"
     except: pass
 
     async with async_session() as session:
@@ -318,12 +319,12 @@ async def update_sourcing_price(data: dict):
         if cp:
             cp.buy_price = buy_p
             cp.approve_delay = delay
-            cp.country_name = country_name # Update name if detected better
+            cp.country_name = name_only
         else:
             cp = CountryPrice(
                 country_code=code, 
-                country_name=country_name, 
-                price=0, # Sell price starts at 0, independent
+                country_name=name_only, 
+                price=0,
                 buy_price=buy_p,
                 approve_delay=delay
             )
