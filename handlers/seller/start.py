@@ -56,7 +56,7 @@ async def seller_start_cmd(message: Message, bot: Bot = None):
     else:
         welcome_text = (
             "- Welcome to the account reception bot .\n\n"
-            "- To start, send the desired virtual account number or send /help for assistance."
+            "-  To start, send the desired virtual account number or send /help for assistance."
         )
     
     await message.answer(welcome_text, reply_markup=ReplyKeyboardRemove())
