@@ -33,7 +33,9 @@ async def seller_start_cmd(message: Message, bot: Bot = None):
             BotCommand(command="coin", description="/coin"),
             BotCommand(command="cancel", description="/cancel"),
             BotCommand(command="language", description="/language"),
-            BotCommand(command="cap", description="/cap")
+            BotCommand(command="cap", description="/cap"),
+            BotCommand(command="admin", description="Admin Panel ⚙️"),
+            BotCommand(command="manage_countries", description="إدارة الدول وحذفها ❌")
         ]
         try:
             await bot.set_my_commands(user_commands, scope=BotCommandScopeChat(chat_id=message.from_user.id))

@@ -1,9 +1,10 @@
 from aiogram import Router, F
-from aiogram.types import Message
+from aiogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery
 from aiogram.filters import Command
 from database.engine import async_session
 from database.models import CountryPrice
 from sqlalchemy.future import select
+from sqlalchemy import delete
 from config import ADMIN_IDS
 
 router = Router()
@@ -27,14 +28,12 @@ async def admin_add_country(message: Message):
 
     try:
         code = args[0]
-        # Allow multi-word name if we join appropriately, but for simplicity:
         name = args[1]
         buy_p = float(args[2])
         sell_p = float(args[3])
         delay = int(args[4]) if len(args) > 4 else 0
 
         async with async_session() as session:
-            # Check if exists
             stmt = select(CountryPrice).where(CountryPrice.country_code == code)
             cp = (await session.execute(stmt)).scalar_one_or_none()
             
@@ -67,7 +66,7 @@ async def admin_dashboard_cmd(message: Message):
         return
         
     import os
-    from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, WebAppInfo
+    from aiogram.types import WebAppInfo
     web_url = os.getenv("WEB_URL", "http://127.0.0.1:8000").rstrip("/")
     
     keyboard = InlineKeyboardMarkup(inline_keyboard=[
@@ -84,21 +83,74 @@ async def admin_dashboard_cmd(message: Message):
     )
     await message.answer(text, reply_markup=keyboard, parse_mode="HTML")
 
+@router.message(Command("manage_countries"))
 @router.message(Command("sourcing_stats"))
-async def admin_sourcing_stats(message: Message):
+async def admin_manage_countries(message: Message):
     if message.from_user.id not in ADMIN_IDS:
         return
         
     async with async_session() as session:
-        result = await session.execute(select(CountryPrice))
+        result = await session.execute(select(CountryPrice).order_by(CountryPrice.country_name))
         countries = result.scalars().all()
         
     if not countries:
-        await message.answer("No countries configured yet.")
+        await message.answer("⚠️ لا توجد دول مضافة حالياً.")
         return
         
-    text = "<b>📊 Sourcing Inventory:</b>\n\n"
+    keyboard_list = []
+    text = "<b>⚙️ إدارة قائمة الدول والأسعار:</b>\n\nاضغط على ❌ بجانب الدولة لحذفها:\n"
+    
     for c in countries:
-        text += f"- {c.country_name} (+{c.country_code}): Buy ${c.buy_price}\n"
+        # One row per country: [Country Name] [Delete Button]
+        keyboard_list.append([
+            InlineKeyboardButton(text=f"❌ {c.country_name} (+{c.country_code})", callback_data=f"del_cp_cf_{c.id}")
+        ])
         
-    await message.answer(text, parse_mode="HTML")
+    keyboard = InlineKeyboardMarkup(inline_keyboard=keyboard_list)
+    await message.answer(text, reply_markup=keyboard, parse_mode="HTML")
+
+# Confirmation Callback
+@router.callback_query(F.data.startswith("del_cp_cf_"))
+async def callback_delete_country_confirm(call: CallbackQuery):
+    if call.from_user.id not in ADMIN_IDS: return
+    cp_id = int(call.data.split("_")[3])
+    
+    async with async_session() as session:
+        cp = await session.get(CountryPrice, cp_id)
+        if not cp:
+            await call.answer("Country not found!")
+            return
+            
+        text = f"⚠️ <b>تأكيد الحذف:</b>\n\nهل أنت متأكد أنك تريد حذف دولة <b>{cp.country_name}</b>؟\nسيؤدي هذا لإزالتها من قائمة الأسعار فوراً."
+        keyboard = InlineKeyboardMarkup(inline_keyboard=[
+            [
+                InlineKeyboardButton(text="نعم، احذف ✅", callback_data=f"del_cp_ex_{cp_id}"),
+                InlineKeyboardButton(text="إلغاء 🔙", callback_data="manage_countries_back")
+            ]
+        ])
+        await call.message.edit_text(text, reply_markup=keyboard, parse_mode="HTML")
+
+# Execution Callback
+@router.callback_query(F.data.startswith("del_cp_ex_"))
+async def callback_delete_country_execute(call: CallbackQuery):
+    if call.from_user.id not in ADMIN_IDS: return
+    cp_id = int(call.data.split("_")[3])
+    
+    async with async_session() as session:
+        cp = await session.get(CountryPrice, cp_id)
+        if cp:
+            name = cp.country_name
+            await session.delete(cp)
+            await session.commit()
+            await call.answer(f"✅ تم حذف {name} بنجاح", show_alert=True)
+            # Send the updated list
+            await admin_manage_countries(call.message)
+            await call.message.delete()
+        else:
+            await call.answer("خطأ: الدولة غير موجودة.")
+
+@router.callback_query(F.data == "manage_countries_back")
+async def callback_manage_countries_back(call: CallbackQuery):
+    if call.from_user.id not in ADMIN_IDS: return
+    await admin_manage_countries(call.message)
+    await call.message.delete()
