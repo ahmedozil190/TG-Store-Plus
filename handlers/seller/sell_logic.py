@@ -18,14 +18,17 @@ class SellerAddState(StatesGroup):
     waiting_2fa = State()
 
 @router.callback_query(F.data == "seller_add_account")
-async def seller_add_start(call: CallbackQuery, state: FSMContext):
+async def seller_add_start_callback(call: CallbackQuery, state: FSMContext):
+    await seller_add_start(call.message, state)
+    await call.answer()
+
+async def seller_add_start(message: Message, state: FSMContext):
     await state.set_state(SellerAddState.waiting_phone)
-    await call.message.answer(
+    await message.answer(
         "📝 **الخطوة 1: أدخل رقم الهاتف**\n\n"
         "يرجى إرسال رقم الهاتف الذي تود بيعه (مع رمز الدولة، مثال: +20123...)",
         parse_mode="Markdown"
     )
-    await call.answer()
 
 @router.message(SellerAddState.waiting_phone)
 async def seller_process_phone(message: Message, state: FSMContext):
