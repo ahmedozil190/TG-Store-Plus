@@ -1,5 +1,5 @@
-from aiogram import Router, F
-from aiogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery, ReplyKeyboardRemove
+from aiogram import Router, F, Bot
+from aiogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery, ReplyKeyboardRemove, BotCommand, BotCommandScopeChat
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from database.engine import async_session
@@ -13,7 +13,20 @@ async def seller_ping(message: Message):
     await message.answer("Sourcing Bot is Ready! 🚀")
 
 @router.message(Command("start"))
-async def seller_start_cmd(message: Message):
+async def seller_start_cmd(message: Message, bot: Bot):
+    # Force refresh commands for this specific user to break cache
+    user_commands = [
+        BotCommand(command="start", description="/start"),
+        BotCommand(command="coin", description="/coin"),
+        BotCommand(command="cancel", description="/cancel"),
+        BotCommand(command="language", description="/language"),
+        BotCommand(command="cap", description="/cap")
+    ]
+    try:
+        await bot.set_my_commands(user_commands, scope=BotCommandScopeChat(chat_id=message.from_user.id))
+    except:
+        pass
+
     async with async_session() as session:
         user = (await session.execute(select(User).where(User.id == message.from_user.id))).scalar_one_or_none()
         if not user:
