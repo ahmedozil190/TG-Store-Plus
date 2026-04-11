@@ -74,14 +74,18 @@ async def auto_approve_task(bot_seller: Bot):
         
         await asyncio.sleep(60)
 
+from handlers.seller import seller_router
+
 async def start_bot_service(dp: Dispatcher, bot: Bot, name: str):
     """Safely starts a bot service."""
     try:
-        logger.info(f"Starting {name} Bot service...")
+        me = await bot.get_me()
+        logger.info(f"✅ SUCCESS: {name} Bot (@{me.username}) is connected and starting!")
+        
         await bot.set_my_commands([BotCommand(command="start", description="تشغيل البوت")])
         await dp.start_polling(bot)
     except Exception as e:
-        logger.error(f"Fatal error in {name} Bot: {e}")
+        logger.error(f"❌ FATAL ERROR in {name} Bot connection: {e}")
 
 async def main():
     logger.info("Initializing Dual-Bot Ecosystem...")
@@ -110,11 +114,10 @@ async def main():
         try:
             bot_seller = Bot(token=SELLER_BOT_TOKEN)
             dp_seller = Dispatcher()
-            from handlers.seller import seller_router
             dp_seller.include_router(seller_router)
-            logger.info("✅ SUCCESS: Seller Bot Initialized and Router Registered.")
+            logger.info("Seller Bot configured.")
         except Exception as e:
-            logger.error(f"❌ ERROR: Seller Bot init failed: {e}")
+            logger.error(f"Seller Bot configuration failed: {e}")
             bot_seller = None
     else:
         logger.warning("⚠️ WARNING: SELLER_BOT_TOKEN is empty! Seller Bot will not start.")
