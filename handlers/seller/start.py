@@ -63,29 +63,41 @@ async def seller_start_cmd(message: Message, bot: Bot = None):
 
 @router.message(Command("coin"))
 async def seller_coin_cmd(message: Message):
-    from datetime import datetime
-    async with async_session() as session:
-        user = (await session.execute(select(User).where(User.id == message.from_user.id))).scalar_one_or_none()
-        balance = user.balance if user else 0.0
-        lang = user.language if user else "en"
-    
-    now_utc = datetime.now(timezone.utc)
-    now_egypt = now_utc + timedelta(hours=2)
-    now = now_egypt.strftime("%Y/%m/%d - %I:%M:%S")
-    balance_display = int(balance) if balance == int(balance) else balance
-    coin_text = (
-        f"💵 Your user account in the robot:\n\n"
-        f"👤ID: `{message.from_user.id}`\n"
-        f"💰 Your balance: {balance_display}$\n\n"
-        f"⏰ This post was taken in {now}"
-    )
-    
-    withdraw_text = "سحب الأموال" if lang == "ar" else "☑️ Withdraw funds ✅"
-    markup = InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text=withdraw_text, callback_data="seller_withdraw")]
-    ])
-    
-    await message.reply(coin_text, reply_markup=markup, parse_mode="Markdown")
+    try:
+        from datetime import datetime, timedelta, timezone
+        async with async_session() as session:
+            user = (await session.execute(select(User).where(User.id == message.from_user.id))).scalar_one_or_none()
+            if not user:
+                # Create user if missing
+                user = User(id=message.from_user.id, language="ar")
+                session.add(user)
+                await session.commit()
+                balance = 0.0
+                lang = "ar"
+            else:
+                balance = user.balance
+                lang = user.language
+        
+        now_utc = datetime.now(timezone.utc)
+        now_egypt = now_utc + timedelta(hours=2)
+        now = now_egypt.strftime("%Y/%m/%d - %I:%M:%S")
+        
+        balance_display = int(balance) if balance == int(balance) else balance
+        coin_text = (
+            f"<b>💵 Your user account in the robot:</b>\n\n"
+            f"👤ID: <code>{message.from_user.id}</code>\n"
+            f"💰 Your balance: {balance_display}$\n\n"
+            f"⏰ This post was taken in {now}"
+        )
+        
+        withdraw_text = "سحب الأموال" if lang == "ar" else "☑️ Withdraw funds ✅"
+        markup = InlineKeyboardMarkup(inline_keyboard=[
+            [InlineKeyboardButton(text=withdraw_text, callback_data="seller_withdraw")]
+        ])
+        
+        await message.answer(coin_text, reply_markup=markup, parse_mode="HTML")
+    except Exception as e:
+        await message.answer(f"⚠️ Error: {str(e)}")
 
 @router.message(Command("cap"))
 async def seller_cap_cmd(message: Message, state: FSMContext):
