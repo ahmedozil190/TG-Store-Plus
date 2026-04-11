@@ -9,14 +9,14 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --bg-color: #030712;
-            --sidebar-bg: #0f172a;
-            --glass-bg: rgba(15, 23, 42, 0.6);
+            --bg-color: #080d27;
+            --sidebar-bg: #0c1232;
+            --glass-bg: rgba(17, 26, 58, 0.7);
             --blue-primary: #3b82f6;
             --blue-glow: rgba(59, 130, 246, 0.4);
             --text-main: #f8fafc;
-            --text-dim: #94a3b8;
-            --border: rgba(59, 130, 246, 0.15);
+            --text-dim: #8b95b5;
+            --border: rgba(100, 120, 200, 0.12);
             --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
@@ -94,7 +94,7 @@
         /* Top Bar Styling */
         .topbar {
             position: fixed; top: 0; left: 0; right: 0; height: 60px;
-            background: #0b1120; border-bottom: 1px solid rgba(255,255,255,0.06);
+            background: #0c1232; border-bottom: 1px solid rgba(100,120,200,0.08);
             display: flex; align-items: center; justify-content: space-between;
             padding: 0 16px; z-index: 1000;
         }
@@ -204,51 +204,54 @@
 
         /* Users page specific */
         .user-stat-card {
-            background: #0f1629; border: 1px solid rgba(255,255,255,0.06);
+            background: #111a3a; border: 1px solid rgba(100,120,200,0.1);
+            border-left: 3px solid;
+            border-image: linear-gradient(180deg, #3b82f6, #8b5cf6) 1;
             border-radius: 16px; padding: 18px 20px;
             display: flex; justify-content: space-between; align-items: center;
             margin-bottom: 12px;
         }
-        .user-stat-card .label { font-size: 0.85rem; font-weight: 700; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; }
+        .user-stat-card .label { font-size: 0.85rem; font-weight: 700; color: #8b95b5; text-transform: uppercase; letter-spacing: 1px; }
         .user-stat-card .value { font-size: 1.4rem; font-weight: 800; }
         .user-stat-card .value.green { color: #22c55e; }
         .user-stat-card .value.red { color: #ef4444; }
 
         .search-card {
-            background: #0f1629; border: 1px solid rgba(255,255,255,0.06);
-            border-radius: 20px; padding: 25px 20px; margin-bottom: 20px;
+            background: #111a3a; border: 1px solid rgba(100,120,200,0.1);
+            border-radius: 20px; padding: 25px 20px; margin: 25px 0 20px;
         }
         .search-input {
-            width: 100%; background: #0b1120; border: 1px solid rgba(255,255,255,0.1);
+            width: 100%; background: #080d27; border: 1px solid rgba(150,160,200,0.2);
             border-radius: 12px; padding: 14px 16px; color: #fff; font-size: 0.95rem;
             outline: none; margin-bottom: 15px;
         }
-        .search-input::placeholder { color: #475569; }
+        .search-input:focus { border-color: rgba(139, 92, 246, 0.5); }
+        .search-input::placeholder { color: #5a6585; }
         .btn-find {
             width: 100%; padding: 14px; border: none; border-radius: 14px; cursor: pointer;
-            background: linear-gradient(135deg, #3b82f6, #a855f7);
+            background: linear-gradient(135deg, #22c55e, #8b5cf6);
             color: #fff; font-size: 1rem; font-weight: 700;
             display: flex; align-items: center; justify-content: center; gap: 10px;
-            transition: all 0.3s; box-shadow: 0 4px 20px rgba(139, 92, 246, 0.3);
+            transition: all 0.3s; box-shadow: 0 4px 20px rgba(139, 92, 246, 0.25);
         }
         .btn-find:hover { transform: translateY(-2px); box-shadow: 0 6px 25px rgba(139, 92, 246, 0.4); }
 
         .mgmt-card {
-            background: #0f1629; border: 1px solid rgba(255,255,255,0.06);
+            background: #111a3a; border: 1px solid rgba(100,120,200,0.1);
             border-radius: 20px; padding: 25px 20px;
         }
-        .mgmt-card h4 { font-size: 1rem; font-weight: 700; color: #fff; margin-bottom: 18px; }
+        .mgmt-card h4 { font-size: 1rem; font-weight: 700; color: #e2e8f0; margin-bottom: 18px; }
         .tab-row { display: flex; gap: 12px; margin-bottom: 20px; }
         .tab-btn {
             padding: 10px 28px; border-radius: 25px; border: none; cursor: pointer;
             font-size: 0.85rem; font-weight: 700; transition: all 0.3s;
         }
         .tab-btn.active { background: var(--blue-primary); color: #fff; }
-        .tab-btn:not(.active) { background: transparent; color: var(--text-dim); border: 1px solid rgba(255,255,255,0.1); }
+        .tab-btn:not(.active) { background: transparent; color: #8b95b5; border: 1px solid rgba(100,120,200,0.15); }
         .tab-btn:not(.active):hover { border-color: var(--blue-primary); color: var(--blue-primary); }
 
         .user-card {
-            background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06);
+            background: rgba(17, 26, 58, 0.5); border: 1px solid rgba(100,120,200,0.08);
             border-radius: 16px; padding: 16px; margin-bottom: 10px;
             display: flex; align-items: center; gap: 14px;
         }
@@ -258,8 +261,8 @@
             font-weight: 800; font-size: 0.9rem; color: #fff; flex-shrink: 0;
         }
         .user-card .u-info { flex: 1; }
-        .user-card .u-info h5 { font-size: 0.95rem; font-weight: 600; color: #fff; margin-bottom: 3px; }
-        .user-card .u-info p { font-size: 0.8rem; color: var(--text-dim); }
+        .user-card .u-info h5 { font-size: 0.95rem; font-weight: 600; color: #e2e8f0; margin-bottom: 3px; }
+        .user-card .u-info p { font-size: 0.8rem; color: #8b95b5; }
         .user-card .u-balance { font-size: 1rem; font-weight: 800; color: #22c55e; }
 
         @media (min-width: 1024px) {
