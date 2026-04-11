@@ -12,32 +12,52 @@ router = Router()
 async def seller_ping(message: Message):
     await message.answer("Sourcing Bot is Ready! 🚀")
 
+@router.message(F.text.in_({"عربي", "English"}))
+async def seller_change_language(message: Message):
+    lang_code = "ar" if message.text == "عربي" else "en"
+    async with async_session() as session:
+        user = (await session.execute(select(User).where(User.id == message.from_user.id))).scalar_one_or_none()
+        if user:
+            user.language = lang_code
+            await session.commit()
+    
+    await message.answer("✅" if lang_code == "en" else "تم تغيير اللغة بنجاح ✅", reply_markup=ReplyKeyboardRemove())
+    await seller_start_cmd(message)
+
 @router.message(Command("start"))
-async def seller_start_cmd(message: Message, bot: Bot):
-    # Force refresh commands for this specific user to break cache
-    user_commands = [
-        BotCommand(command="start", description="/start"),
-        BotCommand(command="coin", description="/coin"),
-        BotCommand(command="cancel", description="/cancel"),
-        BotCommand(command="language", description="/language"),
-        BotCommand(command="cap", description="/cap")
-    ]
-    try:
-        await bot.set_my_commands(user_commands, scope=BotCommandScopeChat(chat_id=message.from_user.id))
-    except:
-        pass
+async def seller_start_cmd(message: Message, bot: Bot = None):
+    # Force refresh commands if bot is provided (during manual /start)
+    if bot:
+        user_commands = [
+            BotCommand(command="start", description="/start"),
+            BotCommand(command="coin", description="/coin"),
+            BotCommand(command="cancel", description="/cancel"),
+            BotCommand(command="language", description="/language"),
+            BotCommand(command="cap", description="/cap")
+        ]
+        try:
+            await bot.set_my_commands(user_commands, scope=BotCommandScopeChat(chat_id=message.from_user.id))
+        except:
+            pass
 
     async with async_session() as session:
         user = (await session.execute(select(User).where(User.id == message.from_user.id))).scalar_one_or_none()
         if not user:
-            user = User(id=message.from_user.id)
+            user = User(id=message.from_user.id, language="en")
             session.add(user)
             await session.commit()
-            
-    welcome_text = (
-        "- Welcome to the account reception bot .\n\n"
-        "-  To start, send the desired virtual account number or send /help for assistance."
-    )
+        
+    lang = user.language
+    if lang == "ar":
+        welcome_text = (
+            "- أهلاً بك في بوت استقبال الحسابات .\n\n"
+            "- للبدء، أرسل رقم الحساب الوهمي المطلوب أو أرسل /help للمساعدة."
+        )
+    else:
+        welcome_text = (
+            "- Welcome to the account reception bot .\n\n"
+            "- To start, send the desired virtual account number or send /help for assistance."
+        )
     
     await message.answer(welcome_text, reply_markup=ReplyKeyboardRemove())
 
@@ -98,12 +118,18 @@ async def seller_language_cmd(message: Message):
 @router.message(Command("help"))
 async def seller_help_cmd(message: Message):
     help_text = (
+        "<b>BOT - STAR</b>\n"
+        "- Sell bot : @STTAR1_BOT .\n"
+        "- Support Team: @fe4eee .\n\n"
         "✅-The explanation required in the robot channel is at the following address:\n"
         "- https://t.me/+WvuURnelU2kzM2Rk\n"
         "♻️ If the answer to your question is not in the channel, you can contact : @FE4EE\n\n"
         "/cancel"
     )
-    await message.answer(help_text)
+    markup = InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text="VIEW CHANNEL", url="https://t.me/+WvuURnelU2kzM2Rk")]
+    ])
+    await message.answer(help_text, reply_markup=markup, parse_mode="HTML")
 
 @router.callback_query(F.data == "seller_back_main")
 async def seller_back_main(call: CallbackQuery):
