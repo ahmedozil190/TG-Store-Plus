@@ -146,9 +146,6 @@ async def seller_help_cmd(message: Message):
         
     if lang == "ar":
         help_text = (
-            "<b>BOT - STAR</b>\n"
-            "- Sell bot : @STTAR1_BOT .\n"
-            "- Support Team: @fe4eee .\n\n"
             "✅-الشرح المطلوب في قناة الروبوت موجود على العنوان التالي:\n"
             "- https://t.me/+WvuURnelU2kzM2Rk\n"
             "♻️- في حال عدم وجود إجابة سؤالك في القناة يمكنك التواصل مع : @FE4EE\n\n"
@@ -156,9 +153,6 @@ async def seller_help_cmd(message: Message):
         )
     else:
         help_text = (
-            "<b>BOT - STAR</b>\n"
-            "- Sell bot : @STTAR1_BOT .\n"
-            "- Support Team: @fe4eee .\n\n"
             "✅-The explanation required in the robot channel is at the following address:\n"
             "- https://t.me/+WvuURnelU2kzM2Rk\n"
             "♻️ If the answer to your question is not in the channel, you can contact : @FE4EE\n\n"
