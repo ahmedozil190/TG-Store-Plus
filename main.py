@@ -127,12 +127,17 @@ async def main():
     logger.info(f"Web Admin Panel task created on port {port}.")
 
     # 4. Background Helper Tasks
-    if bot_seller:
-        asyncio.create_task(auto_approve_task(bot_seller))
-        asyncio.create_task(start_bot_service(dp_seller, bot_seller, "Seller/Sourcing"))
-
+    tasks = [web_task]
+    
     # 5. Main Polling (Buyer Bot)
-    await start_bot_service(dp_buyer, bot_buyer, "Store/Buyer")
+    tasks.append(asyncio.create_task(start_bot_service(dp_buyer, bot_buyer, "Store/Buyer")))
+    
+    if bot_seller:
+        tasks.append(asyncio.create_task(auto_approve_task(bot_seller)))
+        tasks.append(asyncio.create_task(start_bot_service(dp_seller, bot_seller, "Seller/Sourcing")))
+
+    # Wait for completion or keep running
+    await asyncio.gather(*tasks)
 
 if __name__ == "__main__":
     asyncio.run(main())

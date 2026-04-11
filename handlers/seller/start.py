@@ -37,7 +37,6 @@ async def seller_start_cmd(message: Message):
     await message.answer(welcome_text, parse_mode="Markdown", reply_markup=markup)
 
 @router.callback_query(F.data == "seller_back_main")
-async def seller_back_main(call: F.data):
-    # This is a bit tricky since we're using a common handler. 
-    # Usually I would use a different callback but let's just re-run the start logic.
+async def seller_back_main(call: CallbackQuery):
+    # Re-run the start logic
     await seller_start_cmd(call.message)
