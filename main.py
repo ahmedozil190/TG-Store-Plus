@@ -145,13 +145,15 @@ async def main():
         BotCommand(command="cap", description="cap")
     ]
 
+    from aiogram.types import BotCommandScopeAllPrivateChats
+
     async def start_buyer():
-        await bot_buyer.set_my_commands(buyer_commands)
+        await bot_buyer.set_my_commands(buyer_commands, scope=BotCommandScopeAllPrivateChats())
         await start_bot_service(dp_buyer, bot_buyer, "Store/Buyer")
 
     async def start_seller():
         if bot_seller:
-            await bot_seller.set_my_commands(seller_commands)
+            await bot_seller.set_my_commands(seller_commands, scope=BotCommandScopeAllPrivateChats())
             await start_bot_service(dp_seller, bot_seller, "Seller/Sourcing")
 
     tasks.append(asyncio.create_task(start_buyer()))

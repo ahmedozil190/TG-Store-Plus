@@ -20,31 +20,13 @@ async def seller_start_cmd(message: Message):
             user = User(id=message.from_user.id)
             session.add(user)
             await session.commit()
-        
+            
     welcome_text = (
         "- Welcome to the account reception bot .\n\n"
         "-  To start, send the desired virtual account number or send /help for assistance."
     )
     
-    # Reply Keyboard (Main Menu Buttons in the bottom)
-    main_menu_kb = ReplyKeyboardMarkup(
-        keyboard=[
-            [KeyboardButton(text="💰 Sell Accounts"), KeyboardButton(text="📊 My Coins")],
-            [KeyboardButton(text="🌍 Language"), KeyboardButton(text="❌ Cancel")]
-        ],
-        resize_keyboard=True
-    )
-    
-    # Inline Keyboard (Buttons under the message)
-    markup = InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text="💰 Add Number for Sale", callback_data="seller_add_account")],
-        [InlineKeyboardButton(text="📊 My Balance & Stats", callback_data="seller_my_stats")],
-        [InlineKeyboardButton(text="📜 Rules & Prices", callback_data="seller_rules")],
-        [InlineKeyboardButton(text="💬 Support", url="https://t.me/your_support_link")]
-    ])
-    
-    await message.answer(welcome_text, reply_markup=main_menu_kb)
-    await message.answer("Use the menu below to navigate or interact with the bot.", reply_markup=markup)
+    await message.answer(welcome_text)
 
 # Handlers for Reply Keyboard buttons
 @router.message(F.text == "💰 Sell Accounts")
