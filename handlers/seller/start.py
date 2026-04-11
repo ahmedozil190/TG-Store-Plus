@@ -48,7 +48,10 @@ async def seller_coin_cmd(message: Message):
         user = (await session.execute(select(User).where(User.id == message.from_user.id))).scalar_one_or_none()
         balance = user.balance if user else 0.0
     
-    now = datetime.now().strftime("%Y/%m/%d - %I:%M:%S %p")
+    from datetime import datetime, timedelta, timezone
+    now_utc = datetime.now(timezone.utc)
+    now_egypt = now_utc + timedelta(hours=2)
+    now = now_egypt.strftime("%Y/%m/%d - %I:%M:%S")
     balance_display = int(balance) if balance == int(balance) else balance
     coin_text = (
         f"💵 Your user account in the robot:\n\n"
