@@ -120,7 +120,7 @@ async def seller_cap_cmd(message: Message):
             await message.answer("<b>📊 Buying Prices List</b>\n\n- The list is currently empty.", parse_mode="HTML")
             return
 
-        text_lines = ["<b>📊 Buying Prices List:</b>\n"]
+        text_lines = ["<blockquote expandable>"] # Start expandable quote
         for i, c in enumerate(countries, 1):
             try:
                 iso = region_code_for_country_code(int(c.country_code))
@@ -133,13 +133,20 @@ async def seller_cap_cmd(message: Message):
             line = f"{i}- {flag} +{c.country_code} -{iso}: ${c.buy_price:.2f}"
             text_lines.append(line)
         
+        text_lines.append("</blockquote>") # End expandable quote
+        
         final_text = "\n".join(text_lines)
+        # Even with blockquote, we should respect length limits
         if len(final_text) > 4000:
+            # For very long lists, expandable blockquote might not work well across chunks,
+            # but we'll try to keep them grouped.
             for i in range(0, len(text_lines), 50):
                 chunk = "\n".join(text_lines[i:i+50])
+                if not chunk.startswith("<blockquote"): chunk = " <blockquote expandable>\n" + chunk
+                if not chunk.endswith("</blockquote>"): chunk = chunk + "\n</blockquote>"
                 await message.answer(chunk, parse_mode="HTML")
         else:
-            await message.answer(final_text, parse_mode="HTML")
+            await message.answer(f"<b>📊 Buying Prices List:</b>\n{final_text}", parse_mode="HTML")
     except Exception as e:
         await message.answer(f"⚠️ Error in /cap: {str(e)}")
 
