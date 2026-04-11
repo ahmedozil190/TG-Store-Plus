@@ -1,67 +1,112 @@
-from fastapi import FastAPI
-from sqladmin import Admin, ModelView
-from sqladmin.authentication import AuthenticationBackend
-from starlette.requests import Request
-from database.engine import engine
-from database.models import User, Account, Transaction
 import os
+from fastapi import FastAPI, Request, HTTPException, Depends
+from fastapi.templating import Jinja2Templates
+from fastapi.responses import HTMLResponse
+from sqlalchemy.future import select
+from sqlalchemy import func
+from database.engine import async_session
+from database.models import User, Account, Transaction, AccountStatus, TransactionType
+from pydantic import BaseModel
+from typing import List
 
 app = FastAPI(title="Store Admin Panel")
+templates = Jinja2Templates(directory="templates")
 
-# Secret key for session cookies
-SECRET_KEY = os.getenv("SECRET_KEY", "super-secret-key-12345")
+# Models for API requests
+class StockAdd(BaseModel):
+    phone: str
+    country: str
+    price: float
+    session: str
 
-class AdminAuth(AuthenticationBackend):
-    async def login(self, request: Request) -> bool:
-        form = await request.form()
-        username, password = form.get("username"), form.get("password")
+class BalanceUpdate(BaseModel):
+    user_id: int
+    amount: float
 
-        # Basic authentication (In production, load these from .env)
-        # We will use "admin" and "admin123" for now.
-        if username == "admin" and password == "admin123":
-            request.session.update({"token": "authenticated"})
-            return True
-        return False
+# Helper for DB Session
+async def get_session():
+    async with async_session() as session:
+        yield session
 
-    async def logout(self, request: Request) -> bool:
-        request.session.clear()
-        return True
+@app.get("/admin", response_class=HTMLResponse)
+async def admin_dashboard(request: Request):
+    # In a real app, verify Telegram InitData here
+    return templates.TemplateResponse("dashboard.html", {"request": request})
 
-    async def authenticate(self, request: Request) -> bool:
-        token = request.session.get("token")
-        if not token:
-            return False
-        return True
+@app.get("/api/admin/data")
+async def get_admin_data():
+    async with async_session() as session:
+        # Stats
+        user_count = (await session.execute(select(func.count(User.id)))).scalar()
+        stock_count = (await session.execute(select(func.count(Account.id)).where(Account.status == AccountStatus.AVAILABLE))).scalar()
+        total_balance = (await session.execute(select(func.sum(User.balance)))).scalar() or 0.0
+        
+        # Users
+        users_result = await session.execute(select(User).order_by(User.join_date.desc()).limit(100))
+        users = [{"id": u.id, "balance": u.balance, "join_date": u.join_date.strftime("%Y-%m-%d")} for u in users_result.scalars().all()]
+        
+        # Accounts (Stock)
+        accounts_result = await session.execute(select(Account).where(Account.status == AccountStatus.AVAILABLE).limit(100))
+        accounts = [{"id": a.id, "phone_number": a.phone_number, "country": a.country, "price": a.price} for a in accounts_result.scalars().all()]
+        
+        # Recent Transactions
+        tx_result = await session.execute(
+            select(Transaction, Account)
+            .join(Account, Transaction.amount == -Account.price) # Simple join for display
+            .where(Transaction.type == TransactionType.BUY)
+            .order_by(Transaction.timestamp.desc())
+            .limit(10)
+        )
+        transactions = []
+        for tx, acc in tx_result:
+            transactions.append({
+                "buyer_id": tx.user_id,
+                "phone_number": acc.phone_number,
+                "country": acc.country,
+                "price": acc.price,
+                "date": tx.timestamp.strftime("%Y-%m-%d %H:%M")
+            })
 
-authentication_backend = AdminAuth(secret_key=SECRET_KEY)
-admin = Admin(app, engine, authentication_backend=authentication_backend, title="Store Admin")
+    return {
+        "stats": {
+            "user_count": user_count,
+            "stock_count": stock_count,
+            "total_balance": total_balance
+        },
+        "users": users,
+        "accounts": accounts,
+        "transactions": transactions
+    }
 
-class UserAdmin(ModelView, model=User):
-    column_list = [User.id, User.balance, User.language, User.join_date]
-    name_plural = "المستخدمين"
-    icon = "fa-solid fa-users"
-    can_create = True
-    can_edit = True
-    can_delete = True
+@app.post("/api/admin/stock/add")
+async def add_stock(data: StockAdd):
+    async with async_session() as session:
+        new_acc = Account(
+            phone_number=data.phone,
+            country=data.country,
+            price=data.price,
+            session_string=data.session,
+            status=AccountStatus.AVAILABLE
+        )
+        session.add(new_acc)
+        await session.commit()
+    return {"status": "success"}
 
-class AccountAdmin(ModelView, model=Account):
-    column_list = [Account.id, Account.phone_number, Account.country, Account.status, Account.price, Account.buyer_id]
-    name_plural = "أرقام التلجرام"
-    icon = "fa-solid fa-phone"
-    can_create = True
-    can_edit = True
-    can_delete = True
-    column_searchable_list = [Account.phone_number, Account.country]
+@app.delete("/api/admin/stock/delete/{acc_id}")
+async def delete_stock(acc_id: int):
+    async with async_session() as session:
+        acc = await session.get(Account, acc_id)
+        if acc:
+            await session.delete(acc)
+            await session.commit()
+    return {"status": "success"}
 
-class TransactionAdmin(ModelView, model=Transaction):
-    column_list = [Transaction.id, Transaction.user_id, Transaction.type, Transaction.amount, Transaction.timestamp]
-    name_plural = "العمليات المالية"
-    icon = "fa-solid fa-money-bill-wave"
-    can_create = False
-    can_edit = False
-    can_delete = True
-    column_searchable_list = [Transaction.user_id]
-
-admin.add_view(UserAdmin)
-admin.add_view(AccountAdmin)
-admin.add_view(TransactionAdmin)
+@app.post("/api/admin/user/balance")
+async def update_balance(data: BalanceUpdate):
+    async with async_session() as session:
+        user = await session.get(User, data.user_id)
+        if user:
+            user.balance = data.amount
+            await session.commit()
+            return {"status": "success"}
+    raise HTTPException(status_code=404, detail="User not found")
