@@ -43,10 +43,26 @@ async def seller_start_cmd(message: Message, bot: Bot):
 
 @router.message(Command("coin"))
 async def seller_coin_cmd(message: Message):
+    from datetime import datetime
     async with async_session() as session:
         user = (await session.execute(select(User).where(User.id == message.from_user.id))).scalar_one_or_none()
         balance = user.balance if user else 0.0
-    await message.answer(f"💰 Your Current Balance: **${balance:.2f}**", parse_mode="Markdown")
+    
+    now = datetime.now().strftime("%Y/%m/%d - %H:%M:%S")
+    coin_text = (
+        f"凡卄爪乇D 爪乇D卄卂T\n"
+        f"/coin\n"
+        f"💵 Your user account in the robot:\n\n"
+        f"👤 ID: `{message.from_user.id}`\n"
+        f"💰 Your balance: {balance}$\n\n"
+        f"⏰ This post was taken in {now}"
+    )
+    
+    markup = InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text="☑️ Withdraw funds ✅", callback_data="seller_withdraw")]
+    ])
+    
+    await message.answer(coin_text, reply_markup=markup, parse_mode="Markdown")
 
 @router.message(Command("cap"))
 async def seller_cap_cmd(message: Message, state: FSMContext):
@@ -57,7 +73,11 @@ async def seller_cap_cmd(message: Message, state: FSMContext):
 @router.message(Command("cancel"))
 async def seller_cancel_cmd(message: Message, state: FSMContext):
     await state.clear()
-    await message.answer("❌ Current operation cancelled.")
+    cancel_text = (
+        "❎ The process has been canceled! To continue,\n\n"
+        "send the desired virtual account number or send /help for assistance."
+    )
+    await message.answer(cancel_text)
 
 @router.message(Command("language"))
 async def seller_language_cmd(message: Message):
