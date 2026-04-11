@@ -21,7 +21,7 @@ async def seller_change_language(message: Message):
             user.language = lang_code
             await session.commit()
     
-    await message.answer("✅" if lang_code == "en" else "تم تغيير اللغة بنجاح ✅", reply_markup=ReplyKeyboardRemove())
+    # Just show the start message without any confirmation text
     await seller_start_cmd(message)
 
 @router.message(Command("start"))
@@ -50,8 +50,8 @@ async def seller_start_cmd(message: Message, bot: Bot = None):
     lang = user.language
     if lang == "ar":
         welcome_text = (
-            "- أهلاً بك في بوت استقبال الحسابات .\n\n"
-            "- للبدء، أرسل رقم الحساب الوهمي المطلوب أو أرسل /help للمساعدة."
+            "- مرحبًا بك في روبوت استقبال الحسابات 🎊 .\n\n"
+            "- 👉 للبدء ، أرسل رقم الحساب الافتراضي المطلوب أو أرسل /help للحصول على المساعدة ."
         )
     else:
         welcome_text = (
@@ -80,8 +80,9 @@ async def seller_coin_cmd(message: Message):
         f"⏰ This post was taken in {now}"
     )
     
+    withdraw_text = "سحب الأموال" if lang == "ar" else "☑️ Withdraw funds ✅"
     markup = InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text="☑️ Withdraw funds ✅", callback_data="seller_withdraw")]
+        [InlineKeyboardButton(text=withdraw_text, callback_data="seller_withdraw")]
     ])
     
     await message.reply(coin_text, reply_markup=markup, parse_mode="Markdown")
@@ -92,13 +93,20 @@ async def seller_cap_cmd(message: Message, state: FSMContext):
     # We simulate the callback to start the sell flow
     await seller_add_start(message, state)
 
-@router.message(Command("cancel"))
-async def seller_cancel_cmd(message: Message, state: FSMContext):
-    await state.clear()
-    cancel_text = (
-        "❎ The process has been canceled! To continue,\n\n"
-        "send the desired virtual account number or send /help for assistance."
-    )
+    async with async_session() as session:
+        user = (await session.execute(select(User).where(User.id == message.from_user.id))).scalar_one_or_none()
+        lang = user.language if user else "en"
+
+    if lang == "ar":
+        cancel_text = (
+            "❎- تم إلغاء العملية! للمتابعة،\n\n"
+            " أرسل رقم الحساب الافتراضي المطلوب أو أرسل /help للحصول على المساعدة."
+        )
+    else:
+        cancel_text = (
+            "❎ The process has been canceled! To continue,\n\n"
+            "send the desired virtual account number or send /help for assistance."
+        )
     await message.answer(cancel_text)
 
 @router.message(Command("language"))
@@ -117,15 +125,30 @@ async def seller_language_cmd(message: Message):
 
 @router.message(Command("help"))
 async def seller_help_cmd(message: Message):
-    help_text = (
-        "<b>BOT - STAR</b>\n"
-        "- Sell bot : @STTAR1_BOT .\n"
-        "- Support Team: @fe4eee .\n\n"
-        "✅-The explanation required in the robot channel is at the following address:\n"
-        "- https://t.me/+WvuURnelU2kzM2Rk\n"
-        "♻️ If the answer to your question is not in the channel, you can contact : @FE4EE\n\n"
-        "/cancel"
-    )
+    async with async_session() as session:
+        user = (await session.execute(select(User).where(User.id == message.from_user.id))).scalar_one_or_none()
+        lang = user.language if user else "en"
+        
+    if lang == "ar":
+        help_text = (
+            "<b>BOT - STAR</b>\n"
+            "- Sell bot : @STTAR1_BOT .\n"
+            "- Support Team: @fe4eee .\n\n"
+            "✅-الشرح المطلوب في قناة الروبوت موجود على العنوان التالي:\n"
+            "- https://t.me/+WvuURnelU2kzM2Rk\n"
+            "♻️- في حال عدم وجود إجابة سؤالك في القناة يمكنك التواصل مع : @FE4EE\n\n"
+            "/cancel"
+        )
+    else:
+        help_text = (
+            "<b>BOT - STAR</b>\n"
+            "- Sell bot : @STTAR1_BOT .\n"
+            "- Support Team: @fe4eee .\n\n"
+            "✅-The explanation required in the robot channel is at the following address:\n"
+            "- https://t.me/+WvuURnelU2kzM2Rk\n"
+            "♻️ If the answer to your question is not in the channel, you can contact : @FE4EE\n\n"
+            "/cancel"
+        )
     markup = InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(text="VIEW CHANNEL", url="https://t.me/+WvuURnelU2kzM2Rk")]
     ])
