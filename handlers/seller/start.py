@@ -1,6 +1,7 @@
 from aiogram import Router, F
 from aiogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery
 from aiogram.filters import Command
+from aiogram.fsm.context import FSMContext
 from database.engine import async_session
 from database.models import User
 from sqlalchemy.future import select
