@@ -1008,11 +1008,16 @@
                     </div>
                 </div>
 
-                <div class="section-header" style="margin-bottom: 15px;">
-                    <i class="fas fa-coins"></i>
-                    <h2 data-i18n="nav_prices">Selling Prices</h2>
-                </div>
                 <div class="card" style="padding: 22px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <div class="section-header" style="margin: 0;">
+                            <i class="fas fa-coins"></i>
+                            <h2 data-i18n="nav_prices">Selling Prices</h2>
+                        </div>
+                        <button class="btn-add" onclick="openPriceModal()">
+                            <i class="fas fa-plus"></i> <span data-i18n="btn_add">Add</span>
+                        </button>
+                    </div>
                     <div class="list-container" id="price-list"></div>
                 </div>
             </section>
@@ -1384,22 +1389,15 @@
             document.getElementById('stat-total-countries').innerText = list.length;
             const container = document.getElementById('price-list');
             
-            const addCardHtml = `
-                <div class="user-card" style="display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 120px; cursor: pointer; background: rgba(96, 165, 250, 0.05); border: 2px dashed rgba(96, 165, 250, 0.3); margin-top: 0; margin-bottom: 15px;" onclick="openPriceModal()">
-                    <i class="fas fa-plus" style="font-size: 2.2rem; color: var(--accent); margin-bottom: 10px;"></i>
-                    <span style="color: var(--accent); font-weight: 700; font-size: 1.1rem;">${currentLang === 'ar' ? 'إضافة دولة جديدة' : 'Add New Country'}</span>
-                </div>
-            `;
-
             if (!list || !list.length) {
-                container.innerHTML = addCardHtml + `
+                container.innerHTML = `
                 <div style="text-align: center; padding: 40px 20px; background: rgba(0,0,0,0.15); border-radius: 16px; border: 1px dashed rgba(255,255,255,0.05); margin-top: 10px;">
                     <i class="fas fa-tags" style="font-size: 2.5rem; color: rgba(255,255,255,0.1); margin-bottom: 12px;"></i>
                     <p style="color: var(--text-secondary); font-weight: 600; font-size: 0.95rem;">No countries found</p>
                 </div>`;
                 return;
             }
-            container.innerHTML = addCardHtml + list.map(p => `
+            container.innerHTML = list.map(p => `
                 <div class="user-card" style="margin-top: 0; margin-bottom: 15px; cursor: default;">
                     <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px;">
                         <!-- Country Code -->
