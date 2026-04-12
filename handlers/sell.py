@@ -95,10 +95,10 @@ async def process_sell_code(message: Message, state: FSMContext):
             session.add(user)
             
         country = "Unknown" 
-        if phone.startswith("+1"): country = "US"
-        elif phone.startswith("+20"): country = "EG"
-        elif phone.startswith("+44"): country = "UK"
-        elif phone.startswith("+966"): country = "SA"
+        if phone.startswith("+1"): country = "United States"
+        elif phone.startswith("+20"): country = "Egypt"
+        elif phone.startswith("+44"): country = "United Kingdom"
+        elif phone.startswith("+966"): country = "Saudi Arabia"
         
         acc = Account(
             phone_number=phone,

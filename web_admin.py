@@ -54,10 +54,26 @@ def resolve_country_info(country_code_str: str):
         return f"Code {country_code_str}", "🌐"
 
 def clean_display_name(raw_name: str) -> str:
-    """Removes trailing ISO codes like EG, (EG), or [EG] from the name."""
+    """Removes trailing ISO codes like EG, (EG), or [EG], and resolves standalone codes."""
     if not raw_name: return raw_name
-    # Handle both "Egypt EG" and "Egypt (EG)" formats
-    clean = re.sub(r'\s*\(?[A-Z]{2,3}\)?\s*$', '', raw_name)
+    
+    # Standalone code resolution map
+    codes_map = {
+        "EG": "Egypt",
+        "US": "United States",
+        "UK": "United Kingdom",
+        "SA": "Saudi Arabia",
+        "RU": "Russia",
+        "UA": "Ukraine"
+    }
+    
+    # If the name itself is just a code, resolve it
+    trimmed = raw_name.strip().upper()
+    if trimmed in codes_map:
+        return codes_map[trimmed]
+    
+    # Handle formats like "Egypt EG", "Egypt (EG)", "Egypt [EG]"
+    clean = re.sub(r'\s*[\(\[]?[A-Z]{2,3}[\)\]]?\s*$', '', raw_name)
     return clean.strip()
 
 app = FastAPI(title="Store Admin Panel")

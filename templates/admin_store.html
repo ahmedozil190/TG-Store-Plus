@@ -1597,7 +1597,17 @@
                         <!-- Country Name -->
                         <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); padding: 14px 18px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center;">
                             <span style="color: var(--text-secondary); font-size: 0.8rem; font-weight: 700; text-transform: uppercase;">${currentLang === 'ar' ? 'اسم الدولة' : 'Country Name'}</span>
-                            <span style="color: var(--success); font-weight: 800; font-size: 1.1rem;">${p.name.replace(/\s?\(?[A-Z]{2}\)?$/, '').trim()}</span>
+                            <span style="color: var(--success); font-weight: 800; font-size: 1.1rem;">${(() => {
+                                let n = p.name || '';
+                                const map = { "EG": "Egypt", "US": "United States", "UK": "United Kingdom", "SA": "Saudi Arabia" };
+                                // Strip existing flag if any for internal check
+                                let clean = n.replace(/[\u{1F1E6}-\u{1F1FF}]{2}\s*/u, '').trim();
+                                if (map[clean.toUpperCase()]) {
+                                    // If it's just a code, return mapped name (keeping flag if it was there)
+                                    return n.replace(clean, map[clean.toUpperCase()]);
+                                }
+                                return n.replace(/\s*[\(\[]?[A-Z]{2,3}[\)\]]?\s*$/, '').trim();
+                            })()}</span>
                         </div>
                         <!-- Country Code -->
                         <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); padding: 14px 18px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center;">
