@@ -183,7 +183,11 @@ async def get_sourcing_data():
                     "status": a.status.name
                 })
 
-            prices_result = await session.execute(select(CountryPrice).order_by(CountryPrice.country_name))
+            prices_result = await session.execute(
+                select(CountryPrice)
+                .where(CountryPrice.buy_price > 0)
+                .order_by(CountryPrice.country_name)
+            )
             prices = []
             for p in prices_result.scalars().all():
                 flag = "🌐"
@@ -229,8 +233,12 @@ async def get_admin_store_data():
             for tx in tx_result.scalars().all():
                 transactions.append({"buyer_id": tx.user_id, "price": abs(tx.amount)})
 
-            # Fetch sell prices (only price field, not buy_price)
-            prices_result = await session.execute(select(CountryPrice).order_by(CountryPrice.country_name))
+            # Fetch sell prices only (price > 0 means it's configured for selling)
+            prices_result = await session.execute(
+                select(CountryPrice)
+                .where(CountryPrice.price > 0)
+                .order_by(CountryPrice.country_name)
+            )
             prices = []
             for p in prices_result.scalars().all():
                 flag = "🌐"
