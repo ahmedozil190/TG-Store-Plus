@@ -14,6 +14,7 @@ from pydantic import BaseModel
 from typing import List
 from services.session_manager import request_app_code, submit_app_code, login_clients
 import pycountry
+import re
 
 # Setup logging
 logging.basicConfig(level=logging.INFO)
@@ -41,13 +42,23 @@ def resolve_country_info(country_code_str: str):
         try:
             country = pycountry.countries.get(alpha_2=iso_code)
             if country:
+                # pycountry names are clean, but let's ensure no extra codes are appended
                 name = country.name
+                # Remove common suffixes like "EG", "(EG)", etc.
+                name = re.sub(r'\s*\(?[A-Z]{2,3}\)?\s*$', '', name).strip()
         except: pass
         
         return name, flag
     except Exception as e:
         logger.error(f"Error resolving country {country_code_str}: {e}")
         return f"Code {country_code_str}", "🌐"
+
+def clean_display_name(raw_name: str) -> str:
+    """Removes trailing ISO codes like EG, (EG), or [EG] from the name."""
+    if not raw_name: return raw_name
+    # Handle both "Egypt EG" and "Egypt (EG)" formats
+    clean = re.sub(r'\s*\(?[A-Z]{2,3}\)?\s*$', '', raw_name)
+    return clean.strip()
 
 app = FastAPI(title="Store Admin Panel")
 
@@ -222,7 +233,7 @@ async def get_sourcing_data():
                 except: pass
                 prices.append({
                     "code": p.country_code, 
-                    "name": f"{flag} {p.country_name}", 
+                    "name": f"{flag} {clean_display_name(p.country_name)}", 
                     "buy_price": p.buy_price,
                     "price": p.price,
                     "approve_delay": p.approve_delay
@@ -273,7 +284,7 @@ async def get_admin_store_data():
                 except: pass
                 prices.append({
                     "code": p.country_code,
-                    "name": f"{flag} {p.country_name}",
+                    "name": f"{flag} {clean_display_name(p.country_name)}",
                     "price": p.price
                 })
 
