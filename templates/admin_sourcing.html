@@ -1064,7 +1064,7 @@
                     <button class="btn-find" onclick="searchPrices()">
                         <i class="fas fa-search"></i> <span data-i18n="btn_find">Find</span>
                     </button>
-                    <div id="reset-price-search-container" style="display: none; margin-top: 10px;">
+                    <div id="reset-price-search-container" style="display: none; margin-top: 4px;">
                         <button class="cancel-btn" onclick="resetPriceSearch()" data-i18n="btn_reset">Reset</button>
                     </div>
                 </div>
@@ -1109,7 +1109,7 @@
                     <button class="btn-find" onclick="searchUsers()">
                         <i class="fas fa-search"></i> <span data-i18n="btn_find">Find</span>
                     </button>
-                    <div id="reset-search-container" style="display: none; margin-top: 10px;">
+                    <div id="reset-search-container" style="display: none; margin-top: 4px;">
                         <button class="cancel-btn" onclick="resetSearch()" data-i18n="btn_reset">Reset</button>
                     </div>
                 </div>
@@ -1490,7 +1490,7 @@
         }
 
         function renderPrices(list) {
-            document.getElementById('stat-total-countries').innerText = list.length;
+            document.getElementById('stat-total-countries').innerText = (allPrices || list).length;
             const container = document.getElementById('price-list');
             const pagContainer = document.getElementById('price-pagination');
 

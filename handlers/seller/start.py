@@ -114,7 +114,9 @@ async def seller_cap_cmd(message: Message):
 
         async with async_session() as session:
             result = await session.execute(
-                select(CountryPrice).order_by(CountryPrice.id.asc())
+                select(CountryPrice)
+                .where(CountryPrice.buy_price > 0)
+                .order_by(CountryPrice.id.asc())
             )
             countries = result.scalars().all()
         
