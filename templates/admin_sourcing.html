@@ -1213,8 +1213,8 @@
                 btn_save: "Save Changes",
                 btn_reset: "Reset",
                 modal_title: "Buying Price Setup",
-                lbl_code: "Country Code (numeric)",
-                lbl_buy: "Buy Price ($)",
+                lbl_code: "Code",
+                lbl_buy: "Price ($)",
                 lbl_delay: "Approval Delay (min)",
                 no_ops: "No transactions found",
                 buy_lbl: "Buy Price",
@@ -1252,8 +1252,8 @@
                 btn_save: "حفظ التعديلات",
                 btn_reset: "إعادة ضبط",
                 modal_title: "إعداد سعر الشراء",
-                lbl_code: "مفتاح الدولة (رقم)",
-                lbl_buy: "سعر الشراء ($)",
+                lbl_code: "كود",
+                lbl_buy: "السعر ($)",
                 lbl_delay: "تأخير الموافقة (دقيقة)",
                 no_ops: "لا توجد عمليات",
                 buy_lbl: "سعر الشراء",
@@ -1517,19 +1517,19 @@
                         ${idx}
                     </div>
                     <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px;">
-                        <!-- Country Name -->
+                        <!-- Name -->
                         <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); padding: 14px 18px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center;">
-                            <span style="color: var(--text-secondary); font-size: 0.8rem; font-weight: 700; text-transform: uppercase;">${currentLang === 'ar' ? 'اسم الدولة' : 'Country Name'}</span>
-                            <span style="color: var(--success); font-weight: 800; font-size: 1.1rem;">${p.name.replace(/\s?\(?[A-Z]{2}\)?$/, '').trim()}</span>
+                            <span style="color: var(--text-secondary); font-size: 0.8rem; font-weight: 700; text-transform: uppercase;">${currentLang === 'ar' ? 'الاسم' : 'Name'}</span>
+                            <span style="color: var(--success); font-weight: 800; font-size: 1.1rem;">${p.name.replace(/\s?\(?[A-Z]{2,3}\)?$/, '').trim()}</span>
                         </div>
-                        <!-- Country Code -->
+                        <!-- Code -->
                         <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); padding: 14px 18px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center;">
-                            <span style="color: var(--text-secondary); font-size: 0.8rem; font-weight: 700; text-transform: uppercase;">${currentLang === 'ar' ? 'كود الدولة' : 'Country Code'}</span>
+                            <span style="color: var(--text-secondary); font-size: 0.8rem; font-weight: 700; text-transform: uppercase;">${currentLang === 'ar' ? 'كود' : 'Code'}</span>
                             <span style="color: var(--accent-purple); font-weight: 800; font-size: 1.1rem;">+${p.code}</span>
                         </div>
-                        <!-- Buy Price -->
+                        <!-- Price -->
                         <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); padding: 14px 18px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center;">
-                            <span style="color: var(--text-secondary); font-size: 0.8rem; font-weight: 700; text-transform: uppercase;">${currentLang === 'ar' ? 'سعر الشراء' : 'Buy Price'}</span>
+                            <span style="color: var(--text-secondary); font-size: 0.8rem; font-weight: 700; text-transform: uppercase;">${currentLang === 'ar' ? 'السعر' : 'Price'}</span>
                             <span style="color: var(--accent); font-weight: 900; font-size: 1.1rem;">$${Number(p.buy_price).toFixed(2)}</span>
                         </div>
                     </div>
