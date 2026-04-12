@@ -1520,7 +1520,7 @@
                         <!-- Country Name -->
                         <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); padding: 14px 18px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center;">
                             <span style="color: var(--text-secondary); font-size: 0.8rem; font-weight: 700; text-transform: uppercase;">${currentLang === 'ar' ? 'اسم الدولة' : 'Country Name'}</span>
-                            <span style="color: var(--success); font-weight: 800; font-size: 1.1rem;">${p.name.split(' ').filter(word => !/^[A-Z]{2}$/.test(word)).join(' ')}</span>
+                            <span style="color: var(--success); font-weight: 800; font-size: 1.1rem;">${p.name.replace(/\s?\(?[A-Z]{2}\)?$/, '').trim()}</span>
                         </div>
                         <!-- Country Code -->
                         <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); padding: 14px 18px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center;">
