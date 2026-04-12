@@ -298,6 +298,87 @@
             backdrop-filter: blur(20px);
         }
 
+        /* ========== Confirm Modal ========== */
+        .confirm-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(8px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 4000;
+            opacity: 0;
+            transition: 0.3s;
+        }
+        .confirm-overlay.active {
+            display: flex;
+            opacity: 1;
+        }
+        .confirm-modal {
+            background: linear-gradient(165deg, #1e2235, #161929);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            width: 90%;
+            max-width: 400px;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            transform: scale(0.9);
+            transition: 0.3s;
+        }
+        .confirm-overlay.active .confirm-modal {
+            transform: scale(1);
+        }
+        .confirm-icon {
+            width: 60px;
+            height: 60px;
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin: 0 auto 20px;
+        }
+        .confirm-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 10px;
+        }
+        .confirm-msg {
+            color: #94a3b8;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            margin-bottom: 25px;
+        }
+        .confirm-btns {
+            display: flex;
+            gap: 12px;
+        }
+        .confirm-btn {
+            flex: 1;
+            padding: 12px;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+            border: none;
+        }
+        .confirm-yes {
+            background: var(--danger);
+            color: #fff;
+        }
+        .confirm-no {
+            background: rgba(255, 255, 255, 0.05);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .confirm-yes:hover { opacity: 0.9; transform: translateY(-2px); }
+        .confirm-no:hover { background: rgba(255, 255, 255, 0.1); }
+
         .menu-btn {
             font-size: 1.5rem;
             color: var(--text-secondary);
@@ -1150,7 +1231,11 @@
                 lbl_bot_name: "Bot Name",
                 btn_save_settings: "Save Settings",
                 stat_total_countries: "TOTAL COUNTRIES",
-                search_countries_ph: "Search countries..."
+                search_countries_ph: "Search countries...",
+                confirm_title: "Are you sure?",
+                confirm_delete_msg: "This action cannot be undone.",
+                btn_confirm: "Delete Now",
+                btn_cancel: "Cancel"
             },
             ar: {
                 panel_title: "لوحة التوريد",
@@ -1185,7 +1270,11 @@
                 lbl_bot_name: "اسم البوت",
                 btn_save_settings: "حفظ الإعدادات",
                 stat_total_countries: "إجمالي الدول",
-                search_countries_ph: "بحث عن دولة..."
+                search_countries_ph: "بحث عن دولة...",
+                confirm_title: "هل أنت متأكد؟",
+                confirm_delete_msg: "لا يمكن التراجع عن هذا الإجراء بعد تنفيذه.",
+                btn_confirm: "حذف الآن",
+                btn_cancel: "إلغاء"
             }
         };
 
@@ -1506,12 +1595,43 @@
         }
 
         async function deletePrice(code) {
-            if (!confirm(currentLang === 'ar' ? 'هل أنت متأكد من حذف هذه الدولة؟' : 'Are you sure you want to delete this country?')) return;
+            const confirmed = await showConfirm();
+            if (!confirmed) return;
+
             try {
-                await fetch(`/api/admin/prices/delete/${code}`, { method: 'DELETE' });
+                // Optimistic UI update: Remove from local array immediately
+                allPrices = allPrices.filter(p => p.code !== code);
+                if (filteredPrices) filteredPrices = filteredPrices.filter(p => p.code !== code);
+                
+                // Re-render only the prices list (instant UI)
+                renderPrices(filteredPrices || allPrices);
+                
+                // Perform deletion in background
+                fetch(`/api/admin/prices/delete/${code}`, { method: 'DELETE' }).catch(e => {
+                    console.error("Delete failed:", e);
+                    init(); // Re-sync if error
+                });
+            } catch (e) { 
+                console.error(e);
                 init();
-            } catch (e) {
-                alert('Error deleting country');
+            }
+        }
+
+        // Confirm Modal Logic
+        let confirmResolve = null;
+        function showConfirm() {
+            document.getElementById('confirm-overlay').classList.add('active');
+            updateUI(); // Ensure translations are applied
+            return new Promise((resolve) => {
+                confirmResolve = resolve;
+            });
+        }
+
+        function closeConfirm(result) {
+            document.getElementById('confirm-overlay').classList.remove('active');
+            if (confirmResolve) {
+                confirmResolve(result);
+                confirmResolve = null;
             }
         }
 
@@ -1544,6 +1664,17 @@
             else switchNav(savedView, null, true);
         }
     </script>
+    <div id="confirm-overlay" class="confirm-overlay" onclick="closeConfirm(false)">
+        <div class="confirm-modal" onclick="event.stopPropagation()">
+            <div class="confirm-icon"><i class="fas fa-exclamation-triangle"></i></div>
+            <div id="confirm-title" class="confirm-title" data-i18n="confirm_title">Confirm Action</div>
+            <div id="confirm-msg" class="confirm-msg" data-i18n="confirm_delete_msg">Are you sure you want to proceed?</div>
+            <div class="confirm-btns">
+                <button class="confirm-btn confirm-no" onclick="closeConfirm(false)" data-i18n="btn_cancel">Cancel</button>
+                <button class="confirm-btn confirm-yes" onclick="closeConfirm(true)" data-i18n="btn_confirm">Delete Now</button>
+            </div>
+        </div>
+    </div>
 </body>
 
 </html>
