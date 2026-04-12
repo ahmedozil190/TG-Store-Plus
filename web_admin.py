@@ -315,9 +315,18 @@ async def get_admin_store_data():
                 bought = (await session.execute(
                     select(func.count(Account.id)).where(Account.buyer_id == u.id)
                 )).scalar() or 0
+                # Total spent (sum of TransactionType.BUY amounts)
+                spent = (await session.execute(
+                    select(func.sum(Transaction.amount)).where(
+                        Transaction.user_id == u.id,
+                        Transaction.type == TransactionType.BUY
+                    )
+                )).scalar() or 0.0
+                
                 seller_stats[u.id] = {
                     "sold": sold, "accepted": accepted,
-                    "rejected": rejected, "bought": bought
+                    "rejected": rejected, "bought": bought,
+                    "spent": abs(spent)
                 }
 
             users = [
@@ -332,6 +341,7 @@ async def get_admin_store_data():
                     "accepted_count": seller_stats[u.id]["accepted"],
                     "rejected_count": seller_stats[u.id]["rejected"],
                     "bought_count": seller_stats[u.id]["bought"],
+                    "spent_total": round(seller_stats[u.id]["spent"], 2),
                 }
                 for u in all_users_raw
             ]
