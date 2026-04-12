@@ -1143,7 +1143,6 @@
                 const key = el.getAttribute('data-i18n-placeholder');
                 if (translations[currentLang][key]) el.placeholder = translations[currentLang][key];
             });
-            document.getElementById('lang-text').innerText = currentLang === 'en' ? 'العربية' : 'English';
             init();
         }
 
