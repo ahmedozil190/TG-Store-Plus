@@ -999,7 +999,28 @@
                         <i class="fas fa-plus"></i> <span data-i18n="btn_add">Add</span>
                     </button>
                 </div>
-                <div class="list-container" id="price-list"></div>
+
+                <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px;">
+                    <div class="card stat-row">
+                        <span class="label" data-i18n="stat_total_countries">TOTAL COUNTRIES</span>
+                        <span class="value" id="stat-total-countries" style="color: var(--accent);">0</span>
+                    </div>
+                </div>
+
+                <div class="card" style="padding: 18px; margin-bottom: 25px;">
+                    <input class="search-input" type="text" id="price-search" placeholder="Search countries..."
+                        data-i18n-placeholder="search_countries_ph">
+                    <button class="btn-find" onclick="searchPrices()">
+                        <i class="fas fa-search"></i> <span data-i18n="btn_find">Find</span>
+                    </button>
+                    <div id="reset-price-search-container" style="display: none; margin-top: 10px;">
+                        <button class="cancel-btn" onclick="resetPriceSearch()" data-i18n="btn_reset">Reset</button>
+                    </div>
+                </div>
+
+                <div class="card" style="padding: 22px;">
+                    <div class="list-container" id="price-list"></div>
+                </div>
             </section>
 
             <!-- ===== Sales History Section ===== -->
@@ -1096,7 +1117,9 @@
                 no_users: "No users found",
                 nav_settings: "Settings",
                 lbl_bot_name: "Bot Name",
-                btn_save_settings: "Save Settings"
+                btn_save_settings: "Save Settings",
+                stat_total_countries: "TOTAL COUNTRIES",
+                search_countries_ph: "Search countries..."
             },
             ar: {
                 panel_title: "لوحة المتجر",
@@ -1132,7 +1155,9 @@
                 no_users: "لا يوجد مستخدمين",
                 nav_settings: "الإعدادات",
                 lbl_bot_name: "اسم البوت",
-                btn_save_settings: "حفظ الإعدادات"
+                btn_save_settings: "حفظ الإعدادات",
+                stat_total_countries: "إجمالي الدول",
+                search_countries_ph: "بحث عن دولة..."
             }
         };
 
@@ -1143,6 +1168,8 @@
         let filteredUsers = null;
         const USERS_PER_PAGE = 10;
         let currentPage = 1;
+        let allPrices = [];
+        let filteredPrices = null;
 
         function updateUI() {
             document.documentElement.lang = currentLang;
@@ -1206,7 +1233,8 @@
                 // Fetch prices
                 const pRes = await fetch('/api/admin/sourcing/data');
                 const pData = await pRes.json();
-                renderPrices(pData.prices);
+                allPrices = pData.prices || [];
+                renderPrices(allPrices);
             } catch (e) { console.error(e); }
             finally { document.getElementById('loader').style.display = 'none'; }
         }
@@ -1343,10 +1371,30 @@
         }
 
         // ===== Prices =====
+        function searchPrices() {
+            const q = document.getElementById('price-search').value.trim().toLowerCase();
+            if (!q) { filteredPrices = null; renderPrices(allPrices); return; }
+            filteredPrices = allPrices.filter(p => (p.name && p.name.toLowerCase().includes(q)) || String(p.code).includes(q));
+            document.getElementById('reset-price-search-container').style.display = 'block';
+            renderPrices(filteredPrices);
+        }
+
+        function resetPriceSearch() {
+            document.getElementById('price-search').value = '';
+            filteredPrices = null;
+            document.getElementById('reset-price-search-container').style.display = 'none';
+            renderPrices(allPrices);
+        }
+
         function renderPrices(list) {
+            document.getElementById('stat-total-countries').innerText = list.length;
             const container = document.getElementById('price-list');
             if (!list || !list.length) {
-                container.innerHTML = `<p style="text-align: center; color: var(--text-secondary); padding: 20px;">${translations[currentLang].no_sales}</p>`;
+                container.innerHTML = `
+                <div style="text-align: center; padding: 40px 20px; background: rgba(0,0,0,0.15); border-radius: 16px; border: 1px dashed rgba(255,255,255,0.05); margin-top: 10px;">
+                    <i class="fas fa-tags" style="font-size: 2.5rem; color: rgba(255,255,255,0.1); margin-bottom: 12px;"></i>
+                    <p style="color: var(--text-secondary); font-weight: 600; font-size: 0.95rem;">No countries found</p>
+                </div>`;
                 return;
             }
             container.innerHTML = list.map(p => `
