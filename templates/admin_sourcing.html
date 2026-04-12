@@ -1225,7 +1225,7 @@
             document.getElementById('menu-overlay').classList.toggle('active');
         }
 
-        function switchNav(id, btn) {
+        function switchNav(id, btn, skipToggle = false) {
             document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
             document.getElementById('section-' + id).classList.add('active');
             document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active'));
@@ -1239,7 +1239,7 @@
             titleEl.setAttribute('data-i18n', titleMap[id]);
             titleEl.innerText = translations[currentLang][titleMap[id]];
 
-            if (window.innerWidth < 1024) toggleMenu();
+            if (!skipToggle && window.innerWidth < 1024) toggleMenu();
         }
 
         async function init() {
@@ -1540,8 +1540,8 @@
         const savedView = sessionStorage.getItem('last_view_admin_sourcing');
         if (savedView && savedView !== 'home') {
             const menuBtn = document.getElementById('menu-' + (savedView === 'users' ? 'users' : savedView === 'prices' ? 'prices' : savedView === 'history' ? 'history' : savedView === 'settings' ? 'settings' : 'dashboard'));
-            if (menuBtn) switchNav(savedView, menuBtn);
-            else switchNav(savedView);
+            if (menuBtn) switchNav(savedView, menuBtn, true);
+            else switchNav(savedView, null, true);
         }
     </script>
 </body>
