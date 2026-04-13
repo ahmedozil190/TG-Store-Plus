@@ -105,6 +105,22 @@ async def run_migrations():
             try:
                 await conn.execute(sqlalchemy.text("ALTER TABLE users ADD COLUMN balance_sourcing FLOAT DEFAULT 0.0"))
             except: pass
+            # Add is_active_store to users if missing
+            try:
+                await conn.execute(sqlalchemy.text("ALTER TABLE users ADD COLUMN is_active_store BOOLEAN DEFAULT 0"))
+            except: pass
+            # Add is_active_sourcing to users if missing
+            try:
+                await conn.execute(sqlalchemy.text("ALTER TABLE users ADD COLUMN is_active_sourcing BOOLEAN DEFAULT 0"))
+            except: pass
+            # Add is_banned_store to users if missing
+            try:
+                await conn.execute(sqlalchemy.text("ALTER TABLE users ADD COLUMN is_banned_store BOOLEAN DEFAULT 0"))
+            except: pass
+            # Add is_banned_sourcing to users if missing
+            try:
+                await conn.execute(sqlalchemy.text("ALTER TABLE users ADD COLUMN is_banned_sourcing BOOLEAN DEFAULT 0"))
+            except: pass
         logger.info("DB migration check complete.")
     except Exception as e:
         logger.warning(f"Migration warning: {e}")
@@ -129,6 +145,11 @@ class BalanceUpdate(BaseModel):
     user_id: int
     amount: float
     type: str = "store" # "store" or "sourcing"
+
+class BanToggle(BaseModel):
+    user_id: int
+    bot_type: str # "store" or "sourcing"
+    banned: bool
 
 class PriceUpdate(BaseModel):
     country_code: str
@@ -287,16 +308,50 @@ async def get_sourcing_data():
                     "approve_delay": p.approve_delay
                 })
 
+            # Bot-specific user count and balance
+            user_count = (await session.execute(select(func.count(User.id)).where(User.is_active_sourcing == True))).scalar() or 0
             total_sourcing_balance = (await session.execute(select(func.sum(User.balance_sourcing)))).scalar() or 0.0
+
+            # NEW: Sourcing User List
+            users_result = await session.execute(select(User).where(User.is_active_sourcing == True).order_by(User.id.desc()).limit(200))
+            active_users = users_result.scalars().all()
             
+            # Get seller stats for these users
+            u_ids = [u.id for u in active_users]
+            seller_stats = {uid: {"sold": 0, "accepted": 0, "rejected": 0} for uid in u_ids}
+            if u_ids:
+                sold_stmt = select(Account.seller_id, func.count(Account.id)).where(Account.seller_id.in_(u_ids), Account.status == AccountStatus.SOLD).group_by(Account.seller_id)
+                acc_stmt = select(Account.seller_id, func.count(Account.id)).where(Account.seller_id.in_(u_ids), Account.status == AccountStatus.AVAILABLE).group_by(Account.seller_id)
+                rej_stmt = select(Account.seller_id, func.count(Account.id)).where(Account.seller_id.in_(u_ids), Account.status == AccountStatus.REJECTED).group_by(Account.seller_id)
+                
+                for rid, cnt in (await session.execute(sold_stmt)).all(): seller_stats[rid]["sold"] = cnt
+                for rid, cnt in (await session.execute(acc_stmt)).all(): seller_stats[rid]["accepted"] = cnt
+                for rid, cnt in (await session.execute(rej_stmt)).all(): seller_stats[rid]["rejected"] = cnt
+
+            users_list = []
+            for u in active_users:
+                users_list.append({
+                    "id": u.id,
+                    "full_name": u.full_name or "N/A",
+                    "username": f"@{u.username}" if u.username else "N/A",
+                    "balance_sourcing": round(u.balance_sourcing or 0.0, 2),
+                    "join_date": u.join_date.strftime("%Y-%m-%d") if u.join_date else "N/A",
+                    "banned": u.is_banned_sourcing,
+                    "sold_count": seller_stats[u.id]["sold"],
+                    "accepted_count": seller_stats[u.id]["accepted"],
+                    "rejected_count": seller_stats[u.id]["rejected"]
+                })
+
             return {
                 "stats": {
                     "total_sourced": total_sourced, 
                     "pending_count": pending_count,
-                    "total_balance": round(total_sourcing_balance, 2)
+                    "total_balance": round(total_sourcing_balance, 2),
+                    "user_count": user_count
                 },
                 "recent": recent,
-                "prices": prices
+                "prices": prices,
+                "users": users_list
             }
     except Exception as e:
         logger.error(f"Sourcing Data Error: {e}")
@@ -306,11 +361,11 @@ async def get_sourcing_data():
 async def get_admin_store_data():
     try:
         async with async_session() as session:
-            user_count = (await session.execute(select(func.count(User.id)))).scalar() or 0
+            user_count = (await session.execute(select(func.count(User.id)).where(User.is_active_store == True))).scalar() or 0
             stock_count = (await session.execute(select(func.count(Account.id)).where(Account.status == AccountStatus.AVAILABLE))).scalar() or 0
             total_balance = (await session.execute(select(func.sum(User.balance_store)))).scalar() or 0.0
 
-            users_result = await session.execute(select(User).order_by(User.id.desc()).limit(200))
+            users_result = await session.execute(select(User).where(User.is_active_store == True).order_by(User.id.desc()).limit(200))
             all_users_raw = users_result.scalars().all()
 
             # Get per-user account stats in one query
@@ -356,7 +411,7 @@ async def get_admin_store_data():
                     "balance_store": round(u.balance_store or 0.0, 2),
                     "balance_sourcing": round(u.balance_sourcing or 0.0, 2),
                     "join_date": u.join_date.strftime("%Y-%m-%d") if u.join_date else "N/A",
-                    "banned": False,
+                    "banned": u.is_banned_store,
                     "sold_count": seller_stats[u.id]["sold"],
                     "accepted_count": seller_stats[u.id]["accepted"],
                     "rejected_count": seller_stats[u.id]["rejected"],
@@ -552,6 +607,19 @@ async def update_balance(data: BalanceUpdate):
                 user.balance_sourcing = data.amount
             else:
                 user.balance_store = data.amount
+            await session.commit()
+            return {"status": "success"}
+    raise HTTPException(status_code=404, detail="User not found")
+
+@app.post("/api/admin/user/toggle-ban")
+async def toggle_ban(data: BanToggle):
+    async with async_session() as session:
+        user = await session.get(User, data.user_id)
+        if user:
+            if data.bot_type == "sourcing":
+                user.is_banned_sourcing = data.banned
+            else:
+                user.is_banned_store = data.banned
             await session.commit()
             return {"status": "success"}
     raise HTTPException(status_code=404, detail="User not found")

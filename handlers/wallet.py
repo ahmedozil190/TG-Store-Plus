@@ -26,11 +26,23 @@ async def get_profile_text(user_id: int, full_name: str) -> str:
 
 @router.message(Command("profile"))
 async def cmd_profile(message: Message):
+    async with async_session() as session:
+        user = await session.get(User, message.from_user.id)
+        if user and user.is_banned_store:
+            await message.answer("🚫 عذراً، لقد تم حظرك من المتجر.")
+            return
+
     text = await get_profile_text(message.from_user.id, message.from_user.full_name)
     await message.answer(text, parse_mode="Markdown", reply_markup=profile_keyboard())
 
 @router.callback_query(F.data == "my_profile")
 async def cq_profile(call: CallbackQuery):
+    async with async_session() as session:
+        user = await session.get(User, call.from_user.id)
+        if user and user.is_banned_store:
+            await call.answer("🚫 عذراً، لقد تم حظرك من المتجر.", show_alert=True)
+            return
+
     text = await get_profile_text(call.from_user.id, call.from_user.full_name)
     await call.message.edit_text(text, parse_mode="Markdown", reply_markup=profile_keyboard())
 

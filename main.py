@@ -109,7 +109,7 @@ async def main():
     dp_buyer.include_router(main_router)
     
     # Register middleware
-    dp_buyer.update.outer_middleware(UserUpdateMiddleware())
+    dp_buyer.update.outer_middleware(UserUpdateMiddleware(bot_type="store"))
 
     # Seller Bot (Optional token)
     bot_seller = None
@@ -120,7 +120,7 @@ async def main():
             dp_seller.include_router(seller_router)
             
             # Register middleware
-            dp_seller.update.outer_middleware(UserUpdateMiddleware())
+            dp_seller.update.outer_middleware(UserUpdateMiddleware(bot_type="sourcing"))
             
             logger.info("Seller Bot configured.")
         except Exception as e:

@@ -23,6 +23,12 @@ async def seller_add_start_callback(call: CallbackQuery, state: FSMContext):
     await call.answer()
 
 async def seller_add_start(message: Message, state: FSMContext):
+    async with async_session() as session:
+        user = await session.get(User, message.from_user.id)
+        if user and user.is_banned_sourcing:
+            await message.answer("🚫 عذراً، أنت محظور من التوريد.")
+            return
+
     await state.set_state(SellerAddState.waiting_phone)
     await message.answer(
         "📝 **الخطوة 1: أدخل رقم الهاتف**\n\n"

@@ -1529,6 +1529,15 @@
                             <span style="color: #ffcc00; font-weight: 900; font-size: 1.1rem;">$${u.spent_total}</span>
                         </div>
                     </div>
+                    <!-- Action Buttons -->
+                    <div style="display: flex; gap: 10px;">
+                        <button class="primary-btn" style="flex: 1; background: rgba(96, 165, 250, 0.1); color: var(--accent); border: 1px solid rgba(96, 165, 250, 0.2); box-shadow: none; padding: 14px; font-size: 0.95rem;" onclick="promptBalance(${u.id}, ${u.balance_store}, 'store')">
+                            <i class="fas fa-wallet" style="margin-right: 5px;"></i> ${currentLang === 'ar' ? 'تعديل الرصيد' : 'Update Balance'}
+                        </button>
+                        <button class="primary-btn" style="flex: 1; background: ${u.banned ? 'rgba(48, 209, 88, 0.1)' : 'rgba(255, 69, 58, 0.1)'}; color: ${u.banned ? 'var(--success)' : 'var(--danger)'}; border: 1px solid ${u.banned ? 'rgba(48, 209, 88, 0.2)' : 'rgba(255, 69, 58, 0.2)'}; box-shadow: none; padding: 14px; font-size: 0.95rem;" onclick="toggleBan(${u.id}, ${u.banned}, 'store')">
+                            <i class="fas ${u.banned ? 'fa-user-check' : 'fa-user-slash'}" style="margin-right: 5px;"></i> ${u.banned ? (currentLang === 'ar' ? 'إلغاء الحظر' : 'Unban') : (currentLang === 'ar' ? 'حظر' : 'Ban')}
+                        </button>
+                    </div>
                 </div>`;
             }).join('');
 
@@ -1555,6 +1564,38 @@
             const filtered = currentTab === 'banned' ? list.filter(u => u.banned) : list.filter(u => !u.banned);
             const totalPages = Math.ceil(filtered.length / USERS_PER_PAGE);
             if (currentPage < totalPages) { currentPage++; renderUsers(list); }
+        }
+
+        async function promptBalance(userId, currentBalance, type) {
+            const amount = prompt(currentLang === 'ar' ? `أدخل الرصيد الجديد للمستخدم ${userId}:` : `Enter new balance for user ${userId}:`, currentBalance);
+            if (amount === null) return;
+            const val = parseFloat(amount);
+            if (isNaN(val)) return;
+
+            try {
+                const res = await fetch('/api/admin/user/balance', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ user_id: userId, amount: val, type: type })
+                });
+                if (res.ok) init();
+                else alert('Failed to update balance');
+            } catch (e) { console.error(e); }
+        }
+
+        async function toggleBan(userId, currentStatus, botType) {
+            const confirmed = await showConfirm();
+            if (!confirmed) return;
+
+            try {
+                const res = await fetch('/api/admin/user/toggle-ban', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ user_id: userId, bot_type: botType, banned: !currentStatus })
+                });
+                if (res.ok) init();
+                else alert('Failed to toggle ban');
+            } catch (e) { console.error(e); }
         }
 
         // ===== Prices =====

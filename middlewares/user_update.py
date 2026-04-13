@@ -9,6 +9,10 @@ import logging
 logger = logging.getLogger(__name__)
 
 class UserUpdateMiddleware(BaseMiddleware):
+    def __init__(self, bot_type: str = "store"):
+        self.bot_type = bot_type
+        super().__init__()
+
     async def __call__(
         self,
         handler: Callable[[TelegramObject, Dict[str, Any]], Awaitable[Any]],
@@ -34,13 +38,23 @@ class UserUpdateMiddleware(BaseMiddleware):
                         user = User(
                             id=user_id, 
                             full_name=full_name, 
-                            username=username
+                            username=username,
+                            is_active_store=(self.bot_type == "store"),
+                            is_active_sourcing=(self.bot_type == "sourcing")
                         )
                         session.add(user)
-                        logger.info(f"Middleware: Created new user {user_id}")
+                        logger.info(f"Middleware: Created new user {user_id} for {self.bot_type}")
                     else:
                         # Update if changed
                         changed = False
+                        
+                        # Set active flag if not already set
+                        if self.bot_type == "store" and not user.is_active_store:
+                            user.is_active_store = True
+                            changed = True
+                        elif self.bot_type == "sourcing" and not user.is_active_sourcing:
+                            user.is_active_sourcing = True
+                            changed = True
                         if user.full_name != full_name:
                             user.full_name = full_name
                             changed = True

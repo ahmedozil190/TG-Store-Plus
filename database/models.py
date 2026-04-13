@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Float, ForeignKey, DateTime, Enum
+from sqlalchemy import Column, Integer, String, Float, ForeignKey, DateTime, Enum, Boolean
 from sqlalchemy.orm import declarative_base
 import enum
 from datetime import datetime
@@ -25,6 +25,12 @@ class User(Base):
     join_date = Column(DateTime, default=datetime.utcnow)
     full_name = Column(String, nullable=True)
     username = Column(String, nullable=True)
+    
+    # Isolation flags
+    is_active_store = Column(Boolean, default=False)
+    is_active_sourcing = Column(Boolean, default=False)
+    is_banned_store = Column(Boolean, default=False)
+    is_banned_sourcing = Column(Boolean, default=False)
 
 class Account(Base):
     __tablename__ = 'accounts'

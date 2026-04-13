@@ -47,6 +47,13 @@ def chunk_list(lst, n):
 @router.callback_query(F.data == "buy_number")
 async def cq_buy_number(call: CallbackQuery, state: FSMContext):
     await state.clear()
+    
+    async with async_session() as session:
+        user = await session.get(User, call.from_user.id)
+        if user and user.is_banned_store:
+            await call.answer("🚫 عذراً، لقد تم حظرك من الشراء في المتجر.", show_alert=True)
+            return
+
     markup = InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(text="🛍️ فتح متجر الأرقام", web_app=WebAppInfo(url=STORE_URL))],
         [InlineKeyboardButton(text="- عودة.", callback_data="back_main")]

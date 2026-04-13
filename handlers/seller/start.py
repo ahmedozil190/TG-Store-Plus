@@ -45,9 +45,13 @@ async def seller_start_cmd(message: Message, bot: Bot = None):
     async with async_session() as session:
         user = (await session.execute(select(User).where(User.id == message.from_user.id))).scalar_one_or_none()
         if not user:
-            user = User(id=message.from_user.id, language="en")
+            user = User(id=message.from_user.id, language="en", is_active_sourcing=True)
             session.add(user)
             await session.commit()
+        
+        if user.is_banned_sourcing:
+            await message.answer("🚫 عذراً، لقد تم حظرك من استخدام بوت التوريد.")
+            return
         
     lang = user.language
     if lang == "ar":
@@ -71,13 +75,16 @@ async def seller_coin_cmd(message: Message):
             user = (await session.execute(select(User).where(User.id == message.from_user.id))).scalar_one_or_none()
             if not user:
                 # Create user if missing
-                user = User(id=message.from_user.id, language="ar")
+                user = User(id=message.from_user.id, language="ar", is_active_sourcing=True)
                 session.add(user)
                 await session.commit()
                 balance = 0.0
                 lang = "ar"
             else:
-                balance = user.balance
+                if user.is_banned_sourcing:
+                    await message.answer("🚫 عذراً، أنت محظور.")
+                    return
+                balance = user.balance_sourcing
                 lang = user.language
         
         now_utc = datetime.now(timezone.utc)
