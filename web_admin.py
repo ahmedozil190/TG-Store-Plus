@@ -147,6 +147,17 @@ async def run_migrations():
             try:
                 await conn.execute(sqlalchemy.text("UPDATE users SET is_active_store = 1, is_active_sourcing = 1 WHERE is_active_store = 0 AND is_active_sourcing = 0"))
             except: pass
+
+            # Add missing columns to accounts table
+            try:
+                await conn.execute(sqlalchemy.text("ALTER TABLE accounts ADD COLUMN seller_id INTEGER"))
+            except: pass
+            try:
+                await conn.execute(sqlalchemy.text("ALTER TABLE accounts ADD COLUMN buyer_id INTEGER"))
+            except: pass
+            try:
+                await conn.execute(sqlalchemy.text("ALTER TABLE accounts ADD COLUMN created_at DATETIME"))
+            except: pass
         logger.info("DB migration check complete.")
     except Exception as e:
         logger.warning(f"Migration warning: {e}")
