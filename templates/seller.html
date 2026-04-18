@@ -823,14 +823,14 @@
                                 <span class="h-amt" style="color:var(--text-p); font-size:1.1rem">$${h.amount.toFixed(2)}</span>
                                 <span class="h-status st-${h.status}">${h.status}</span>
                             </div>
-                            <div style="text-align:center; margin-bottom:8px">
-                                <span class="h-meta" style="font-size:0.85rem; font-weight:700; color:var(--text-p)">
-                                    <i class="fas fa-barcode" style="margin-right:4px"></i>${h.transaction_id}
+                            <div style="margin-bottom:8px; text-align:left">
+                                <span class="h-meta" style="font-size:0.8rem; font-weight:600; color:var(--text-p); opacity:0.9">
+                                    <i class="fas fa-barcode" style="margin-right:4px; opacity:0.7"></i>${h.transaction_id}
                                 </span>
                             </div>
-                            <div style="display:flex; justify-content:space-between; align-items:center; opacity:0.7">
-                                <span class="h-meta"><i class="far fa-calendar-alt" style="margin-right:4px"></i>${h.date}</span>
-                                <span class="h-meta"><i class="fas fa-wallet" style="margin-right:4px"></i>${shortAddr}</span>
+                            <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid rgba(255,255,255,0.05); padding-top:8px">
+                                <span class="h-meta" style="color:var(--text-p); opacity:0.8"><i class="far fa-calendar-alt" style="margin-right:4px; color:var(--accent)"></i>${h.date}</span>
+                                <span class="h-meta" style="color:var(--text-p); opacity:0.8"><i class="fas fa-wallet" style="margin-right:4px; color:var(--accent)"></i>${shortAddr}</span>
                             </div>
                         </div>
                     `;
