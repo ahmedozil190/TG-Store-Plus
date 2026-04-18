@@ -174,13 +174,38 @@
         }
         .btn-secondary:active { background: var(--border); transform: scale(0.97); }
 
+        /* ─── Search Bar Styling ─── */
+        .search-area { position: sticky; top: 0; background: var(--bg); padding-bottom: 20px; z-index: 10; }
+        .search-box {
+            background: var(--bg-elevated); border: 1px solid var(--border);
+            border-radius: 16px; padding: 0 18px;
+            display: flex; align-items: center; gap: 12px; height: 54px;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+        .search-box:focus-within { border-color: var(--accent); box-shadow: 0 0 15px var(--accent-glow); }
+        .search-box i { color: var(--text-s); font-size: 1rem; }
+        .search-input { 
+            background: transparent; border: none; outline: none; 
+            color: var(--text-p); font-size: 0.95rem; font-weight: 600; width: 100%;
+            font-family: inherit;
+        }
+        .search-input::placeholder { color: var(--text-s); opacity: 0.6; }
+
         /* ─── Pricing List View ─── */
-        .pricing-list { display: flex; flex-direction: column; gap: 12px; }
+        .pricing-list { display: flex; flex-direction: column; gap: 12px; min-height: 200px; }
         .price-item {
-            background: var(--card-glass); border: 1px solid var(--border);
+            background: var(--bg-elevated); border: 1px solid var(--border);
             padding: 18px 22px; border-radius: var(--radius-md);
             display: flex; align-items: center; justify-content: space-between;
+            animation: viewIn 0.4s var(--ease);
         }
+        .empty-state {
+            padding: 60px 20px; text-align: center; display: none;
+            flex-direction: column; align-items: center; gap: 15px;
+            animation: viewIn 0.5s var(--ease);
+        }
+        .empty-icon { font-size: 3rem; color: var(--text-s); opacity: 0.2; margin-bottom: 5px; }
+        .empty-text { font-size: 0.9rem; color: var(--text-s); font-weight: 600; }
         .country-side { display: flex; align-items: center; gap: 15px; }
         .c-flag { font-size: 2.2rem; }
         .c-name { font-size: 0.95rem; font-weight: 700; margin-bottom: 2px; }
@@ -393,9 +418,20 @@
 
         <!-- View: Pricing -->
         <div class="view-panel" id="view-pricing">
-            <h2 class="w-title" style="margin-bottom:20px; text-align:left">Current Rates</h2>
+            <div class="search-area">
+                <div class="search-box" style="margin-bottom: 20px;">
+                    <i class="fas fa-search"></i>
+                    <input type="text" class="search-input" id="priceSearch" placeholder="Search by country or code..." oninput="filterPrices()">
+                </div>
+            </div>
+
             <div class="pricing-list" id="priceList">
                 <!-- Data populated by JS -->
+            </div>
+
+            <div class="empty-state" id="priceEmpty">
+                <div class="empty-icon"><i class="fas fa-map-location-dot"></i></div>
+                <div class="empty-text">No results found for your search.</div>
             </div>
         </div>
 
@@ -423,6 +459,7 @@
 
         let currentHash = null;
         let currentPhone = null;
+        let allPrices = [];
 
         // ─── Navigation Logic ───
         function openNav() {
@@ -478,7 +515,8 @@
                 document.getElementById('statAccepted').innerHTML = `${data.stats.accepted}<span> NUM</span>`;
                 document.getElementById('statRejected').innerHTML = `${data.stats.rejected}<span> NUM</span>`;
 
-                renderPrices(data.prices);
+                allPrices = data.prices;
+                renderPrices(allPrices);
             } catch (err) {
                 showToast("Connection Error");
             } finally {
@@ -486,13 +524,30 @@
             }
         }
 
-        function renderPrices(prices) {
+        function filterPrices() {
+            const query = document.getElementById('priceSearch').value.toLowerCase();
+            const filtered = allPrices.filter(p => 
+                p.name.toLowerCase().includes(query) || 
+                p.code.toLowerCase().includes(query)
+            );
+            renderPrices(filtered);
+        }
+
+        function renderPrices(priceArray) {
             const list = document.getElementById('priceList');
-            if (!prices || prices.length === 0) {
-                list.innerHTML = `<p style="text-align:center; opacity:0.5; padding:40px">Pricing offline</p>`;
+            const empty = document.getElementById('priceEmpty');
+            list.innerHTML = '';
+
+            if (!priceArray || priceArray.length === 0) {
+                empty.style.display = 'flex';
+                list.style.display = 'none';
                 return;
             }
-            list.innerHTML = prices.map(p => `
+
+            empty.style.display = 'none';
+            list.style.display = 'flex';
+
+            list.innerHTML = priceArray.map(p => `
                 <div class="price-item">
                     <div class="country-side">
                         <span class="c-flag">${p.flag}</span>
