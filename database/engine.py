@@ -19,6 +19,22 @@ async_session = sessionmaker(
     engine, expire_on_commit=False, class_=AsyncSession
 )
 
+from sqlalchemy import text
+
 async def init_db():
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
+        
+        # Auto-migration: Check if transaction_id exists in withdrawal_requests
+        try:
+            # Check existing columns
+            def check_columns(connection):
+                cursor = connection.execute(text("PRAGMA table_info(withdrawal_requests)"))
+                return [row[1] for row in cursor]
+            
+            columns = await conn.run_sync(check_columns)
+            if 'transaction_id' not in columns:
+                await conn.execute(text("ALTER TABLE withdrawal_requests ADD COLUMN transaction_id VARCHAR(12)"))
+                print("Successfully added transaction_id column to withdrawal_requests")
+        except Exception as e:
+            print(f"Migration check failed or not needed: {e}")
