@@ -309,6 +309,22 @@
             letter-spacing: 1px;
         }
 
+        /* ─── Pagination Controls ─── */
+        .pagination-ctrls {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-top: 20px; padding: 12px; background: rgba(255,255,255,0.02);
+            border-radius: 12px; border: 1px solid var(--border);
+        }
+        .pg-btn {
+            background: var(--bg-elevated); color: var(--text-p);
+            border: 1px solid var(--border); padding: 8px 16px;
+            border-radius: 8px; font-size: 0.8rem; font-weight: 600;
+            cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 6px;
+        }
+        .pg-btn:hover:not(:disabled) { background: var(--border); }
+        .pg-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+        .pg-info { font-size: 0.75rem; color: var(--text-s); font-weight: 500; }
+
     </style>
 </head>
 <body class="dark-mode">
@@ -505,6 +521,17 @@
                 <div class="empty-state" id="historyEmpty" style="padding:40px">
                     <div class="empty-icon" style="font-size:2rem"><i class="fas fa-history"></i></div>
                     <div class="empty-text">No withdrawal records found.</div>
+                </div>
+
+                <!-- Pagination Controls -->
+                <div id="historyPagination" class="pagination-ctrls" style="display: none;">
+                    <button class="pg-btn" id="pgPrevWithdraw" onclick="moveWithdrawPage(-1)">
+                        <i class="fas fa-chevron-left"></i> Prev
+                    </button>
+                    <span class="pg-info" id="pgInfoWithdraw">Page 1 of 1</span>
+                    <button class="pg-btn" id="pgNextWithdraw" onclick="moveWithdrawPage(1)">
+                        Next <i class="fas fa-chevron-right"></i>
+                    </button>
                 </div>
             </div>
         </div>
@@ -708,6 +735,16 @@
         // ─── Withdrawal Logic ───
         let currentMethod = 'TRX - TRC20';
         let currentMin = 4.0;
+        let currentWithdrawPage = 1;
+        let totalWithdrawPages = 1;
+
+        async function moveWithdrawPage(delta) {
+            const target = currentWithdrawPage + delta;
+            if (target >= 1 && target <= totalWithdrawPages) {
+                currentWithdrawPage = target;
+                await fetchWithdrawals();
+            }
+        }
 
         function setWithdrawMethod(method, min) {
             currentMethod = method;
@@ -799,19 +836,29 @@
         async function fetchWithdrawals() {
             const list = document.getElementById('withdrawalHistory');
             const empty = document.getElementById('historyEmpty');
+            const pgCtrls = document.getElementById('historyPagination');
+            
             try {
-                const res = await fetch(`/api/seller/withdrawals?user_id=${userId}`);
+                const res = await fetch(`/api/seller/withdrawals?user_id=${userId}&page=${currentWithdrawPage}`);
                 const data = await res.json();
                 
                 list.innerHTML = '';
                 if (!data.history || data.history.length === 0) {
                     empty.style.display = 'block';
                     list.style.display = 'none';
+                    pgCtrls.style.display = 'none';
                     return;
                 }
 
                 empty.style.display = 'none';
                 list.style.display = 'flex';
+                
+                // Update Pagination Controls
+                totalWithdrawPages = data.total_pages;
+                pgCtrls.style.display = totalWithdrawPages > 1 ? 'flex' : 'none';
+                document.getElementById('pgInfoWithdraw').textContent = `Page ${data.current_page} of ${totalWithdrawPages}`;
+                document.getElementById('pgPrevWithdraw').disabled = (data.current_page <= 1);
+                document.getElementById('pgNextWithdraw').disabled = (data.current_page >= totalWithdrawPages);
                 
                 data.history.forEach(h => {
                     const item = document.createElement('div');

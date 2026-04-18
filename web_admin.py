@@ -842,9 +842,17 @@ async def seller_withdraw(req: WithdrawSubmit):
         return {"ok": True, "id": tid}
 
 @app.get("/api/seller/withdrawals")
-async def get_withdrawals(user_id: int):
+async def get_withdrawals(user_id: int, page: int = 1):
+    page_size = 10
+    offset = (page - 1) * page_size
     async with async_session() as session:
-        stmt = select(WithdrawalRequest).where(WithdrawalRequest.user_id == user_id).order_by(WithdrawalRequest.created_at.desc()).limit(20)
+        # Get total count for pagination
+        count_stmt = select(func.count(WithdrawalRequest.id)).where(WithdrawalRequest.user_id == user_id)
+        total_count = (await session.execute(count_stmt)).scalar() or 0
+        total_pages = (total_count + page_size - 1) // page_size
+
+        # Get page data
+        stmt = select(WithdrawalRequest).where(WithdrawalRequest.user_id == user_id).order_by(WithdrawalRequest.created_at.desc()).offset(offset).limit(page_size)
         results = (await session.execute(stmt)).scalars().all()
         
         history = []
@@ -858,6 +866,11 @@ async def get_withdrawals(user_id: int):
                 "status": r.status.value,
                 "date": r.created_at.strftime("%Y-%m-%d")
             })
-        return {"history": history}
+        return {
+            "history": history,
+            "total_pages": total_pages,
+            "current_page": page,
+            "total_count": total_count
+        }
 
 # --- End of Web Admin SOURCINGPRO ---
