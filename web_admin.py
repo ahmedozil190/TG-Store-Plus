@@ -96,7 +96,7 @@ app = FastAPI(title="Store Admin Panel")
 
 @app.get("/seller", response_class=HTMLResponse)
 async def get_seller_panel(request: Request):
-    return templates.TemplateResponse("seller.html", {"request": request})
+    return templates.TemplateResponse(request=request, name="seller.html")
 
 @app.on_event("startup")
 async def run_migrations():
@@ -224,21 +224,15 @@ async def admin_store(request: Request):
         return templates.TemplateResponse(request=request, name="admin_store.html", context={})
     except Exception as e:
         logger.error(f"Error rendering store dashboard: {e}")
-        return HTMLResponse(content=f"<h1>Error</h1><pre>{e}</pre>", status_code=500)
+    return templates.TemplateResponse(request=request, name="admin_store.html")
 
-@app.get("/admin", response_class=HTMLResponse)
+@app.get("/", response_class=HTMLResponse)
 async def admin_dashboard(request: Request):
-    # Backward compatibility: Redirect to the new store admin by default
-    from fastapi.responses import RedirectResponse
-    return RedirectResponse(url="/admin/store")
+    return templates.TemplateResponse(request=request, name="index.html")
 
 @app.get("/store", response_class=HTMLResponse)
-async def client_store(request: Request):
-    try:
-        return templates.TemplateResponse(request=request, name="store.html", context={})
-    except Exception as e:
-        logger.error(f"Error rendering store: {e}")
-        return HTMLResponse(content=f"<h1>Internal Server Error</h1><pre>{e}</pre>", status_code=500)
+async def store_page(request: Request):
+    return templates.TemplateResponse(request=request, name="store.html")
 
 @app.get("/api/store/data")
 async def get_store_data(user_id: int = None):
