@@ -619,6 +619,9 @@
             targetView.classList.add('active');
             targetBtn.classList.add('active');
             
+            // Update URL Hash for persistence
+            window.location.hash = viewId;
+            
             // Update Top Bar Title
             const titles = {
                 dashboard: 'Dashboard',
@@ -918,7 +921,16 @@
             setTimeout(() => t.classList.remove('show'), 3000);
         }
 
-        window.onload = fetchSellerData;
+        // ─── Startup Logic ───
+        window.onload = () => {
+            fetchSellerData();
+            // Check hash for persistence
+            const hash = window.location.hash.replace('#', '');
+            const validViews = ['dashboard', 'submit', 'withdraw', 'pricing'];
+            if (hash && validViews.includes(hash)) {
+                changeView(hash);
+            }
+        };
     </script>
 </body>
 </html>
