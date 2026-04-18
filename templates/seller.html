@@ -143,10 +143,10 @@
         /* Secondary Stats Grid */
         .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 30px; }
         .s-card {
-            background: var(--card-glass); border: 1px solid var(--border);
+            background: var(--bg-elevated); border: 1px solid var(--border);
             padding: 15px 10px; border-radius: 16px;
             display: flex; flex-direction: column; align-items: center; gap: 4px;
-            text-align: center;
+            text-align: center; box-shadow: var(--shadow-sm);
         }
         .s-card-val { font-size: 1.15rem; font-weight: 800; }
         .s-card-lbl { font-size: 0.65rem; color: var(--text-s); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
@@ -173,6 +173,15 @@
             display: flex; align-items: center; justify-content: center; gap: 12px;
         }
         .btn-action:active { transform: scale(0.97); }
+
+        .btn-secondary {
+            width: 100%; background: var(--card-glass); color: var(--text-p);
+            padding: 18px; border-radius: 18px; border: 1px solid var(--border);
+            font-size: 0.95rem; font-weight: 700; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; gap: 12px;
+            transition: all 0.3s;
+        }
+        .btn-secondary:active { background: var(--border); transform: scale(0.97); }
 
         /* ─── Pricing List View ─── */
         .pricing-list { display: flex; flex-direction: column; gap: 12px; }
@@ -314,9 +323,21 @@
                 </div>
             </div>
             
-            <button class="btn-action" onclick="changeView('submit')">
-                Sell Account Now <i class="fas fa-plus-circle" style="margin-left: 8px"></i>
-            </button>
+            <div class="v-stack" style="gap:15px">
+                <button class="btn-action" onclick="changeView('submit')">
+                    Sell Account Now <i class="fas fa-plus-circle"></i>
+                </button>
+                <button class="btn-secondary" onclick="changeView('withdraw')">
+                    Request Payout <i class="fas fa-hand-holding-usd"></i>
+                </button>
+                <button class="btn-secondary" onclick="changeView('pricing')">
+                    View Price List <i class="fas fa-tags"></i>
+                </button>
+            </div>
+
+            <div style="text-align:center; padding-top:40px; padding-bottom:20px; font-size:0.7rem; color:var(--text-s); opacity:0.5; letter-spacing:1px">
+                VERSION v1.0.0
+            </div>
         </div>
 
         <!-- View: Submit (Wizard) -->
