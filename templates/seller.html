@@ -8,18 +8,44 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
     <style>
+        /* ─── Variables System ─── */
         :root {
-            --bg: #080915;
-            --bg-lighter: #101124;
             --accent: #5865F2;
             --accent-glow: rgba(88, 101, 242, 0.3);
+            --success: #10b981;
+            --gold: #fbbf24;
+            --radius: 20px;
+            --ease: cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        /* Dark Mode Colors */
+        .dark-mode {
+            --bg: #080915;
+            --bg-lighter: #101124;
+            --bg-card-grad: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
             --card-glass: rgba(255, 255, 255, 0.04);
             --border: rgba(255, 255, 255, 0.08);
             --text-p: #f8fafc;
             --text-s: #94a3b8;
-            --success: #10b981;
-            --gold: #fbbf24;
-            --radius: 20px;
+            --modal-bg: #101124;
+            --input-bg: #080915;
+            --shadow-sm: 0 4px 15px rgba(0,0,0,0.4);
+            --shadow-lg: 0 10px 40px rgba(0,0,0,0.5);
+        }
+
+        /* Light Mode Colors */
+        .light-mode {
+            --bg: #f8f9fa;
+            --bg-lighter: #ffffff;
+            --bg-card-grad: linear-gradient(135deg, #ffffff 0%, #f1f2f6 100%);
+            --card-glass: rgba(0, 0, 0, 0.02);
+            --border: rgba(0, 0, 0, 0.06);
+            --text-p: #0f172a;
+            --text-s: #64748b;
+            --modal-bg: #ffffff;
+            --input-bg: #f1f2f6;
+            --shadow-sm: 0 4px 15px rgba(0,0,0,0.05);
+            --shadow-lg: 0 10px 40px rgba(0,0,0,0.08);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -32,6 +58,7 @@
             padding-bottom: 30px;
             overflow-x: hidden;
             line-height: 1.5;
+            transition: background-color 0.4s var(--ease), color 0.4s var(--ease);
         }
 
         /* ─── Minimalist Header ─── */
@@ -51,7 +78,7 @@
         .brand-name { font-size: 0.95rem; font-weight: 800; letter-spacing: 0.5px; }
 
         .support-btn {
-            background: rgba(255,255,255,0.05); color: var(--text-s);
+            background: var(--card-glass); color: var(--text-s);
             width: 40px; height: 40px; border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
             border: 1px solid var(--border); font-size: 0.9rem;
@@ -60,21 +87,18 @@
         /* ─── Hero Stats ─── */
         .hero { padding: 0 20px 30px; }
         .dashboard-card {
-            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            background: var(--bg-card-grad);
             border: 1px solid var(--border);
             border-radius: 24px;
             padding: 28px;
             text-align: center;
             position: relative; overflow: hidden;
-        }
-        .dashboard-card::before {
-            content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
-            background: radial-gradient(circle at center, rgba(88, 101, 242, 0.1) 0%, transparent 70%);
-            pointer-events: none;
+            box-shadow: var(--shadow-lg);
+            transition: background 0.4s var(--ease), transform 0.3s var(--ease);
         }
 
         .balance-label { font-size: 0.8rem; color: var(--text-s); font-weight: 600; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 15px; }
-        .balance-value { font-size: 2.8rem; font-weight: 800; color: #fff; margin-bottom: 25px; font-family: 'Plus Jakarta Sans'; }
+        .balance-value { font-size: 2.8rem; font-weight: 800; color: var(--text-p); margin-bottom: 25px; font-family: 'Plus Jakarta Sans'; }
         .balance-value span { font-size: 1.1rem; color: var(--text-s); margin-right: 5px; }
 
         .hero-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
@@ -85,7 +109,7 @@
             transition: all 0.2s;
         }
         .action-pill i { font-size: 1.1rem; margin-bottom: 2px; }
-        .action-val { font-size: 1.1rem; font-weight: 700; }
+        .action-val { font-size: 1.1rem; font-weight: 700; color: var(--text-p); }
         .action-lbl { font-size: 0.7rem; color: var(--text-s); font-weight: 600; }
 
         /* ─── Main Action ─── */
@@ -114,11 +138,11 @@
             display: flex; align-items: center; justify-content: space-between;
             transition: all 0.2s;
         }
-        .price-row:active { background: rgba(255,255,255,0.08); }
+        .price-row:active { background: rgba(0,0,0,0.05); }
         
         .p-info { display: flex; align-items: center; gap: 15px; }
         .p-flag { font-size: 2rem; border-radius: 4px; }
-        .p-name { font-size: 0.95rem; font-weight: 700; margin-bottom: 2px; }
+        .p-name { font-size: 0.95rem; font-weight: 700; color: var(--text-p); margin-bottom: 2px; }
         .p-code { font-size: 0.75rem; color: var(--text-s); font-weight: 500; }
         
         .p-amt {
@@ -128,25 +152,26 @@
             font-weight: 800; font-size: 0.95rem; font-family: 'Plus Jakarta Sans';
         }
 
-        /* ─── Clean Modal Pane ─── */
+        /* ─── Adaptive Modal ─── */
         .modal-wrap {
             position: fixed; inset: 0; z-index: 5000;
-            background: rgba(5, 6, 15, 0.8);
+            background: rgba(0, 0, 0, 0.4);
             backdrop-filter: blur(10px);
             display: flex; align-items: center; justify-content: center;
-            opacity: 0; visibility: hidden; transition: all 0.3s;
+            opacity: 0; visibility: hidden; transition: all 0.3s var(--ease);
             padding: 20px;
         }
         .modal-wrap.show { opacity: 1; visibility: visible; }
         
         .modal-box {
             width: 100%; max-width: 400px;
-            background: #101124;
+            background: var(--modal-bg);
             border: 1px solid var(--border);
             border-radius: 28px;
             padding: 35px 25px;
             position: relative;
-            transform: scale(0.9); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transform: scale(0.9); transition: transform 0.3s var(--ease), background 0.4s var(--ease);
+            box-shadow: var(--shadow-lg);
         }
         .modal-wrap.show .modal-box { transform: scale(1); }
 
@@ -160,26 +185,27 @@
             color: var(--accent); border-radius: 18px;
             display: flex; align-items: center; justify-content: center; font-size: 1.6rem;
         }
-        .s-title { font-size: 1.4rem; font-weight: 800; margin-bottom: 10px; }
+        .s-title { font-size: 1.4rem; font-weight: 800; color: var(--text-p); margin-bottom: 10px; }
         .s-desc { font-size: 0.9rem; color: var(--text-s); margin-bottom: 25px; line-height: 1.6; }
 
         .input-wrap { text-align: right; margin-bottom: 25px; }
         .input-wrap label { display: block; font-size: 0.75rem; color: var(--text-s); font-weight: 700; margin-bottom: 8px; margin-right: 5px; }
         
         .clean-input {
-            width: 100%; background: #080915;
+            width: 100%; background: var(--input-bg);
             border: 1px solid var(--border); border-radius: 16px;
-            padding: 18px; color: white; font-size: 1.1rem; font-weight: 600;
-            outline: none; transition: border-color 0.2s;
+            padding: 18px; color: var(--text-p); font-size: 1.1rem; font-weight: 600;
+            outline: none; transition: border-color 0.2s, background 0.4s var(--ease);
             text-align: left; direction: ltr; font-family: 'Plus Jakarta Sans';
         }
         .clean-input:focus { border-color: var(--accent); }
 
         .otp-input-clean {
-            width: 100%; background: #080915;
+            width: 100%; background: var(--input-bg);
             border: 2px solid var(--border); border-radius: 16px;
             padding: 18px; color: var(--accent); font-size: 2rem; font-weight: 800;
             text-align: center; letter-spacing: 12px; outline: none; font-family: 'Plus Jakarta Sans';
+            transition: background 0.4s var(--ease);
         }
         .otp-input-clean:focus { border-color: var(--accent); }
 
@@ -197,7 +223,7 @@
             position: fixed; inset: 0; z-index: 9999;
             background: var(--bg); display: flex; flex-direction: column;
             align-items: center; justify-content: center;
-            transition: opacity 0.4s;
+            transition: opacity 0.4s, background 0.4s var(--ease);
         }
         .splash-screen.hide { opacity: 0; visibility: hidden; }
         .splash-ico { font-size: 2.5rem; color: var(--accent); animation: float 2s infinite ease-in-out; }
@@ -209,16 +235,16 @@
 
         .toast {
             position: fixed; top: 30px; left: 50%; transform: translateX(-50%) translateY(-100px);
-            background: #1e293b; color: white; padding: 14px 24px;
+            background: var(--modal-bg); color: var(--text-p); padding: 14px 24px;
             border-radius: 14px; font-size: 0.9rem; font-weight: 600;
-            z-index: 10000; transition: transform 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
-            border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            z-index: 10000; transition: transform 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28), background 0.4s var(--ease);
+            border: 1px solid var(--border); box-shadow: var(--shadow-lg);
         }
         .toast.show { transform: translateX(-50%) translateY(0); }
 
     </style>
 </head>
-<body>
+<body class="dark-mode"> <!-- Default to dark, updated by JS -->
 
     <div class="splash-screen" id="splash">
         <i class="fas fa-microchip splash-ico"></i>
@@ -288,7 +314,7 @@
                 <p class="s-desc">أرسلنا رمزاً لـ <b id="displayPhone"></b>. أدخله لإكمال العملية.</p>
                 <div class="input-wrap">
                     <label>رمز التحقق (5 أرقام)</label>
-                    <input type="text" id="otpInput" class="otp-input-clean" maxlength="5" placeholder="00000">
+                    <input type="text" id="otpInput" class="otp-input-clean" maxlength="5" placeholder="00000" inputmode="numeric">
                 </div>
                 <button class="btn-confirm" id="submitCodeBtn" onclick="submitOTP()">
                     تأكيد البيع <i class="fas fa-check" style="margin-right:8px"></i>
@@ -310,8 +336,25 @@
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
-        tg.headerColor = '#080915';
-        tg.backgroundColor = '#080915';
+
+        // Theme Adaptive Logic
+        function applyTheme() {
+            const scheme = tg.colorScheme;
+            document.body.classList.remove('light-mode', 'dark-mode');
+            document.body.classList.add(scheme === 'light' ? 'light-mode' : 'dark-mode');
+            
+            // Set header color to match background
+            if (scheme === 'light') {
+                tg.headerColor = '#f8f9fa';
+                tg.backgroundColor = '#f8f9fa';
+            } else {
+                tg.headerColor = '#080915';
+                tg.backgroundColor = '#080915';
+            }
+        }
+
+        tg.onEvent('themeChanged', applyTheme);
+        applyTheme(); // Initial run
 
         const userId = tg.initDataUnsafe?.user?.id || 0;
         let currentHash = null;
@@ -337,7 +380,7 @@
         function renderPrices(prices) {
             const list = document.getElementById('priceList');
             if (!prices || prices.length === 0) {
-                list.innerHTML = '<p style="text-align:center; color:var(--text-s); padding:20px;">لا توجد أسعار حالياً</p>';
+                list.innerHTML = `<p style="text-align:center; color:var(--text-s); padding:20px;">لا توجد أسعار حالياً</p>`;
                 return;
             }
             list.innerHTML = prices.map(p => `
@@ -451,7 +494,7 @@
         }
 
         function requestWithdraw() {
-            tg.showAlert("تم إرسال طلب السحب للإدارة.");
+            tg.showAlert("سيتم التواصل معك لطلب سحب الرصيد قريباً.");
         }
 
         window.onload = fetchSellerData;
