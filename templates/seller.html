@@ -3,484 +3,324 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>SOURCINGPRO - Premium Panel</title>
+    <title>SOURCINGPRO - Professional Sourcing</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Outfit:wght@300;400;500;600;700;800;900&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-deep: #020202;
-            --bg-card: rgba(13, 13, 13, 0.7);
-            --bg-elevated: rgba(25, 25, 25, 0.8);
-            --accent: #ff3c3c;
-            --accent-soft: #ff5e5e;
-            --accent-glow: rgba(255, 60, 60, 0.25);
-            --text-main: #ffffff;
-            --text-muted: #9ca3af;
-            --text-dark: #4b5563;
-            --border-glass: rgba(255, 255, 255, 0.05);
-            --border-glow: rgba(255, 60, 60, 0.15);
+            --bg: #080915;
+            --bg-lighter: #101124;
+            --accent: #5865F2;
+            --accent-glow: rgba(88, 101, 242, 0.3);
+            --card-glass: rgba(255, 255, 255, 0.04);
+            --border: rgba(255, 255, 255, 0.08);
+            --text-p: #f8fafc;
+            --text-s: #94a3b8;
             --success: #10b981;
-            --ruby-grad: linear-gradient(135deg, #ff3c3c 0%, #991b1b 100%);
-            --glass-blur: blur(25px);
+            --gold: #fbbf24;
+            --radius: 20px;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
         body {
-            background-color: var(--bg-deep);
-            color: var(--text-main);
-            font-family: 'Outfit', 'Tajawal', sans-serif;
+            background-color: var(--bg);
+            color: var(--text-p);
+            font-family: 'Plus Jakarta Sans', 'Tajawal', sans-serif;
             min-height: 100vh;
+            padding-bottom: 30px;
             overflow-x: hidden;
-            padding-bottom: 50px;
+            line-height: 1.5;
         }
 
-        /* ─── Premium Mesh Background ─── */
-        .mesh-bg {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
-            background: 
-                radial-gradient(circle at 10% 10%, rgba(255, 60, 60, 0.07) 0%, transparent 40%),
-                radial-gradient(circle at 90% 80%, rgba(255, 60, 60, 0.05) 0%, transparent 40%),
-                radial-gradient(circle at 50% 50%, rgba(13, 13, 13, 1) 0%, var(--bg-deep) 100%);
-        }
-        .mesh-bg::before {
-            content: ''; position: absolute; inset: 0;
-            background: linear-gradient(45deg, transparent 45%, rgba(255, 60, 60, 0.02) 50%, transparent 55%);
-            background-size: 200% 200%;
-            animation: meshFlow 10s ease infinite;
-        }
-        @keyframes meshFlow { 0% { background-position: 0% 0%; } 50% { background-position: 100% 100%; } 100% { background-position: 0% 0%; } }
-
-        /* ─── Header & Nav ─── */
+        /* ─── Minimalist Header ─── */
         header {
-            padding: 30px 20px 20px;
-            display: flex; flex-direction: column; gap: 25px;
-        }
-
-        .nav-top { display: flex; align-items: center; justify-content: space-between; }
-        
-        .logo-area { display: flex; align-items: center; gap: 12px; }
-        .logo-box {
-            width: 48px; height: 48px;
-            background: var(--ruby-grad);
-            border-radius: 15px;
-            display: flex; align-items: center; justify-content: center;
-            box-shadow: 0 0 25px var(--accent-glow);
-            font-size: 1.4rem; color: white;
-            position: relative;
-        }
-        .logo-box::after {
-            content: ''; position: absolute; inset: -2px; border-radius: 16px;
-            background: linear-gradient(45deg, var(--accent), transparent, var(--accent));
-            z-index: -1; opacity: 0.5;
-        }
-        
-        .logo-text { font-size: 1.3rem; font-weight: 900; letter-spacing: -0.5px; font-family: 'Outfit'; }
-        .logo-text span { color: var(--accent); }
-
-        .withdraw-pill {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid var(--border-glass);
-            padding: 10px 18px; border-radius: 50px;
-            font-size: 0.85rem; font-weight: 700;
-            display: flex; align-items: center; gap: 8px;
-            backdrop-filter: var(--glass-blur);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .withdraw-pill:active { transform: scale(0.95) translateY(2px); background: rgba(255, 60, 60, 0.1); }
-        .withdraw-pill i { color: var(--accent); }
-
-        /* ─── Hero Balance ─── */
-        .hero-balance {
-            padding: 0 20px; margin-bottom: 25px;
-        }
-        .balance-glow-card {
-            background: var(--bg-card);
-            backdrop-filter: var(--glass-blur);
-            border: 1px solid var(--border-glass);
-            border-radius: 30px;
-            padding: 30px;
-            position: relative; overflow: hidden;
-            display: flex; flex-direction: column; align-items: center; text-align: center;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
-        }
-        .balance-glow-card::before {
-            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px;
-            background: var(--ruby-grad);
-        }
-        .balance-lbl { font-size: 0.9rem; color: var(--text-muted); font-weight: 600; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px; }
-        .balance-amt { font-size: 3.2rem; font-weight: 900; letter-spacing: -2px; font-family: 'Outfit'; }
-        .balance-amt span { font-size: 1.2rem; color: var(--accent); margin-right: 8px; vertical-align: middle; }
-
-        /* ─── Stats Grid ─── */
-        .compact-stats {
-            padding: 0 20px 30px;
-            display: grid; grid-template-columns: 1fr 1fr; gap: 15px;
-        }
-        .mini-stat {
-            background: var(--bg-card);
-            backdrop-filter: var(--glass-blur);
-            border: 1px solid var(--border-glass);
-            border-radius: 20px;
-            padding: 20px;
-            display: flex; align-items: center; gap: 15px;
-        }
-        .mini-stat-icon {
-            width: 44px; height: 44px; border-radius: 12px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 1.2rem; background: rgba(255,255,255,0.03);
-        }
-        .mini-stat-data { display: flex; flex-direction: column; }
-        .ms-val { font-size: 1.2rem; font-weight: 800; }
-        .ms-lbl { font-size: 0.75rem; color: var(--text-muted); font-weight: 600; }
-
-        /* ─── Call to Action ─── */
-        .cta-container { padding: 0 20px 40px; }
-        .btn-ruby-mega {
-            width: 100%;
-            background: var(--ruby-grad);
-            border: none; padding: 22px;
-            border-radius: 22px;
-            color: white; font-size: 1.15rem; font-weight: 800;
-            display: flex; align-items: center; justify-content: center; gap: 15px;
-            box-shadow: 0 10px 30px var(--accent-glow);
-            transition: all 0.3s;
-            cursor: pointer;
-        }
-        .btn-ruby-mega:active { transform: translateY(4px) scale(0.98); box-shadow: 0 5px 15px var(--accent-glow); }
-
-        /* ─── Recent Activity Ticker ─── */
-        .activity-section { padding: 0 20px 40px; }
-        .ticker-card {
-            background: var(--bg-card);
-            border-radius: 20px; padding: 15px 20px;
-            border-left: 4px solid var(--accent);
-            display: flex; align-items: center; gap: 15px;
-            animation: pulse-border 2s infinite;
-        }
-        @keyframes pulse-border { 0% { border-left-color: var(--accent); } 50% { border-left-color: var(--accent-soft); } 100% { border-left-color: var(--accent); } }
-        .ticker-icon { color: var(--accent); font-size: 1.2rem; }
-        .ticker-text { font-size: 0.85rem; font-weight: 500; color: var(--text-muted); }
-        .ticker-text b { color: white; margin: 0 4px; }
-
-        /* ─── Pricing Grid ─── */
-        .section-header {
-            padding: 0 25px 20px;
-            display: flex; align-items: center; gap: 15px;
-        }
-        .section-header h3 { font-size: 1rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
-        .section-line { flex: 1; height: 1px; background: var(--border-glass); }
-
-        .price-grid {
-            padding: 0 20px;
-            display: grid; grid-template-columns: 1fr 1fr; gap: 15px;
-        }
-        .price-item {
-            background: var(--bg-card);
-            backdrop-filter: var(--glass-blur);
-            border: 1px solid var(--border-glass);
-            border-radius: 22px;
-            padding: 18px;
-            display: flex; flex-direction: column; gap: 12px;
-            transition: all 0.3s;
-            position: relative; overflow: hidden;
-        }
-        .price-item::before {
-            content: ''; position: absolute; inset: 0; 
-            background: radial-gradient(circle at 0px 0px, rgba(255,60,60,0.05) 0%, transparent 70%);
-            opacity: 0; transition: opacity 0.3s;
-        }
-        .price-item:active { border-color: var(--accent); }
-        .price-item:active::before { opacity: 1; }
-
-        .pi-top { display: flex; align-items: center; gap: 10px; }
-        .pi-flag { font-size: 1.8rem; border-radius: 6px; overflow: hidden; }
-        .pi-name { font-size: 0.9rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .pi-code { font-size: 0.7rem; color: var(--text-muted); font-weight: 600; display: block; margin-top: 2px; }
-        
-        .pi-bottom {
+            padding: 25px 20px;
             display: flex; align-items: center; justify-content: space-between;
-            margin-top: 5px;
         }
-        .pi-price {
-            font-size: 1.1rem; font-weight: 900; color: var(--success);
-            font-family: 'Outfit';
+
+        .brand-pill {
+            display: flex; align-items: center; gap: 10px;
+            background: var(--card-glass);
+            border: 1px solid var(--border);
+            padding: 8px 16px; border-radius: 50px;
+            backdrop-filter: blur(10px);
         }
-        .pi-price span { font-size: 0.7rem; color: var(--text-muted); margin-left: 2px; }
+        .brand-dot { width: 10px; height: 10px; background: var(--accent); border-radius: 50%; box-shadow: 0 0 10px var(--accent); }
+        .brand-name { font-size: 0.95rem; font-weight: 800; letter-spacing: 0.5px; }
 
-        /* ─── Modal Glass ─── */
-        .modal-overlay {
-            position: fixed; inset: 0; z-index: 5000;
-            background: rgba(0, 0, 0, 0.4);
-            backdrop-filter: blur(8px);
-            display: flex; align-items: flex-end; justify-content: center;
-            opacity: 0; visibility: hidden; transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-        .modal-overlay.show { opacity: 1; visibility: visible; }
-        
-        .modal-pane {
-            width: 100%; max-width: 500px;
-            background: var(--bg-deep);
-            border-radius: 35px 35px 0 0;
-            padding: 30px 24px 60px;
-            transform: translateY(100%);
-            transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-            position: relative;
-            border-top: 1px solid var(--border-glass);
-        }
-        .modal-pane::after {
-            content: ''; position: absolute; top: 0; left: 10%; width: 80%; height: 200px;
-            background: radial-gradient(circle at center, var(--accent-glow) 0%, transparent 70%);
-            z-index: -1; transform: translateY(-50%); pointer-events: none;
-        }
-        .modal-overlay.show .modal-pane { transform: translateY(0); }
-
-        .pane-handle { width: 45px; height: 5px; background: rgba(255,255,255,0.1); border-radius: 10px; margin: 0 auto 35px; }
-
-        .step-core { display: none; text-align: center; }
-        .step-core.active { display: block; animation: paneUp 0.5s ease-out; }
-        @keyframes paneUp { from { opacity: 0; transform: translateY(40px) scale(0.95); } to { opacity: 1; transform: translateY(0) scale(1); } }
-
-        .pane-icon {
-            width: 75px; height: 75px; margin: 0 auto 25px;
-            background: var(--bg-card);
-            border: 1px solid var(--border-glass);
-            border-radius: 22px; display: flex; align-items: center; justify-content: center;
-            font-size: 1.8rem; color: var(--accent);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
-        }
-        .pane-title { font-size: 1.5rem; font-weight: 900; margin-bottom: 12px; font-family: 'Outfit'; }
-        .pane-desc { font-size: 0.9rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 30px; padding: 0 15px; }
-
-        /* Luxury Inputs */
-        .field-group { margin-bottom: 30px; text-align: right; }
-        .field-label { display: block; font-size: 0.8rem; font-weight: 700; color: var(--text-muted); margin-bottom: 10px; margin-right: 5px; text-transform: uppercase; letter-spacing: 1px; }
-
-        .fancy-input {
-            width: 100%;
-            background: rgba(255,255,255,0.02);
-            border: 1px solid var(--border-glass);
-            border-radius: 20px;
-            padding: 22px;
-            color: white; font-size: 1.2rem; font-family: 'Outfit'; font-weight: 700;
-            outline: none; transition: all 0.3s;
-            text-align: left; direction: ltr;
-        }
-        .fancy-input:focus { background: rgba(255,255,255,0.04); border-color: var(--accent); box-shadow: 0 0 20px var(--accent-glow); }
-
-        .otp-box {
-            width: 100%;
-            background: var(--bg-card);
-            border: 2px solid var(--border-glass);
-            border-radius: 24px; padding: 22px;
-            color: white; font-size: 2.2rem; font-weight: 900; font-family: 'Outfit';
-            text-align: center; letter-spacing: 18px; outline: none; transition: all 0.3s;
-        }
-        .otp-box:focus { border-color: var(--accent); color: var(--accent); }
-
-        .btn-fancy {
-            width: 100%;
-            background: var(--ruby-grad); color: white;
-            padding: 20px; border-radius: 20px;
-            font-size: 1.1rem; font-weight: 800; border: none;
-            box-shadow: 0 10px 25px var(--accent-glow);
-            display: flex; align-items: center; justify-content: center; gap: 12px;
-            cursor: pointer; transition: all 0.3s;
-        }
-        .btn-fancy:active { transform: scale(0.96); }
-        .btn-fancy:disabled { opacity: 0.4; pointer-events: none; }
-
-        /* Success State */
-        .shiny-check {
-            width: 100px; height: 100px; margin: 0 auto 25px;
-            background: rgba(16, 185, 129, 0.1);
-            border: 4px solid var(--success);
-            color: var(--success); border-radius: 50%;
+        .support-btn {
+            background: rgba(255,255,255,0.05); color: var(--text-s);
+            width: 40px; height: 40px; border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
-            font-size: 3rem; position: relative;
+            border: 1px solid var(--border); font-size: 0.9rem;
         }
-        .shiny-check::after {
-            content: ''; position: absolute; inset: -15px; border-radius: 50%;
-            background: var(--success); opacity: 0.1; filter: blur(20px);
-            animation: ping 2s infinite;
-        }
-        @keyframes ping { 0% { transform: scale(0.8); opacity: 0.2; } 100% { transform: scale(1.5); opacity: 0; } }
 
-        /* Toasts */
-        .toast-popup {
-            position: fixed; top: 30px; left: 50%; transform: translateX(-50%) translateY(-100px);
-            background: rgba(25, 25, 25, 0.95); backdrop-filter: var(--glass-blur);
-            border: 1px solid var(--border-glass); padding: 16px 28px;
-            border-radius: 20px; font-size: 0.95rem; font-weight: 600;
-            z-index: 10000; transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-            display: flex; align-items: center; gap: 12px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        /* ─── Hero Stats ─── */
+        .hero { padding: 0 20px 30px; }
+        .dashboard-card {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 28px;
+            text-align: center;
+            position: relative; overflow: hidden;
         }
-        .toast-popup.show { transform: translateX(-50%) translateY(0); }
+        .dashboard-card::before {
+            content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+            background: radial-gradient(circle at center, rgba(88, 101, 242, 0.1) 0%, transparent 70%);
+            pointer-events: none;
+        }
 
-        .loader-spin {
-            width: 20px; height: 20px; border: 3px solid rgba(255,255,255,0.1);
-            border-top-color: white; border-radius: 50%; animation: spin 0.8s linear infinite;
+        .balance-label { font-size: 0.8rem; color: var(--text-s); font-weight: 600; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 15px; }
+        .balance-value { font-size: 2.8rem; font-weight: 800; color: #fff; margin-bottom: 25px; font-family: 'Plus Jakarta Sans'; }
+        .balance-value span { font-size: 1.1rem; color: var(--text-s); margin-right: 5px; }
+
+        .hero-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .action-pill {
+            background: var(--card-glass); border: 1px solid var(--border);
+            padding: 12px; border-radius: 16px;
+            display: flex; flex-direction: column; align-items: center; gap: 4px;
+            transition: all 0.2s;
         }
+        .action-pill i { font-size: 1.1rem; margin-bottom: 2px; }
+        .action-val { font-size: 1.1rem; font-weight: 700; }
+        .action-lbl { font-size: 0.7rem; color: var(--text-s); font-weight: 600; }
+
+        /* ─── Main Action ─── */
+        .main-cta { padding: 0 20px 35px; }
+        .btn-launch {
+            width: 100%;
+            background: var(--accent);
+            color: white; border: none; padding: 20px;
+            border-radius: 20px; font-size: 1.05rem; font-weight: 700;
+            display: flex; align-items: center; justify-content: center; gap: 12px;
+            box-shadow: 0 10px 25px var(--accent-glow);
+            transition: all 0.3s; cursor: pointer;
+        }
+        .btn-launch:active { transform: scale(0.97); filter: brightness(1.1); }
+
+        /* ─── Prices List ─── */
+        .section-title { padding: 0 25px 15px; font-size: 0.9rem; font-weight: 700; color: var(--text-s); display: flex; align-items: center; gap: 10px; }
+        .section-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+        .price-list { padding: 0 20px; display: flex; flex-direction: column; gap: 12px; }
+        .price-row {
+            background: var(--card-glass);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            padding: 15px 18px;
+            display: flex; align-items: center; justify-content: space-between;
+            transition: all 0.2s;
+        }
+        .price-row:active { background: rgba(255,255,255,0.08); }
+        
+        .p-info { display: flex; align-items: center; gap: 15px; }
+        .p-flag { font-size: 2rem; border-radius: 4px; }
+        .p-name { font-size: 0.95rem; font-weight: 700; margin-bottom: 2px; }
+        .p-code { font-size: 0.75rem; color: var(--text-s); font-weight: 500; }
+        
+        .p-amt {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+            padding: 8px 16px; border-radius: 12px;
+            font-weight: 800; font-size: 0.95rem; font-family: 'Plus Jakarta Sans';
+        }
+
+        /* ─── Clean Modal Pane ─── */
+        .modal-wrap {
+            position: fixed; inset: 0; z-index: 5000;
+            background: rgba(5, 6, 15, 0.8);
+            backdrop-filter: blur(10px);
+            display: flex; align-items: center; justify-content: center;
+            opacity: 0; visibility: hidden; transition: all 0.3s;
+            padding: 20px;
+        }
+        .modal-wrap.show { opacity: 1; visibility: visible; }
+        
+        .modal-box {
+            width: 100%; max-width: 400px;
+            background: #101124;
+            border: 1px solid var(--border);
+            border-radius: 28px;
+            padding: 35px 25px;
+            position: relative;
+            transform: scale(0.9); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .modal-wrap.show .modal-box { transform: scale(1); }
+
+        .step { display: none; text-align: center; }
+        .step.active { display: block; animation: stepFade 0.4s ease-out; }
+        @keyframes stepFade { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+
+        .icon-box {
+            width: 60px; height: 60px; margin: 0 auto 20px;
+            background: rgba(88, 101, 242, 0.1);
+            color: var(--accent); border-radius: 18px;
+            display: flex; align-items: center; justify-content: center; font-size: 1.6rem;
+        }
+        .s-title { font-size: 1.4rem; font-weight: 800; margin-bottom: 10px; }
+        .s-desc { font-size: 0.9rem; color: var(--text-s); margin-bottom: 25px; line-height: 1.6; }
+
+        .input-wrap { text-align: right; margin-bottom: 25px; }
+        .input-wrap label { display: block; font-size: 0.75rem; color: var(--text-s); font-weight: 700; margin-bottom: 8px; margin-right: 5px; }
+        
+        .clean-input {
+            width: 100%; background: #080915;
+            border: 1px solid var(--border); border-radius: 16px;
+            padding: 18px; color: white; font-size: 1.1rem; font-weight: 600;
+            outline: none; transition: border-color 0.2s;
+            text-align: left; direction: ltr; font-family: 'Plus Jakarta Sans';
+        }
+        .clean-input:focus { border-color: var(--accent); }
+
+        .otp-input-clean {
+            width: 100%; background: #080915;
+            border: 2px solid var(--border); border-radius: 16px;
+            padding: 18px; color: var(--accent); font-size: 2rem; font-weight: 800;
+            text-align: center; letter-spacing: 12px; outline: none; font-family: 'Plus Jakarta Sans';
+        }
+        .otp-input-clean:focus { border-color: var(--accent); }
+
+        .btn-confirm {
+            width: 100%; background: var(--accent); color: white;
+            border: none; padding: 18px; border-radius: 16px;
+            font-size: 1rem; font-weight: 700; cursor: pointer;
+            box-shadow: 0 4px 15px var(--accent-glow);
+        }
+        .btn-confirm:active { transform: scale(0.97); }
+        .btn-confirm:disabled { opacity: 0.6; }
+
+        /* Splash */
+        .splash-screen {
+            position: fixed; inset: 0; z-index: 9999;
+            background: var(--bg); display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            transition: opacity 0.4s;
+        }
+        .splash-screen.hide { opacity: 0; visibility: hidden; }
+        .splash-ico { font-size: 2.5rem; color: var(--accent); animation: float 2s infinite ease-in-out; }
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+
+        /* Loading */
+        .spinner { width: 22px; height: 22px; border: 3px solid rgba(255,255,255,0.2); border-top-color: white; border-radius: 50%; animation: spin 0.8s linear infinite; display: inline-block; vertical-align: middle; margin-right: 8px; }
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* Skeleton */
-        .skeleton { background: linear-gradient(90deg, #121212 25%, #1a1a1a 50%, #121212 75%); background-size: 200% 100%; animation: skeletonMove 1.5s infinite; border-radius: 10px; }
-        @keyframes skeletonMove { 0% { background-position: 200% 0%; } 100% { background-position: -200% 0%; } }
+        .toast {
+            position: fixed; top: 30px; left: 50%; transform: translateX(-50%) translateY(-100px);
+            background: #1e293b; color: white; padding: 14px 24px;
+            border-radius: 14px; font-size: 0.9rem; font-weight: 600;
+            z-index: 10000; transition: transform 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+            border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        .toast.show { transform: translateX(-50%) translateY(0); }
 
     </style>
 </head>
 <body>
 
-    <div class="mesh-bg"></div>
-
-    <!-- Splash Loader -->
-    <div class="splash" id="splash">
-        <div class="logo-box"><i class="fas fa-hand-holding-dollar"></i></div>
-        <p style="margin-top: 25px; color: var(--text-muted); font-size: 0.95rem; font-weight: 500; letter-spacing: 1px;">INITIALIZING SOURCINGPRO...</p>
+    <div class="splash-screen" id="splash">
+        <i class="fas fa-microchip splash-ico"></i>
+        <p style="margin-top: 20px; font-size: 0.85rem; letter-spacing: 2px; color: var(--text-s);">CORE INITIALIZING</p>
     </div>
 
-    <!-- Header Section -->
     <header>
-        <div class="nav-top">
-            <div class="logo-area">
-                <div class="logo-box"><i class="fas fa-bolt"></i></div>
-                <div class="logo-text">SOURCING<span>PRO</span></div>
-            </div>
-            <button class="withdraw-pill" onclick="requestWithdraw()">
-                <i class="fas fa-coins"></i> سحب أرباحي
-            </button>
+        <div class="brand-pill">
+            <div class="brand-dot"></div>
+            <span class="brand-name">SOURCINGPRO</span>
         </div>
-
-        <div class="hero-balance">
-            <div class="balance-glow-card">
-                <div class="balance-lbl">إجمالي الرصيد المتاح</div>
-                <div class="balance-amt" id="userBalance">0.00 <span>USD</span></div>
-            </div>
-        </div>
-
-        <!-- Quick Stats -->
-        <div class="compact-stats">
-            <div class="mini-stat">
-                <div class="mini-stat-icon" style="color: var(--success);"><i class="fas fa-circle-check"></i></div>
-                <div class="mini-stat-data">
-                    <span class="ms-val" id="soldCount">0</span>
-                    <span class="ms-lbl">تم قبولها</span>
-                </div>
-            </div>
-            <div class="mini-stat">
-                <div class="mini-stat-icon" style="color: #fdcb6e;"><i class="fas fa-hourglass-half"></i></div>
-                <div class="mini-stat-data">
-                    <span class="ms-val" id="pendingCount">0</span>
-                    <span class="ms-lbl">تحت الفحص</span>
-                </div>
-            </div>
-        </div>
+        <button class="support-btn" onclick="requestWithdraw()">
+            <i class="fas fa-wallet"></i>
+        </button>
     </header>
 
-    <!-- UI Action -->
-    <div class="cta-container">
-        <button class="btn-ruby-mega" onclick="openWizard()">
-            <i class="fas fa-plus-circle"></i> بيع حساب الآن
+    <div class="hero">
+        <div class="dashboard-card">
+            <div class="balance-label">الأرباح المستحقة</div>
+            <div class="balance-value" id="userBalance">0.00 <span>USD</span></div>
+            
+            <div class="hero-actions">
+                <div class="action-pill">
+                    <span class="action-val" id="soldCount" style="color: var(--success);">0</span>
+                    <span class="action-lbl">مقبول</span>
+                </div>
+                <div class="action-pill">
+                    <span class="action-val" id="pendingCount" style="color: var(--gold);">0</span>
+                    <span class="action-lbl">فحص</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-cta">
+        <button class="btn-launch" onclick="openWizard()">
+            <i class="fas fa-plus"></i> بيع حساب الآن
         </button>
     </div>
 
-    <!-- Activity Section -->
-    <div class="activity-section">
-        <div class="ticker-card">
-            <i class="fas fa-fire ticker-icon"></i>
-            <span class="ticker-text">آخر عملية توريد ناجحة كانت لـ <b id="randomUser">مجهول</b> بقيمة <b id="randomAmt">$0.00</b></span>
-        </div>
+    <div class="section-title">قائمة أسعار التوريد</div>
+    <div class="price-list" id="priceList">
+        <!-- Rendered by JS -->
     </div>
 
-    <!-- Pricing Section -->
-    <div class="section-header">
-        <h3>قائمة أسعار الشراء</h3>
-        <div class="section-line"></div>
-    </div>
-    
-    <div class="price-grid" id="priceList">
-        <!-- Skeleton Loaders initial state -->
-        <div class="price-item skeleton" style="height: 100px;"></div>
-        <div class="price-item skeleton" style="height: 100px;"></div>
-        <div class="price-item skeleton" style="height: 100px;"></div>
-        <div class="price-item skeleton" style="height: 100px;"></div>
-    </div>
-
-    <!-- Wizard Modal Overhaul -->
-    <div class="modal-overlay" id="wizardModal">
-        <div class="modal-pane">
-            <div class="pane-handle"></div>
-
-            <!-- Step 1: Input -->
-            <div class="step-core active" id="step1">
-                <div class="pane-icon"><i class="fas fa-paper-plane"></i></div>
-                <h2 class="pane-title">ابدأ التوريد</h2>
-                <p class="pane-desc">أدخل رقم الهاتف للحساب الذي تريد بيعه. يرجى التأكد من أن الحساب متاح لتلقي الكود.</p>
-                <div class="field-group">
-                    <label class="field-label">رقم الهاتف</label>
-                    <input type="text" id="phoneInput" class="fancy-input" placeholder="+201..." autocomplete="off">
+    <!-- Wizard Modal -->
+    <div class="modal-wrap" id="wizardModal">
+        <div class="modal-box">
+            <!-- Step 1 -->
+            <div class="step active" id="step1">
+                <div class="icon-box"><i class="fas fa-id-card"></i></div>
+                <h3 class="s-title">بدء التوريد</h3>
+                <p class="s-desc">أدخل رقم الهاتف للحساب الذي تود بيعه. تأكد من تفعيل الحساب لاستلام الرمز.</p>
+                <div class="input-wrap">
+                    <label>رقم الهاتف (بالصيغة الدولية)</label>
+                    <input type="text" id="phoneInput" class="clean-input" placeholder="+20...">
                 </div>
-                <button class="btn-fancy" id="requestCodeBtn" onclick="requestOTP()">
-                    طلب كود التحقق <i class="fas fa-chevron-left"></i>
+                <button class="btn-confirm" id="requestCodeBtn" onclick="requestOTP()">
+                    طلب رمز التحقق <i class="fas fa-chevron-left" style="margin-right:8px"></i>
                 </button>
             </div>
 
-            <!-- Step 2: OTP -->
-            <div class="step-core" id="step2">
-                <div class="pane-icon" style="color: #fdcb6e;"><i class="fas fa-lock"></i></div>
-                <h2 class="pane-title">رسالة التحقق</h2>
-                <p class="pane-desc">أدخل الرمز المكون من 5 أرقام الذي تلقيته في حساب التلجرام الخاص بـ <b id="displayPhone" style="color:var(--accent);"></b>.</p>
-                <div class="field-group">
-                    <label class="field-label">كود التحقق</label>
-                    <input type="text" id="otpInput" class="otp-box" placeholder="00000" maxlength="5" inputmode="numeric">
+            <!-- Step 2 -->
+            <div class="step" id="step2">
+                <div class="icon-box" style="color: var(--gold)"><i class="fas fa-key"></i></div>
+                <h3 class="s-title">تحقق من الرقم</h3>
+                <p class="s-desc">أرسلنا رمزاً لـ <b id="displayPhone"></b>. أدخله لإكمال العملية.</p>
+                <div class="input-wrap">
+                    <label>رمز التحقق (5 أرقام)</label>
+                    <input type="text" id="otpInput" class="otp-input-clean" maxlength="5" placeholder="00000">
                 </div>
-                <button class="btn-fancy" id="submitCodeBtn" onclick="submitOTP()">
-                    تأكيد البيع <i class="fas fa-check-double"></i>
+                <button class="btn-confirm" id="submitCodeBtn" onclick="submitOTP()">
+                    تأكيد البيع <i class="fas fa-check" style="margin-right:8px"></i>
                 </button>
             </div>
 
-            <!-- Step 3: Success -->
-            <div class="step-core" id="step3">
-                <div class="shiny-check"><i class="fas fa-check"></i></div>
-                <h2 class="pane-title">تم تقديم الطلب!</h2>
-                <p class="pane-desc">حسابك الآن في قائمة الانتظار للفحص الفني. سيتم تحويل رصيدك فور التأكد من الجلسة.</p>
-                <button class="btn-fancy" onclick="closeWizard()">
-                    العودة للرئيسية
-                </button>
+            <!-- Step 3 -->
+            <div class="step" id="step3">
+                <div class="icon-box" style="color: var(--success)"><i class="fas fa-check-double"></i></div>
+                <h3 class="s-title">تم بنجاح!</h3>
+                <p class="s-desc">الطلب قيد المعالجة الآن. سيتم تحديث رصيدك تلقائياً فور انتهاء المراجعة.</p>
+                <button class="btn-confirm" onclick="closeWizard()">إغلاق</button>
             </div>
         </div>
     </div>
 
-    <div class="toast-popup" id="toast"></div>
+    <div class="toast" id="toast"></div>
 
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
-        tg.headerColor = '#020202';
-        tg.backgroundColor = '#020202';
+        tg.headerColor = '#080915';
+        tg.backgroundColor = '#080915';
 
         const userId = tg.initDataUnsafe?.user?.id || 0;
-        let sellerData = null;
         let currentHash = null;
         let currentPhone = null;
-
-        // Fake Activity Ticker
-        function updateTicker() {
-            const users = ['أحمد', 'محمد', 'ياسين', 'عمر', 'علي', 'حسين', 'مبارك', 'سعد'];
-            const amts = ['$2.50', '$3.10', '$1.80', '$5.00', '$0.90', '$4.20'];
-            document.getElementById('randomUser').textContent = users[Math.floor(Math.random() * users.length)];
-            document.getElementById('randomAmt').textContent = amts[Math.floor(Math.random() * amts.length)];
-        }
-        setInterval(updateTicker, 8000);
-        updateTicker();
 
         async function fetchSellerData() {
             try {
                 const res = await fetch(`/api/seller/data?user_id=${userId}`);
                 const data = await res.json();
-                sellerData = data;
 
                 document.getElementById('userBalance').innerHTML = `${data.user.balance.toFixed(2)} <span>USD</span>`;
                 document.getElementById('soldCount').textContent = data.stats.sold;
@@ -488,39 +328,34 @@
 
                 renderPrices(data.prices);
             } catch (err) {
-                console.error(err);
-                showToast("❌ فشل في تحديث البيانات");
+                showToast("❌ خطأ في جلب البيانات");
             } finally {
-                setTimeout(() => document.getElementById('splash').classList.add('hide'), 800);
+                setTimeout(() => document.getElementById('splash').classList.add('hide'), 600);
             }
         }
 
         function renderPrices(prices) {
             const list = document.getElementById('priceList');
             if (!prices || prices.length === 0) {
-                list.innerHTML = '<p style="grid-column: 1/-1; text-align:center; color:var(--text-dark); padding:20px;">لا توجد أسعار متاحة حالياً</p>';
+                list.innerHTML = '<p style="text-align:center; color:var(--text-s); padding:20px;">لا توجد أسعار حالياً</p>';
                 return;
             }
-
             list.innerHTML = prices.map(p => `
-                <div class="price-item">
-                    <div class="pi-top">
-                        <span class="pi-flag">${p.flag}</span>
-                        <div style="flex:1">
-                            <span class="pi-name">${p.name}</span>
-                            <span class="pi-code">+${p.code}</span>
+                <div class="price-row">
+                    <div class="p-info">
+                        <span class="p-flag">${p.flag}</span>
+                        <div>
+                            <div class="p-name">${p.name}</div>
+                            <div class="p-code">+${p.code}</div>
                         </div>
                     </div>
-                    <div class="pi-bottom">
-                        <span class="pi-price">${p.price.toFixed(2)}<span>USD</span></span>
-                        <i class="fas fa-arrow-up-right-from-square" style="font-size: 0.7rem; opacity: 0.3;"></i>
-                    </div>
+                    <div class="p-amt">$${p.price.toFixed(2)}</div>
                 </div>
             `).join('');
         }
 
         function openWizard() {
-            tg.HapticFeedback.impactOccurred('rigid');
+            tg.HapticFeedback.impactOccurred('medium');
             showStep(1);
             document.getElementById('wizardModal').classList.add('show');
         }
@@ -531,23 +366,23 @@
                 showStep(1);
                 document.getElementById('phoneInput').value = '';
                 document.getElementById('otpInput').value = '';
-            }, 400);
+            }, 300);
             fetchSellerData();
         }
 
         function showStep(s) {
-            document.querySelectorAll('.step-core').forEach(c => c.classList.remove('active'));
+            document.querySelectorAll('.step').forEach(c => c.classList.remove('active'));
             document.getElementById('step' + s).classList.add('active');
         }
 
         async function requestOTP() {
             const phone = document.getElementById('phoneInput').value.trim();
-            if (!phone) return showToast("⚠️ أدخل رقم الهاتف أولاً");
+            if (!phone) return showToast("⚠️ رقم الهاتف مطلوب");
 
             const btn = document.getElementById('requestCodeBtn');
             const orig = btn.innerHTML;
             btn.disabled = true;
-            btn.innerHTML = '<span class="loader-spin"></span> جاري الإرسال...';
+            btn.innerHTML = '<span class="spinner"></span>';
 
             try {
                 const res = await fetch('/api/seller/request-otp', {
@@ -564,11 +399,10 @@
                     tg.HapticFeedback.notificationOccurred('success');
                     showStep(2);
                 } else {
-                    tg.HapticFeedback.notificationOccurred('error');
                     showToast(`❌ ${data.detail}`);
                 }
             } catch (err) {
-                showToast("❌ حدث خطأ في النظام");
+                showToast("❌ فشل الاتصال");
             } finally {
                 btn.disabled = false;
                 btn.innerHTML = orig;
@@ -577,12 +411,12 @@
 
         async function submitOTP() {
             const code = document.getElementById('otpInput').value.trim();
-            if (code.length !== 5) return showToast("⚠️ الكود غير كامل");
+            if (code.length !== 5) return showToast("⚠️ الكود غير مكتمل");
 
             const btn = document.getElementById('submitCodeBtn');
             const orig = btn.innerHTML;
             btn.disabled = true;
-            btn.innerHTML = '<span class="loader-spin"></span> جاري التأكيد...';
+            btn.innerHTML = '<span class="spinner"></span>';
 
             try {
                 const res = await fetch('/api/seller/submit-otp', {
@@ -599,11 +433,10 @@
                     showStep(3);
                 } else {
                     const data = await res.json();
-                    tg.HapticFeedback.notificationOccurred('error');
                     showToast(`❌ ${data.detail}`);
                 }
             } catch (err) {
-                showToast("❌ خطأ غير متوقع");
+                showToast("❌ حدث خطأ");
             } finally {
                 btn.disabled = false;
                 btn.innerHTML = orig;
@@ -612,19 +445,17 @@
 
         function showToast(msg) {
             const t = document.getElementById('toast');
-            t.innerHTML = `<i class="fas fa-circle-exclamation"></i> ${msg}`;
+            t.textContent = msg;
             t.classList.add('show');
             setTimeout(() => t.classList.remove('show'), 3000);
         }
 
         function requestWithdraw() {
-            tg.HapticFeedback.impactOccurred('medium');
-            tg.showAlert("تم إرسال طلب سحب الرصيد للإدارة. سيتم التواصل معك عبر البوت قريباً.");
+            tg.showAlert("تم إرسال طلب السحب للإدارة.");
         }
 
         window.onload = fetchSellerData;
 
-        // Overlay close listener
         document.getElementById('wizardModal').addEventListener('click', e => {
             if (e.target.id === 'wizardModal') closeWizard();
         });
