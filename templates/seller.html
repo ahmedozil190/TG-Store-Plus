@@ -1,51 +1,49 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="en" dir="ltr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>SOURCINGPRO - Professional Sourcing</title>
+    <title>SOURCINGPRO - Dashboard</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         /* ─── Variables System ─── */
         :root {
             --accent: #5865F2;
             --accent-glow: rgba(88, 101, 242, 0.3);
             --success: #10b981;
-            --gold: #fbbf24;
-            --radius: 20px;
+            --warning: #f59e0b;
+            --error: #ef4444;
+            --radius-sm: 12px;
+            --radius-md: 20px;
+            --radius-lg: 28px;
             --ease: cubic-bezier(0.16, 1, 0.3, 1);
+            --sidebar-width: 280px;
         }
 
-        /* Dark Mode Colors */
         .dark-mode {
             --bg: #080915;
-            --bg-lighter: #101124;
-            --bg-card-grad: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            --bg-elevated: #101124;
             --card-glass: rgba(255, 255, 255, 0.04);
             --border: rgba(255, 255, 255, 0.08);
             --text-p: #f8fafc;
             --text-s: #94a3b8;
             --modal-bg: #101124;
             --input-bg: #080915;
-            --shadow-sm: 0 4px 15px rgba(0,0,0,0.4);
-            --shadow-lg: 0 10px 40px rgba(0,0,0,0.5);
+            --shadow: 0 10px 40px rgba(0,0,0,0.5);
         }
 
-        /* Light Mode Colors */
         .light-mode {
             --bg: #f8f9fa;
-            --bg-lighter: #ffffff;
-            --bg-card-grad: linear-gradient(135deg, #ffffff 0%, #f1f2f6 100%);
+            --bg-elevated: #ffffff;
             --card-glass: rgba(0, 0, 0, 0.02);
             --border: rgba(0, 0, 0, 0.06);
             --text-p: #0f172a;
             --text-s: #64748b;
             --modal-bg: #ffffff;
             --input-bg: #f1f2f6;
-            --shadow-sm: 0 4px 15px rgba(0,0,0,0.05);
-            --shadow-lg: 0 10px 40px rgba(0,0,0,0.08);
+            --shadow: 0 10px 40px rgba(0,0,0,0.06);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -53,282 +51,303 @@
         body {
             background-color: var(--bg);
             color: var(--text-p);
-            font-family: 'Plus Jakarta Sans', 'Tajawal', sans-serif;
+            font-family: 'Plus Jakarta Sans', sans-serif;
             min-height: 100vh;
-            padding-bottom: 30px;
             overflow-x: hidden;
-            line-height: 1.5;
             transition: background-color 0.4s var(--ease), color 0.4s var(--ease);
         }
 
-        /* ─── Minimalist Header ─── */
-        header {
-            padding: 25px 20px;
+        /* ─── Top Bar ─── */
+        .top-bar {
+            position: fixed; top: 0; left: 0; width: 100%; height: 70px;
+            background: var(--bg); border-bottom: 1px solid var(--border);
             display: flex; align-items: center; justify-content: space-between;
+            padding: 0 20px; z-index: 1000; transition: background 0.4s var(--ease);
         }
-
-        .brand-pill {
-            display: flex; align-items: center; gap: 10px;
-            background: var(--card-glass);
-            border: 1px solid var(--border);
-            padding: 8px 16px; border-radius: 50px;
-            backdrop-filter: blur(10px);
-        }
-        .brand-dot { width: 10px; height: 10px; background: var(--accent); border-radius: 50%; box-shadow: 0 0 10px var(--accent); }
-        .brand-name { font-size: 0.95rem; font-weight: 800; letter-spacing: 0.5px; }
-
-        .support-btn {
-            background: var(--card-glass); color: var(--text-s);
-            width: 40px; height: 40px; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            border: 1px solid var(--border); font-size: 0.9rem;
-        }
-
-        /* ─── Hero Stats ─── */
-        .hero { padding: 0 20px 30px; }
-        .dashboard-card {
-            background: var(--bg-card-grad);
-            border: 1px solid var(--border);
-            border-radius: 24px;
-            padding: 28px;
-            text-align: center;
-            position: relative; overflow: hidden;
-            box-shadow: var(--shadow-lg);
-            transition: background 0.4s var(--ease), transform 0.3s var(--ease);
-        }
-
-        .balance-label { font-size: 0.8rem; color: var(--text-s); font-weight: 600; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 15px; }
-        .balance-value { font-size: 2.8rem; font-weight: 800; color: var(--text-p); margin-bottom: 25px; font-family: 'Plus Jakarta Sans'; }
-        .balance-value span { font-size: 1.1rem; color: var(--text-s); margin-right: 5px; }
-
-        .hero-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-        .action-pill {
+        .nav-trigger {
+            width: 44px; height: 44px; border-radius: 12px;
             background: var(--card-glass); border: 1px solid var(--border);
-            padding: 12px; border-radius: 16px;
-            display: flex; flex-direction: column; align-items: center; gap: 4px;
-            transition: all 0.2s;
-        }
-        .action-pill i { font-size: 1.1rem; margin-bottom: 2px; }
-        .action-val { font-size: 1.1rem; font-weight: 700; color: var(--text-p); }
-        .action-lbl { font-size: 0.7rem; color: var(--text-s); font-weight: 600; }
-
-        /* ─── Main Action ─── */
-        .main-cta { padding: 0 20px 35px; }
-        .btn-launch {
-            width: 100%;
-            background: var(--accent);
-            color: white; border: none; padding: 20px;
-            border-radius: 20px; font-size: 1.05rem; font-weight: 700;
-            display: flex; align-items: center; justify-content: center; gap: 12px;
-            box-shadow: 0 10px 25px var(--accent-glow);
-            transition: all 0.3s; cursor: pointer;
-        }
-        .btn-launch:active { transform: scale(0.97); filter: brightness(1.1); }
-
-        /* ─── Prices List ─── */
-        .section-title { padding: 0 25px 15px; font-size: 0.9rem; font-weight: 700; color: var(--text-s); display: flex; align-items: center; gap: 10px; }
-        .section-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
-
-        .price-list { padding: 0 20px; display: flex; flex-direction: column; gap: 12px; }
-        .price-row {
-            background: var(--card-glass);
-            border: 1px solid var(--border);
-            border-radius: 18px;
-            padding: 15px 18px;
-            display: flex; align-items: center; justify-content: space-between;
-            transition: all 0.2s;
-        }
-        .price-row:active { background: rgba(0,0,0,0.05); }
-        
-        .p-info { display: flex; align-items: center; gap: 15px; }
-        .p-flag { font-size: 2rem; border-radius: 4px; }
-        .p-name { font-size: 0.95rem; font-weight: 700; color: var(--text-p); margin-bottom: 2px; }
-        .p-code { font-size: 0.75rem; color: var(--text-s); font-weight: 500; }
-        
-        .p-amt {
-            background: rgba(16, 185, 129, 0.1);
-            color: var(--success);
-            padding: 8px 16px; border-radius: 12px;
-            font-weight: 800; font-size: 0.95rem; font-family: 'Plus Jakarta Sans';
-        }
-
-        /* ─── Adaptive Modal ─── */
-        .modal-wrap {
-            position: fixed; inset: 0; z-index: 5000;
-            background: rgba(0, 0, 0, 0.4);
-            backdrop-filter: blur(10px);
             display: flex; align-items: center; justify-content: center;
-            opacity: 0; visibility: hidden; transition: all 0.3s var(--ease);
-            padding: 20px;
+            font-size: 1.2rem; cursor: pointer; color: var(--text-p);
         }
-        .modal-wrap.show { opacity: 1; visibility: visible; }
+        .page-title { font-size: 1rem; font-weight: 800; letter-spacing: 0.5px; opacity: 0.9; }
+        .user-avatar { 
+            width: 44px; height: 44px; border-radius: 12px; 
+            background: var(--accent); color: white;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 800; border: 1px solid var(--border);
+        }
+
+        /* ─── Sidebar Drawer ─── */
+        .sidebar {
+            position: fixed; top: 0; left: 0; width: var(--sidebar-width); height: 100vh;
+            background: var(--bg-elevated); border-right: 1px solid var(--border);
+            z-index: 3000; transform: translateX(-100%);
+            transition: transform 0.4s var(--ease);
+            padding: 40px 20px;
+            display: flex; flex-direction: column; gap: 40px;
+            box-shadow: 20px 0 60px rgba(0,0,0,0.1);
+        }
+        .sidebar.open { transform: translateX(0); }
+        .sidebar-overlay {
+            position: fixed; inset: 0; z-index: 2500;
+            background: rgba(0,0,0,0.4); backdrop-filter: blur(4px);
+            opacity: 0; visibility: hidden; transition: all 0.4s var(--ease);
+        }
+        .sidebar-overlay.show { opacity: 1; visibility: visible; }
+
+        .side-brand { display: flex; align-items: center; gap: 12px; }
+        .side-brand-dot { width: 12px; height: 12px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 10px var(--accent); }
+        .side-brand-name { font-size: 1.2rem; font-weight: 800; }
+
+        .side-nav { display: flex; flex-direction: column; gap: 10px; flex: 1; }
+        .nav-item {
+            padding: 16px 20px; border-radius: 16px;
+            display: flex; align-items: center; gap: 14px;
+            color: var(--text-s); font-weight: 600; font-size: 0.95rem;
+            cursor: pointer; transition: all 0.2s;
+        }
+        .nav-item:hover, .nav-item.active { background: var(--card-glass); color: var(--text-p); }
+        .nav-item.active { border: 1px solid var(--border); color: var(--accent); }
+        .nav-item i { font-size: 1.1rem; width: 24px; text-align: center; }
+
+        .side-footer { border-top: 1px solid var(--border); padding-top: 20px; font-size: 0.75rem; color: var(--text-s); opacity: 0.6; }
+
+        /* ─── View Management ─── */
+        .main-content { margin-top: 70px; padding: 25px 20px; }
+        .view-panel { display: none; }
+        .view-panel.active { display: block; animation: viewIn 0.5s var(--ease); }
+        @keyframes viewIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* ─── Dashboard View ─── */
+        .balance-hero {
+            background: var(--bg-elevated); border: 1px solid var(--border);
+            border-radius: var(--radius-lg); padding: 40px 20px;
+            text-align: center; position: relative; overflow: hidden;
+            box-shadow: var(--shadow); margin-bottom: 25px;
+        }
+        .balance-hero::before {
+            content: ''; position: absolute; inset: -50%;
+            background: radial-gradient(circle at center, rgba(88, 101, 242, 0.08) 0%, transparent 60%);
+        }
+        .bal-label { font-size: 0.8rem; color: var(--text-s); font-weight: 700; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 12px; }
+        .bal-value { font-size: 3rem; font-weight: 800; line-height: 1; margin-bottom: 30px; letter-spacing: -1px; }
+        .bal-value span { font-size: 1rem; color: var(--text-s); margin-right: 5px; }
+
+        .stats-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .stat-card {
+            background: var(--card-glass); border: 1px solid var(--border);
+            padding: 18px; border-radius: var(--radius-md);
+            display: flex; flex-direction: column; gap: 4px;
+        }
+        .stat-val { font-size: 1.3rem; font-weight: 800; }
+        .stat-lbl { font-size: 0.7rem; color: var(--text-s); font-weight: 600; text-transform: uppercase; }
+
+        /* ─── Sourcing Wizard (Submit Numbers) ─── */
+        .wizard-pane {
+            background: var(--bg-elevated); border: 1px solid var(--border);
+            border-radius: var(--radius-lg); padding: 35px 25px;
+            text-align: center; box-shadow: var(--shadow);
+        }
+        .w-icon { width: 70px; height: 70px; margin: 0 auto 25px; background: rgba(88, 101, 242, 0.1); color: var(--accent); border-radius: 20px; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; }
+        .w-title { font-size: 1.5rem; font-weight: 800; margin-bottom: 10px; }
+        .w-desc { font-size: 0.9rem; color: var(--text-s); margin-bottom: 30px; line-height: 1.6; }
+
+        .input-group { border-bottom: 2px solid var(--border); margin-bottom: 30px; padding-bottom: 8px; text-align: left; }
+        .input-group label { display: block; font-size: 0.7rem; color: var(--text-s); font-weight: 800; text-transform: uppercase; margin-bottom: 6px; }
+        .w-input { width: 100%; background: transparent; border: none; outline: none; color: var(--text-p); font-size: 1.3rem; font-weight: 700; font-family: inherit; }
         
-        .modal-box {
-            width: 100%; max-width: 400px;
-            background: var(--modal-bg);
-            border: 1px solid var(--border);
-            border-radius: 28px;
-            padding: 35px 25px;
-            position: relative;
-            transform: scale(0.9); transition: transform 0.3s var(--ease), background 0.4s var(--ease);
-            box-shadow: var(--shadow-lg);
-        }
-        .modal-wrap.show .modal-box { transform: scale(1); }
-
-        .step { display: none; text-align: center; }
-        .step.active { display: block; animation: stepFade 0.4s ease-out; }
-        @keyframes stepFade { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
-
-        .icon-box {
-            width: 60px; height: 60px; margin: 0 auto 20px;
-            background: rgba(88, 101, 242, 0.1);
-            color: var(--accent); border-radius: 18px;
-            display: flex; align-items: center; justify-content: center; font-size: 1.6rem;
-        }
-        .s-title { font-size: 1.4rem; font-weight: 800; color: var(--text-p); margin-bottom: 10px; }
-        .s-desc { font-size: 0.9rem; color: var(--text-s); margin-bottom: 25px; line-height: 1.6; }
-
-        .input-wrap { text-align: right; margin-bottom: 25px; }
-        .input-wrap label { display: block; font-size: 0.75rem; color: var(--text-s); font-weight: 700; margin-bottom: 8px; margin-right: 5px; }
-        
-        .clean-input {
-            width: 100%; background: var(--input-bg);
-            border: 1px solid var(--border); border-radius: 16px;
-            padding: 18px; color: var(--text-p); font-size: 1.1rem; font-weight: 600;
-            outline: none; transition: border-color 0.2s, background 0.4s var(--ease);
-            text-align: left; direction: ltr; font-family: 'Plus Jakarta Sans';
-        }
-        .clean-input:focus { border-color: var(--accent); }
-
-        .otp-input-clean {
-            width: 100%; background: var(--input-bg);
-            border: 2px solid var(--border); border-radius: 16px;
-            padding: 18px; color: var(--accent); font-size: 2rem; font-weight: 800;
-            text-align: center; letter-spacing: 12px; outline: none; font-family: 'Plus Jakarta Sans';
-            transition: background 0.4s var(--ease);
-        }
-        .otp-input-clean:focus { border-color: var(--accent); }
-
-        .btn-confirm {
+        .btn-action {
             width: 100%; background: var(--accent); color: white;
-            border: none; padding: 18px; border-radius: 16px;
-            font-size: 1rem; font-weight: 700; cursor: pointer;
-            box-shadow: 0 4px 15px var(--accent-glow);
+            padding: 20px; border-radius: 18px; border: none;
+            font-size: 1rem; font-weight: 800; cursor: pointer;
+            box-shadow: 0 8px 25px var(--accent-glow); transition: all 0.3s;
+            display: flex; align-items: center; justify-content: center; gap: 12px;
         }
-        .btn-confirm:active { transform: scale(0.97); }
-        .btn-confirm:disabled { opacity: 0.6; }
+        .btn-action:active { transform: scale(0.97); }
 
-        /* Splash */
+        /* ─── Pricing List View ─── */
+        .pricing-list { display: flex; flex-direction: column; gap: 12px; }
+        .price-item {
+            background: var(--card-glass); border: 1px solid var(--border);
+            padding: 18px 22px; border-radius: var(--radius-md);
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .country-side { display: flex; align-items: center; gap: 15px; }
+        .c-flag { font-size: 2.2rem; }
+        .c-name { font-size: 0.95rem; font-weight: 700; margin-bottom: 2px; }
+        .c-code { font-size: 0.75rem; color: var(--text-s); font-weight: 500; }
+        .c-price { 
+            background: rgba(16, 185, 129, 0.1); color: var(--success);
+            padding: 10px 18px; border-radius: 50px; font-weight: 800; font-size: 1rem;
+        }
+
+        /* ─── Withdrawal Form ─── */
+        .withdraw-card {
+            background: var(--bg-elevated); border: 1px solid var(--border);
+            border-radius: var(--radius-lg); padding: 35px 25px;
+            box-shadow: var(--shadow);
+        }
+
+        /* Splash & Utils */
         .splash-screen {
             position: fixed; inset: 0; z-index: 9999;
-            background: var(--bg); display: flex; flex-direction: column;
-            align-items: center; justify-content: center;
-            transition: opacity 0.4s, background 0.4s var(--ease);
+            background: var(--bg); display: flex; align-items: center; justify-content: center;
+            transition: opacity 0.4s var(--ease);
         }
         .splash-screen.hide { opacity: 0; visibility: hidden; }
-        .splash-ico { font-size: 2.5rem; color: var(--accent); animation: float 2s infinite ease-in-out; }
-        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
-
-        /* Loading */
-        .spinner { width: 22px; height: 22px; border: 3px solid rgba(255,255,255,0.2); border-top-color: white; border-radius: 50%; animation: spin 0.8s linear infinite; display: inline-block; vertical-align: middle; margin-right: 8px; }
+        .loader-ring { width: 30px; height: 30px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
 
         .toast {
-            position: fixed; top: 30px; left: 50%; transform: translateX(-50%) translateY(-100px);
-            background: var(--modal-bg); color: var(--text-p); padding: 14px 24px;
-            border-radius: 14px; font-size: 0.9rem; font-weight: 600;
-            z-index: 10000; transition: transform 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28), background 0.4s var(--ease);
-            border: 1px solid var(--border); box-shadow: var(--shadow-lg);
+            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px);
+            background: var(--bg-elevated); color: var(--text-p); padding: 14px 28px;
+            border-radius: 50px; border: 1px solid var(--border);
+            z-index: 10000; transition: transform 0.4s var(--ease); font-weight: 600;
         }
         .toast.show { transform: translateX(-50%) translateY(0); }
 
     </style>
 </head>
-<body class="dark-mode"> <!-- Default to dark, updated by JS -->
+<body class="dark-mode">
 
+    <!-- Splash screen -->
     <div class="splash-screen" id="splash">
-        <i class="fas fa-microchip splash-ico"></i>
-        <p style="margin-top: 20px; font-size: 0.85rem; letter-spacing: 2px; color: var(--text-s);">CORE INITIALIZING</p>
+        <div class="loader-ring"></div>
     </div>
 
-    <header>
-        <div class="brand-pill">
-            <div class="brand-dot"></div>
-            <span class="brand-name">SOURCINGPRO</span>
-        </div>
-        <button class="support-btn" onclick="requestWithdraw()">
-            <i class="fas fa-wallet"></i>
-        </button>
-    </header>
+    <!-- Navigation Overlay -->
+    <div class="sidebar-overlay" id="navOverlay" onclick="closeNav()"></div>
 
-    <div class="hero">
-        <div class="dashboard-card">
-            <div class="balance-label">الأرباح المستحقة</div>
-            <div class="balance-value" id="userBalance">0.00 <span>USD</span></div>
+    <!-- Top Bar -->
+    <div class="top-bar">
+        <button class="nav-trigger" onclick="openNav()">
+            <i class="fas fa-bars"></i>
+        </button>
+        <div class="page-title" id="viewTitle">Dashboard</div>
+        <div class="user-avatar" id="userInitial">S</div>
+    </div>
+
+    <!-- Sidebar Drawer -->
+    <div class="sidebar" id="navSidebar">
+        <div class="side-brand">
+            <div class="side-brand-dot"></div>
+            <span class="side-brand-name">SOURCINGPRO</span>
+        </div>
+
+        <div class="side-nav">
+            <div class="nav-item active" id="btn-dashboard" onclick="changeView('dashboard')">
+                <i class="fas fa-chart-pie"></i> Dashboard
+            </div>
+            <div class="nav-item" id="btn-submit" onclick="changeView('submit')">
+                <i class="fas fa-paper-plane"></i> Submit Numbers
+            </div>
+            <div class="nav-item" id="btn-withdraw" onclick="changeView('withdraw')">
+                <i class="fas fa-hand-holding-usd"></i> Withdrawal
+            </div>
+            <div class="nav-item" id="btn-pricing" onclick="changeView('pricing')">
+                <i class="fas fa-tags"></i> Price List
+            </div>
+        </div>
+
+        <div class="side-footer">
+            SOURCINGPRO v2.0<br>Authorized Access Only
+        </div>
+    </div>
+
+    <!-- Main Content Panels -->
+    <div class="main-content">
+        
+        <!-- View: Dashboard -->
+        <div class="view-panel active" id="view-dashboard">
+            <div class="balance-hero">
+                <div class="bal-label">TOTAL EARNINGS</div>
+                <div class="bal-value" id="userBalance">0.00 <span>USD</span></div>
+                
+                <div class="stats-row">
+                    <div class="stat-card">
+                        <span class="stat-val" id="soldCount" style="color: var(--success);">0</span>
+                        <span class="stat-lbl">Accepted</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-val" id="pendingCount" style="color: var(--warning);">0</span>
+                        <span class="stat-lbl">Pending</span>
+                    </div>
+                </div>
+            </div>
             
-            <div class="hero-actions">
-                <div class="action-pill">
-                    <span class="action-val" id="soldCount" style="color: var(--success);">0</span>
-                    <span class="action-lbl">مقبول</span>
-                </div>
-                <div class="action-pill">
-                    <span class="action-val" id="pendingCount" style="color: var(--gold);">0</span>
-                    <span class="action-lbl">فحص</span>
-                </div>
-            </div>
+            <button class="btn-action" onclick="changeView('submit')">
+                Start Selling <i class="fas fa-arrow-right"></i>
+            </button>
         </div>
-    </div>
 
-    <div class="main-cta">
-        <button class="btn-launch" onclick="openWizard()">
-            <i class="fas fa-plus"></i> بيع حساب الآن
-        </button>
-    </div>
-
-    <div class="section-title">قائمة أسعار التوريد</div>
-    <div class="price-list" id="priceList">
-        <!-- Rendered by JS -->
-    </div>
-
-    <!-- Wizard Modal -->
-    <div class="modal-wrap" id="wizardModal">
-        <div class="modal-box">
-            <!-- Step 1 -->
-            <div class="step active" id="step1">
-                <div class="icon-box"><i class="fas fa-id-card"></i></div>
-                <h3 class="s-title">بدء التوريد</h3>
-                <p class="s-desc">أدخل رقم الهاتف للحساب الذي تود بيعه. تأكد من تفعيل الحساب لاستلام الرمز.</p>
-                <div class="input-wrap">
-                    <label>رقم الهاتف (بالصيغة الدولية)</label>
-                    <input type="text" id="phoneInput" class="clean-input" placeholder="+20...">
+        <!-- View: Submit (Wizard) -->
+        <div class="view-panel" id="view-submit">
+            <div class="wizard-pane" id="step-phone">
+                <div class="w-icon"><i class="fas fa-mobile-alt"></i></div>
+                <h2 class="w-title">Submit Account</h2>
+                <p class="w-desc">Enter the phone number for the account you want to sell. Ensure you can access the account for the code.</p>
+                <div class="input-group">
+                    <label>Phone Number (International Format)</label>
+                    <input type="text" id="phoneInput" class="w-input" placeholder="+123..." autocomplete="off">
                 </div>
-                <button class="btn-confirm" id="requestCodeBtn" onclick="requestOTP()">
-                    طلب رمز التحقق <i class="fas fa-chevron-left" style="margin-right:8px"></i>
+                <button class="btn-action" id="requestCodeBtn" onclick="requestOTP()">
+                    Request Verification Code <i class="fas fa-chevron-right"></i>
                 </button>
             </div>
 
-            <!-- Step 2 -->
-            <div class="step" id="step2">
-                <div class="icon-box" style="color: var(--gold)"><i class="fas fa-key"></i></div>
-                <h3 class="s-title">تحقق من الرقم</h3>
-                <p class="s-desc">أرسلنا رمزاً لـ <b id="displayPhone"></b>. أدخله لإكمال العملية.</p>
-                <div class="input-wrap">
-                    <label>رمز التحقق (5 أرقام)</label>
-                    <input type="text" id="otpInput" class="otp-input-clean" maxlength="5" placeholder="00000" inputmode="numeric">
+            <div class="wizard-pane" id="step-otp" style="display:none">
+                <div class="w-icon" style="color:var(--warning)"><i class="fas fa-shield-alt"></i></div>
+                <h2 class="w-title">Verification</h2>
+                <p class="w-desc">Enter the code sent to the Telegram account of <b id="displayPhone"></b>.</p>
+                <div class="input-group">
+                    <label>5-Digit Code</label>
+                    <input type="text" id="otpInput" class="w-input" placeholder="00000" maxlength="5" inputmode="numeric" style="text-align:center; letter-spacing:10px">
                 </div>
-                <button class="btn-confirm" id="submitCodeBtn" onclick="submitOTP()">
-                    تأكيد البيع <i class="fas fa-check" style="margin-right:8px"></i>
+                <button class="btn-action" id="submitCodeBtn" onclick="submitOTP()">
+                    Confirm Sourcing <i class="fas fa-check-circle"></i>
                 </button>
             </div>
 
-            <!-- Step 3 -->
-            <div class="step" id="step3">
-                <div class="icon-box" style="color: var(--success)"><i class="fas fa-check-double"></i></div>
-                <h3 class="s-title">تم بنجاح!</h3>
-                <p class="s-desc">الطلب قيد المعالجة الآن. سيتم تحديث رصيدك تلقائياً فور انتهاء المراجعة.</p>
-                <button class="btn-confirm" onclick="closeWizard()">إغلاق</button>
+            <div class="wizard-pane" id="step-success" style="display:none">
+                <div class="w-icon" style="color:var(--success)"><i class="fas fa-check-double"></i></div>
+                <h2 class="w-title">Submitted!</h2>
+                <p class="w-desc">Your account is now in the technical review queue. Your balance will be updated automatically upon approval.</p>
+                <button class="btn-action" onclick="changeView('dashboard')">Back to Home</button>
             </div>
         </div>
+
+        <!-- View: Withdrawal -->
+        <div class="view-panel" id="view-withdraw">
+            <div class="withdraw-card">
+                <div class="w-icon"><i class="fas fa-wallet"></i></div>
+                <h2 class="w-title">Request payout</h2>
+                <p class="w-desc">Minimum withdrawal amount is $5.00. Payouts are processed within 24-48 hours.</p>
+                
+                <div class="input-group">
+                    <label>Amount to Withdraw (USD)</label>
+                    <input type="number" id="withdrawAmount" class="w-input" placeholder="0.00">
+                </div>
+
+                <div class="input-group">
+                    <label>Payment Method (TRC20 / Binance ID)</label>
+                    <input type="text" id="paymentDetails" class="w-input" placeholder="Address or ID">
+                </div>
+
+                <button class="btn-action" onclick="requestWithdraw()">
+                    Submit Request <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- View: Pricing -->
+        <div class="view-panel" id="view-pricing">
+            <h2 class="w-title" style="margin-bottom:20px; text-align:left">Current Rates</h2>
+            <div class="pricing-list" id="priceList">
+                <!-- Data populated by JS -->
+            </div>
+        </div>
+
     </div>
 
     <div class="toast" id="toast"></div>
@@ -337,29 +356,57 @@
         const tg = window.Telegram.WebApp;
         tg.expand();
 
-        // Theme Adaptive Logic
+        // ─── Native Theme Support ───
         function applyTheme() {
             const scheme = tg.colorScheme;
-            document.body.classList.remove('light-mode', 'dark-mode');
-            document.body.classList.add(scheme === 'light' ? 'light-mode' : 'dark-mode');
-            
-            // Set header color to match background
-            if (scheme === 'light') {
-                tg.headerColor = '#f8f9fa';
-                tg.backgroundColor = '#f8f9fa';
-            } else {
-                tg.headerColor = '#080915';
-                tg.backgroundColor = '#080915';
-            }
+            document.body.className = scheme === 'light' ? 'light-mode' : 'dark-mode';
+            tg.headerColor = scheme === 'light' ? '#f8f9fa' : '#080915';
+            tg.backgroundColor = scheme === 'light' ? '#f8f9fa' : '#080915';
         }
-
         tg.onEvent('themeChanged', applyTheme);
-        applyTheme(); // Initial run
+        applyTheme();
 
         const userId = tg.initDataUnsafe?.user?.id || 0;
+        const userFirstName = tg.initDataUnsafe?.user?.first_name || "User";
+        document.getElementById('userInitial').textContent = userFirstName.charAt(0).toUpperCase();
+
         let currentHash = null;
         let currentPhone = null;
 
+        // ─── Navigation Logic ───
+        function openNav() {
+            document.getElementById('navSidebar').classList.add('open');
+            document.getElementById('navOverlay').classList.add('show');
+        }
+        function closeNav() {
+            document.getElementById('navSidebar').classList.remove('open');
+            document.getElementById('navOverlay').classList.remove('show');
+        }
+        function changeView(viewId) {
+            closeNav();
+            document.querySelectorAll('.view-panel').forEach(v => v.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(v => v.classList.remove('active'));
+            
+            const targetView = document.getElementById(`view-${viewId}`);
+            const targetBtn = document.getElementById(`btn-${viewId}`);
+            
+            targetView.classList.add('active');
+            targetBtn.classList.add('active');
+            
+            // Update Top Bar Title
+            const titles = {
+                dashboard: 'Dashboard',
+                submit: 'Submit Account',
+                withdraw: 'Withdrawal',
+                pricing: 'Rate List'
+            };
+            document.getElementById('viewTitle').textContent = titles[viewId];
+            
+            if (viewId === 'dashboard') fetchSellerData();
+            if (viewId === 'pricing') fetchSellerData();
+        }
+
+        // ─── Data Services ───
         async function fetchSellerData() {
             try {
                 const res = await fetch(`/api/seller/data?user_id=${userId}`);
@@ -371,61 +418,40 @@
 
                 renderPrices(data.prices);
             } catch (err) {
-                showToast("❌ خطأ في جلب البيانات");
+                showToast("Connection Error");
             } finally {
-                setTimeout(() => document.getElementById('splash').classList.add('hide'), 600);
+                setTimeout(() => document.getElementById('splash').classList.add('hide'), 500);
             }
         }
 
         function renderPrices(prices) {
             const list = document.getElementById('priceList');
             if (!prices || prices.length === 0) {
-                list.innerHTML = `<p style="text-align:center; color:var(--text-s); padding:20px;">لا توجد أسعار حالياً</p>`;
+                list.innerHTML = `<p style="text-align:center; opacity:0.5; padding:40px">Pricing offline</p>`;
                 return;
             }
             list.innerHTML = prices.map(p => `
-                <div class="price-row">
-                    <div class="p-info">
-                        <span class="p-flag">${p.flag}</span>
+                <div class="price-item">
+                    <div class="country-side">
+                        <span class="c-flag">${p.flag}</span>
                         <div>
-                            <div class="p-name">${p.name}</div>
-                            <div class="p-code">+${p.code}</div>
+                            <div class="c-name">${p.name}</div>
+                            <div class="c-code">+${p.code}</div>
                         </div>
                     </div>
-                    <div class="p-amt">$${p.price.toFixed(2)}</div>
+                    <div class="c-price">$${p.price.toFixed(2)}</div>
                 </div>
             `).join('');
         }
 
-        function openWizard() {
-            tg.HapticFeedback.impactOccurred('medium');
-            showStep(1);
-            document.getElementById('wizardModal').classList.add('show');
-        }
-
-        function closeWizard() {
-            document.getElementById('wizardModal').classList.remove('show');
-            setTimeout(() => {
-                showStep(1);
-                document.getElementById('phoneInput').value = '';
-                document.getElementById('otpInput').value = '';
-            }, 300);
-            fetchSellerData();
-        }
-
-        function showStep(s) {
-            document.querySelectorAll('.step').forEach(c => c.classList.remove('active'));
-            document.getElementById('step' + s).classList.add('active');
-        }
-
+        // ─── Business Logic ───
         async function requestOTP() {
             const phone = document.getElementById('phoneInput').value.trim();
-            if (!phone) return showToast("⚠️ رقم الهاتف مطلوب");
+            if (!phone) return showToast("Phone number required");
 
             const btn = document.getElementById('requestCodeBtn');
-            const orig = btn.innerHTML;
             btn.disabled = true;
-            btn.innerHTML = '<span class="spinner"></span>';
+            btn.innerHTML = '<span class="loader-ring" style="width:20px;height:20px"></span>';
 
             try {
                 const res = await fetch('/api/seller/request-otp', {
@@ -440,26 +466,27 @@
                     currentPhone = data.phone;
                     document.getElementById('displayPhone').textContent = currentPhone;
                     tg.HapticFeedback.notificationOccurred('success');
-                    showStep(2);
+                    
+                    document.getElementById('step-phone').style.display = 'none';
+                    document.getElementById('step-otp').style.display = 'block';
                 } else {
-                    showToast(`❌ ${data.detail}`);
+                    showToast(data.detail || "Error");
                 }
             } catch (err) {
-                showToast("❌ فشل الاتصال");
+                showToast("Server Error");
             } finally {
                 btn.disabled = false;
-                btn.innerHTML = orig;
+                btn.innerHTML = 'Request Verification Code <i class="fas fa-chevron-right"></i>';
             }
         }
 
         async function submitOTP() {
             const code = document.getElementById('otpInput').value.trim();
-            if (code.length !== 5) return showToast("⚠️ الكود غير مكتمل");
+            if (code.length !== 5) return showToast("Invalid Code");
 
             const btn = document.getElementById('submitCodeBtn');
-            const orig = btn.innerHTML;
             btn.disabled = true;
-            btn.innerHTML = '<span class="spinner"></span>';
+            btn.innerHTML = '<span class="loader-ring" style="width:20px;height:20px"></span>';
 
             try {
                 const res = await fetch('/api/seller/submit-otp', {
@@ -473,17 +500,33 @@
 
                 if (res.ok) {
                     tg.HapticFeedback.notificationOccurred('success');
-                    showStep(3);
+                    document.getElementById('step-otp').style.display = 'none';
+                    document.getElementById('step-success').style.display = 'block';
                 } else {
                     const data = await res.json();
-                    showToast(`❌ ${data.detail}`);
+                    showToast(data.detail || "Error");
                 }
             } catch (err) {
-                showToast("❌ حدث خطأ");
+                showToast("Process Error");
             } finally {
                 btn.disabled = false;
-                btn.innerHTML = orig;
+                btn.innerHTML = 'Confirm Sourcing <i class="fas fa-check-circle"></i>';
             }
+        }
+
+        function requestWithdraw() {
+            const amount = document.getElementById('withdrawAmount').value;
+            const details = document.getElementById('paymentDetails').value;
+            if (!amount || amount < 5) return tg.showAlert("Minimum withdrawal is $5.00");
+            if (!details) return tg.showAlert("Payment details required");
+            
+            tg.showConfirm(`Confirm withdrawal of $${amount} to ${details}?`, (ok) => {
+                if (ok) {
+                    tg.HapticFeedback.notificationOccurred('success');
+                    tg.showAlert("Request submitted successfully!");
+                    changeView('dashboard');
+                }
+            });
         }
 
         function showToast(msg) {
@@ -493,15 +536,7 @@
             setTimeout(() => t.classList.remove('show'), 3000);
         }
 
-        function requestWithdraw() {
-            tg.showAlert("سيتم التواصل معك لطلب سحب الرصيد قريباً.");
-        }
-
         window.onload = fetchSellerData;
-
-        document.getElementById('wizardModal').addEventListener('click', e => {
-            if (e.target.id === 'wizardModal') closeWizard();
-        });
     </script>
 </body>
 </html>
