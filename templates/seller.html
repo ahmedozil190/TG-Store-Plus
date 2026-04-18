@@ -300,6 +300,15 @@
         .cd-lbl { color: var(--text-s); }
         .cd-val { font-weight: 700; color: var(--text-p); }
 
+        /* ─── Success Modal Customization ─── */
+        .success-icon { font-size: 4rem; color: var(--success); margin-bottom: 20px; }
+        .trans-no-box {
+            background: rgba(16, 185, 129, 0.05); border: 1px dashed var(--success);
+            border-radius: 12px; padding: 12px; margin-top: 15px;
+            font-family: 'Courier New', monospace; font-weight: 700; color: var(--success);
+            letter-spacing: 1px;
+        }
+
     </style>
 </head>
 <body class="dark-mode">
@@ -547,6 +556,25 @@
         </div>
     </div>
 
+    <!-- Success Modal Structure -->
+    <div class="modal-overlay" id="successModal">
+        <div class="confirm-modal" style="max-width: 450px;">
+            <div class="success-icon">✅</div>
+            <div class="modal-title" style="color:var(--text-p)">Request Submitted</div>
+            <div class="modal-body" id="successText" style="text-align: center; color: var(--text-p);">
+                Withdrawal request submitted, please be patient until the bot administrator approves your payment•
+            </div>
+            
+            <div class="trans-no-box" id="successTransNo">
+                Trans No. TCXXXXXXXXXX
+            </div>
+
+            <div style="margin-top: 25px;">
+                <button class="btn-action" style="padding:14px; width:100%" onclick="closeSuccessModal()">Got it</button>
+            </div>
+        </div>
+    </div>
+
     <div class="toast" id="toast"></div>
 
     <script>
@@ -737,11 +765,17 @@
                 const data = await res.json();
                 
                 if (res.ok) {
-                    const opCode = String(data.id).padStart(6, '0');
-                    showToast(`Succeeded! Operation: <span style="color:var(--accent); font-weight:800">#${opCode}</span>`);
+                    // Update Success Modal
+                    document.getElementById('successTransNo').textContent = `Trans No. ${data.id}`;
+                    
                     document.getElementById('withdrawAmount').value = '';
                     document.getElementById('paymentDetails').value = '';
                     closeConfirmModal();
+                    
+                    // Show Success Modal
+                    document.getElementById('successModal').classList.add('show');
+                    tg.HapticFeedback.notificationOccurred('success');
+                    
                     fetchSellerData(); // Refresh balance
                     fetchWithdrawals(); // Refresh history
                 } else {
@@ -753,6 +787,10 @@
                 btn.disabled = false;
                 btn.innerHTML = 'Withdraw';
             }
+        }
+
+        function closeSuccessModal() {
+            document.getElementById('successModal').classList.remove('show');
         }
 
         async function fetchWithdrawals() {

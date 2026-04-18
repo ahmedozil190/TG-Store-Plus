@@ -74,5 +74,6 @@ class WithdrawalRequest(Base):
     amount = Column(Float, nullable=False)
     method = Column(String, nullable=False) # e.g. "TRX - TRC20"
     address = Column(String, nullable=False) # Wallet Address
+    transaction_id = Column(String(12), unique=True, nullable=True) # e.g. "TC782794467F"
     status = Column(Enum(WithdrawalStatus), default=WithdrawalStatus.PENDING)
     created_at = Column(DateTime, default=datetime.utcnow)

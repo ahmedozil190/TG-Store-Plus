@@ -18,6 +18,8 @@ import re
 import urllib.request
 import json
 from datetime import datetime
+import random
+import string
 
 class SellerDataRequest(BaseModel):
     user_id: int
@@ -43,6 +45,11 @@ class WithdrawSubmit(BaseModel):
 # Setup logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+def generate_transaction_id():
+    chars = string.ascii_uppercase + string.digits
+    suffix = ''.join(random.choice(chars) for _ in range(10))
+    return f"TC{suffix}"
 
 def get_flag_emoji(country_code: str):
     """Convert ISO country code to flag emoji."""
@@ -817,11 +824,13 @@ async def seller_withdraw(req: WithdrawSubmit):
             raise HTTPException(status_code=400, detail="Amount too low to cover fees")
 
         # Create Request
+        tid = generate_transaction_id()
         withdraw = WithdrawalRequest(
             user_id=req.user_id,
             amount=req.amount,
             method=req.method,
-            address=req.address
+            address=req.address,
+            transaction_id=tid
         )
         
         # Deduct balance immediately
@@ -830,7 +839,7 @@ async def seller_withdraw(req: WithdrawSubmit):
         session.add(withdraw)
         await session.commit()
         await session.refresh(withdraw)
-        return {"ok": True, "id": withdraw.id}
+        return {"ok": True, "id": tid}
 
 @app.get("/api/seller/withdrawals")
 async def get_withdrawals(user_id: int):
@@ -842,6 +851,7 @@ async def get_withdrawals(user_id: int):
         for r in results:
             history.append({
                 "id": r.id,
+                "transaction_id": r.transaction_id,
                 "amount": r.amount,
                 "method": r.method,
                 "address": r.address,
