@@ -810,8 +810,9 @@ async def seller_withdraw(req: WithdrawSubmit):
         if req.amount < min_amount:
             raise HTTPException(status_code=400, detail=f"Minimum withdrawal is ${min_amount}")
         
-        if user.balance_sourcing < req.amount:
-            raise HTTPException(status_code=400, detail="Insufficient balance")
+        total_needed = req.amount + 0.20
+        if user.balance_sourcing < total_needed:
+            raise HTTPException(status_code=400, detail=f"Insufficient balance. Total needed (incl. fee): ${total_needed:.2f}")
         
         # Create Request
         withdraw = WithdrawalRequest(
@@ -821,8 +822,8 @@ async def seller_withdraw(req: WithdrawSubmit):
             address=req.address
         )
         
-        # Deduct balance immediately
-        user.balance_sourcing -= req.amount
+        # Deduct balance immediately (including fee)
+        user.balance_sourcing -= total_needed
         
         session.add(withdraw)
         await session.commit()

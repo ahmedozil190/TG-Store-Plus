@@ -529,6 +529,10 @@
             
             <div class="confirm-details">
                 <div class="cd-item"><span class="cd-lbl">Amount:</span> <span class="cd-val" id="confAmt">$0.00</span></div>
+                <div class="cd-item"><span class="cd-lbl">Service Fee:</span> <span class="cd-val" style="color:var(--error)">$0.20</span></div>
+                <div class="cd-item" style="border-top:1px solid var(--border); margin-top:8px; padding-top:8px">
+                    <span class="cd-lbl">Total Deduction:</span> <span class="cd-val" id="confTotal" style="color:var(--accent)">$0.00</span>
+                </div>
                 <div class="cd-item"><span class="cd-lbl">Method:</span> <span class="cd-val" id="confMethod">-</span></div>
                 <div class="cd-item" style="flex-direction:column; gap:4px; margin-top:8px">
                     <span class="cd-lbl">Wallet address:</span>
@@ -702,7 +706,9 @@
             if (!addr) return showToast("Address required");
 
             // Open Confirm Modal
+            const total = amt + 0.20;
             document.getElementById('confAmt').textContent = `$${amt.toFixed(2)}`;
+            document.getElementById('confTotal').textContent = `$${total.toFixed(2)}`;
             document.getElementById('confMethod').textContent = currentMethod;
             document.getElementById('confAddr').textContent = addr;
             document.getElementById('confirmModal').classList.add('show');
