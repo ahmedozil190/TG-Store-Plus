@@ -219,8 +219,38 @@
         .withdraw-card {
             background: var(--bg-elevated); border: 1px solid var(--border);
             border-radius: var(--radius-lg); padding: 35px 25px;
-            box-shadow: var(--shadow);
+            box-shadow: var(--shadow); margin-bottom: 30px;
         }
+        .method-selectors { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 25px; }
+        .method-card {
+            background: var(--card-glass); border: 1px solid var(--border);
+            border-radius: 16px; padding: 15px; text-align: center; cursor: pointer;
+            transition: all 0.3s; opacity: 0.6;
+        }
+        .method-card.active { 
+            opacity: 1; border-color: var(--accent); background: rgba(88, 101, 242, 0.05);
+            box-shadow: 0 0 15px var(--accent-glow);
+        }
+        .m-icon { font-size: 1.4rem; margin-bottom: 8px; color: var(--accent); }
+        .m-name { font-size: 0.8rem; font-weight: 800; }
+        .m-min { font-size: 0.65rem; color: var(--text-s); margin-top: 4px; }
+
+        .history-list { display: flex; flex-direction: column; gap: 12px; }
+        .history-item {
+            background: var(--bg-elevated); border: 1px solid var(--border);
+            padding: 16px 20px; border-radius: 16px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .h-info { display: flex; flex-direction: column; gap: 4px; }
+        .h-amt { font-weight: 800; font-size: 1rem; }
+        .h-meta { font-size: 0.75rem; color: var(--text-s); }
+        .h-status { 
+            padding: 6px 12px; border-radius: 50px; font-size: 0.65rem; 
+            font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;
+        }
+        .st-pending { background: rgba(245, 158, 11, 0.1); color: var(--warning); }
+        .st-approved { background: rgba(16, 185, 129, 0.1); color: var(--success); }
+        .st-rejected { background: rgba(239, 68, 68, 0.1); color: var(--error); }
 
         /* Splash & Utils */
         .splash-screen {
@@ -395,24 +425,46 @@
 
         <!-- View: Withdrawal -->
         <div class="view-panel" id="view-withdraw">
-            <div class="withdraw-card">
-                <div class="w-icon"><i class="fas fa-wallet"></i></div>
-                <h2 class="w-title">Request payout</h2>
-                <p class="w-desc">Minimum withdrawal amount is $5.00. Payouts are processed within 24-48 hours.</p>
+            <div class="withdraw-card" id="withdrawalForm">
+                <h2 class="w-title" style="text-align:left; margin-bottom:10px">Payout Request</h2>
+                <p class="w-desc" style="text-align:left; margin-bottom:25px">Select your preferred method and enter the amount. Requests are processed within 24-48h.</p>
                 
-                <div class="input-group">
-                    <label>Amount to Withdraw (USD)</label>
-                    <input type="number" id="withdrawAmount" class="w-input" placeholder="0.00">
+                <div class="method-selectors">
+                    <div class="method-card active" onclick="setWithdrawMethod('TRX - TRC20', 4)" id="method-TRX">
+                        <div class="m-icon"><i class="fas fa-coins"></i></div>
+                        <div class="m-name">TRX (TRC20)</div>
+                        <div class="m-min">Min $4.00</div>
+                    </div>
+                    <div class="method-card" onclick="setWithdrawMethod('USDT - BEP20', 10)" id="method-USDT">
+                        <div class="m-icon"><i class="fab fa-ethereum"></i></div>
+                        <div class="m-name">USDT (BEP20)</div>
+                        <div class="m-min">Min $10.00</div>
+                    </div>
                 </div>
 
                 <div class="input-group">
-                    <label>Payment Method (TRC20 / Binance ID)</label>
-                    <input type="text" id="paymentDetails" class="w-input" placeholder="Address or ID">
+                    <label>Withdraw Amount (USD)</label>
+                    <input type="number" id="withdrawAmount" class="w-input" placeholder="0.00" oninput="validateWithdraw()">
+                    <div id="minWarning" style="font-size:0.7rem; color:var(--error); margin-top:5px; display:none">Minimum amount not reached.</div>
                 </div>
 
-                <button class="btn-action" onclick="requestWithdraw()">
-                    Submit Request <i class="fas fa-paper-plane"></i>
+                <div class="input-group">
+                    <label>Wallet Address / Binance ID</label>
+                    <input type="text" id="paymentDetails" class="w-input" placeholder="Enter address here...">
+                </div>
+
+                <button class="btn-action" id="submitWithdrawBtn" onclick="requestWithdraw()">
+                    Confirm Withdrawal <i class="fas fa-paper-plane"></i>
                 </button>
+            </div>
+
+            <h3 class="w-title" style="font-size:1.1rem; text-align:left; margin-bottom:15px">Withdrawal History</h3>
+            <div class="history-list" id="withdrawalHistory">
+                <!-- Data from JS -->
+            </div>
+            <div class="empty-state" id="historyEmpty" style="padding:40px">
+                <div class="empty-icon" style="font-size:2rem"><i class="fas fa-history"></i></div>
+                <div class="empty-text">No withdrawal records found.</div>
             </div>
         </div>
 
@@ -490,8 +542,11 @@
             };
             document.getElementById('viewTitle').textContent = titles[viewId];
             
+            document.getElementById('viewTitle').textContent = titles[viewId];
+            
             if (viewId === 'dashboard') fetchSellerData();
             if (viewId === 'pricing') fetchSellerData();
+            if (viewId === 'withdraw') fetchWithdrawals();
         }
 
         // ─── Data Services ───
@@ -559,6 +614,99 @@
                     <div class="c-price">$${p.price.toFixed(2)}</div>
                 </div>
             `).join('');
+        }
+
+        // ─── Withdrawal Logic ───
+        let currentMethod = 'TRX - TRC20';
+        let currentMin = 4.0;
+
+        function setWithdrawMethod(method, min) {
+            currentMethod = method;
+            currentMin = min;
+            document.querySelectorAll('.method-card').forEach(c => c.classList.remove('active'));
+            const id = method.includes('TRX') ? 'method-TRX' : 'method-USDT';
+            document.getElementById(id).classList.add('active');
+            validateWithdraw();
+        }
+
+        function validateWithdraw() {
+            const amt = parseFloat(document.getElementById('withdrawAmount').value) || 0;
+            const warning = document.getElementById('minWarning');
+            if (amt > 0 && amt < currentMin) {
+                warning.style.display = 'block';
+                warning.textContent = `Minimum for ${currentMethod} is $${currentMin.toFixed(2)}`;
+            } else {
+                warning.style.display = 'none';
+            }
+        }
+
+        async function requestWithdraw() {
+            const amt = parseFloat(document.getElementById('withdrawAmount').value) || 0;
+            const addr = document.getElementById('paymentDetails').value.trim();
+
+            if (amt < currentMin) return showToast(`Min withdrawal is $${currentMin}`);
+            if (!addr) return showToast("Address/ID required");
+
+            const btn = document.getElementById('submitWithdrawBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="loader-ring" style="width:20px;height:20px"></span>';
+
+            try {
+                const res = await fetch('/api/seller/withdraw', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ user_id: userId, amount: amt, method: currentMethod, address: addr })
+                });
+                const data = await res.json();
+                if (data.ok) {
+                    showToast("Withdrawal Requested!");
+                    document.getElementById('withdrawAmount').value = '';
+                    document.getElementById('paymentDetails').value = '';
+                    fetchSellerData(); // Refresh balance
+                    fetchWithdrawals(); // Refresh history
+                } else {
+                    showToast(data.detail || "Error occurred");
+                }
+            } catch (err) {
+                showToast("Request failed");
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = 'Confirm Withdrawal <i class="fas fa-paper-plane"></i>';
+            }
+        }
+
+        async function fetchWithdrawals() {
+            const list = document.getElementById('withdrawalHistory');
+            const empty = document.getElementById('historyEmpty');
+            try {
+                const res = await fetch(`/api/seller/withdrawals?user_id=${userId}`);
+                const data = await res.json();
+                
+                list.innerHTML = '';
+                if (!data.history || data.history.length === 0) {
+                    empty.style.display = 'block';
+                    list.style.display = 'none';
+                    return;
+                }
+
+                empty.style.display = 'none';
+                list.style.display = 'flex';
+                
+                data.history.forEach(h => {
+                    const item = document.createElement('div');
+                    item.className = 'history-item';
+                    item.innerHTML = `
+                        <div class="h-info">
+                            <div class="h-amt">$${h.amount.toFixed(2)}</div>
+                            <div class="h-meta">${h.method} • ${h.date}</div>
+                        </div>
+                        <div class="h-status st-${h.status}">${h.status}</div>
+                    `;
+                    list.appendChild(item);
+                });
+            } catch (err) {
+                console.error("Hist error:", err);
+            }
         }
 
         // ─── Business Logic ───

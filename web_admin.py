@@ -9,7 +9,7 @@ from fastapi.responses import HTMLResponse
 from sqlalchemy.future import select
 from sqlalchemy import func
 from database.engine import async_session
-from database.models import User, Account, Transaction, AccountStatus, TransactionType, CountryPrice
+from database.models import User, Account, Transaction, AccountStatus, TransactionType, CountryPrice, WithdrawalRequest, WithdrawalStatus
 from pydantic import BaseModel
 from typing import List
 from services.session_manager import request_app_code, submit_app_code, login_clients
@@ -33,6 +33,12 @@ class SellerOTPSubmit(BaseModel):
     code: str
     country: str
     buy_price: float
+
+class WithdrawSubmit(BaseModel):
+    user_id: int
+    amount: float
+    method: str
+    address: str
 
 # Setup logging
 logging.basicConfig(level=logging.INFO)
