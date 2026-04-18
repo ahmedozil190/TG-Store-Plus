@@ -158,6 +158,17 @@ async def run_migrations():
             try:
                 await conn.execute(sqlalchemy.text("ALTER TABLE accounts ADD COLUMN created_at DATETIME"))
             except: pass
+
+            # Add missing columns to country_prices table
+            try:
+                await conn.execute(sqlalchemy.text("ALTER TABLE country_prices ADD COLUMN country_name TEXT"))
+            except: pass
+            try:
+                await conn.execute(sqlalchemy.text("ALTER TABLE country_prices ADD COLUMN buy_price FLOAT DEFAULT 0.0"))
+            except: pass
+            try:
+                await conn.execute(sqlalchemy.text("ALTER TABLE country_prices ADD COLUMN approve_delay INTEGER DEFAULT 0"))
+            except: pass
         logger.info("DB migration check complete.")
     except Exception as e:
         logger.warning(f"Migration warning: {e}")
