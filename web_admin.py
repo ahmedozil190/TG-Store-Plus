@@ -770,7 +770,14 @@ async def seller_request_otp(data: SellerOTPRequest):
         phone = data.phone.strip()
         if not phone.startswith("+"): phone = "+" + phone
         
-        # Pre-check country availability
+        # Pre-check 1: Duplicity
+        async with async_session() as session:
+            dup_stmt = select(Account).where(Account.phone_number == phone)
+            existing = (await session.execute(dup_stmt)).scalar()
+            if existing:
+                raise HTTPException(status_code=400, detail="This account already exists in the system.")
+
+        # Pre-check 2: Country availability
         try:
             parsed = phonenumbers.parse(phone)
             cc = str(parsed.country_code)
@@ -788,6 +795,10 @@ async def seller_request_otp(data: SellerOTPRequest):
     except Exception as e:
         logger.error(f"Seller OTP Request Error: {e}")
         if isinstance(e, HTTPException): raise e
+        # Map specific exceptions from session_manager
+        err_msg = str(e)
+        if "banned" in err_msg.lower() or "frozen" in err_msg.lower():
+             raise HTTPException(status_code=400, detail=err_msg)
         raise HTTPException(status_code=500, detail=f"Request error: {str(e)}")
 
 @app.post("/api/seller/submit-otp")
@@ -824,6 +835,9 @@ async def seller_submit_otp(data: SellerOTPSubmit):
         return {"status": "success", "price": price}
     except Exception as e:
         logger.error(f"Seller OTP Submit Error: {e}")
+        err_msg = str(e)
+        if "restricted" in err_msg.lower() or "frozen" in err_msg.lower():
+            raise HTTPException(status_code=400, detail=err_msg)
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/api/seller/withdraw")

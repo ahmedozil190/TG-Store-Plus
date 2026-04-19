@@ -1,6 +1,7 @@
 import re
 import logging
-from pyrogram import Client
+from pyrogram import Client, errors
+from pyrogram.raw import functions, types
 from typing import Dict
 
 from config import API_ID, API_HASH
@@ -24,6 +25,10 @@ async def request_app_code(user_id: int, phone_number: str) -> str:
         sent_code = await client.send_code(phone_number)
         login_clients[user_id] = client # Store client so we can complete sign_in later
         return sent_code.phone_code_hash
+    except errors.PhoneNumberBanned:
+        raise Exception("This phone number is banned from Telegram.")
+    except errors.UserDeactivated:
+        raise Exception("This account is frozen by Telegram.")
     except Exception as e:
         if client.is_connected:
             await client.disconnect()
@@ -37,8 +42,28 @@ async def submit_app_code(user_id: int, phone_number: str, phone_code_hash: str,
         
     try:
         await client.sign_in(phone_number, phone_code_hash, phone_code)
+        
+        # Health Check: Check for Spam/Restrictions
+        try:
+            spam_info = await client.invoke(functions.account.GetSpamInfo())
+            # If there's a restriction (SpamFilter), we consider it restricted
+            if not isinstance(spam_info, types.messages.SpamFilterNone):
+                await client.log_out()
+                raise Exception("This account is restricted or spam-blocked.")
+        except Exception as e:
+            if "restricted" in str(e).lower():
+                await client.log_out()
+                raise e
+            # Ignore other errors during health check to avoid false negatives
+            pass
+
         session_string = await client.export_session_string()
         return session_string
+    except Exception as e:
+        # If it was a login-level frozen error
+        if "UserDeactivated" in str(e):
+             raise Exception("This account is frozen by Telegram.")
+        raise e
     finally:
         if client.is_connected:
             await client.disconnect()
