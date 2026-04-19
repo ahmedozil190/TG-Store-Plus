@@ -17,56 +17,36 @@
             --success: #10b981;
             --warning: #f59e0b;
             --error: #ef4444;
-            --danger: #ef4444;
-            --accent-dark: #5865F2;
-            --accent-purple: #5865F2;
             --radius-sm: 12px;
             --radius-md: 20px;
             --radius-lg: 28px;
-            --radius: 18px;
             --ease: cubic-bezier(0.16, 1, 0.3, 1);
             --sidebar-width: 280px;
         }
 
-        .dark-mode,
-        :root {
+        /* Dark Mode: Premium Matte Zinc Edition */
+        .dark-mode {
             --bg: #09090b;
             --bg-elevated: #111113;
-            --bg-main: var(--bg);
-            --bg-card: var(--bg-elevated);
-            --border-card: rgba(255, 255, 255, 0.06);
+            --card-glass: rgba(255, 255, 255, 0.02);
             --border: rgba(255, 255, 255, 0.06);
             --text-p: #fafafa;
             --text-s: #a1a1aa;
-            --text-primary: var(--text-p);
-            --text-secondary: var(--text-s);
-            --sidebar-bg: var(--bg-elevated);
-            --nav-bg: var(--bg);
             --modal-bg: #09090b;
             --input-bg: #09090b;
-            --shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
-            --card-glass: rgba(255, 255, 255, 0.02);
-            --stat-val-color: #ffffff;
+            --shadow: 0 10px 40px rgba(0,0,0,0.4);
         }
 
         .light-mode {
             --bg: #f8f9fa;
             --bg-elevated: #ffffff;
-            --bg-main: var(--bg);
-            --bg-card: var(--bg-elevated);
+            --card-glass: rgba(0, 0, 0, 0.02);
             --border: rgba(0, 0, 0, 0.06);
-            --border-card: rgba(0, 0, 0, 0.06);
             --text-p: #0f172a;
             --text-s: #64748b;
-            --text-primary: var(--text-p);
-            --text-secondary: var(--text-s);
-            --sidebar-bg: var(--bg-elevated);
-            --nav-bg: var(--bg);
             --modal-bg: #ffffff;
             --input-bg: #f1f2f6;
-            --shadow: 0 10px 40px rgba(0, 0, 0, 0.06);
-            --card-glass: rgba(0, 0, 0, 0.02);
-            --stat-val-color: #000000;
+            --shadow: 0 10px 40px rgba(0,0,0,0.06);
         }
 
         * {
@@ -365,8 +345,8 @@
         }
 
         .confirm-modal {
-            background: var(--sidebar-bg);
-            border: 1px solid var(--border-card);
+            background: var(--bg-elevated);
+            border: 1px solid var(--border);
             border-radius: 24px;
             width: 90%;
             max-width: 400px;
@@ -431,7 +411,7 @@
         .confirm-no {
             background: rgba(255, 255, 255, 0.05);
             color: var(--text-primary);
-            border: 1px solid var(--border-card);
+            border: 1px solid var(--border);
         }
 
         .confirm-yes:hover {
@@ -513,11 +493,11 @@
 
         /* ========== Glass Card ========== */
         .card {
-            background: var(--bg-card);
-            border: 1px solid var(--border-card);
-            border-radius: var(--radius);
+            background: var(--bg-elevated);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
             padding: 20px;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.3s var(--ease);
             box-shadow: var(--shadow);
         }
 
@@ -554,7 +534,7 @@
         .list-item {
             background: var(--bg-card);
             backdrop-filter: blur(14px);
-            border: 1px solid var(--border-card);
+            border: 1px solid var(--border);
             border-radius: 16px;
             padding: 18px;
             display: flex;
@@ -568,7 +548,7 @@
         }
 
         .info-card {
-            background: var(--bg-card);
+            background: var(--bg-elevated);
             border: 1px solid var(--border);
             border-radius: 20px;
             padding: 22px 20px;
@@ -595,9 +575,9 @@
         }
 
         .info-card-val {
-            font-size: 1.4rem !important;
+            font-size: 1.4rem;
             font-weight: 800;
-            color: var(--text-p) !important;
+            color: var(--text-p);
             line-height: 1;
         }
 
@@ -668,7 +648,7 @@
             margin-bottom: 25px;
             padding: 5px;
             border-radius: 14px;
-            border: 1px solid var(--border-card);
+            border: 1px solid var(--border);
             background: rgba(0, 0, 0, 0.35);
         }
 
@@ -700,7 +680,7 @@
             width: 100%;
             padding: 14px;
             background: var(--sidebar-bg);
-            border: 1px solid var(--border-card);
+            border: 1px solid var(--border);
             border-radius: 12px;
             color: var(--text-primary);
             font-size: 0.95rem;
@@ -742,9 +722,9 @@
 
         /* ========== User Card ========== */
         .user-card {
-            background: var(--bg-card);
+            background: var(--bg-elevated);
             backdrop-filter: blur(14px);
-            border: 1px solid var(--border-card);
+            border: 1px solid var(--border);
             border-radius: 16px;
             padding: 18px;
             margin-top: 15px;
@@ -787,7 +767,7 @@
             width: 100%;
             max-width: 450px;
             border-radius: 24px;
-            border: 1px solid var(--border-card);
+            border: 1px solid var(--border);
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
             overflow: hidden;
             transform: translateY(30px);
@@ -1051,7 +1031,7 @@
         .modal-card {
             background: rgba(19, 23, 34, 0.98);
             backdrop-filter: blur(15px);
-            border: 1px solid var(--border-card);
+            border: 1px solid var(--border);
             border-radius: 30px;
             padding: 30px;
             width: 90%;
@@ -1089,7 +1069,7 @@
 
         .input-field {
             width: 100%;
-            background: var(--bg-card);
+            background: var(--bg-elevated);
             border: 1px solid #2e3248;
             color: var(--text-primary);
             padding: 12px;
@@ -1125,7 +1105,7 @@
             width: 100%;
             padding: 14px;
             background: #1a1d24;
-            border: 1px solid var(--border-card);
+            border: 1px solid var(--border);
             border-radius: 14px;
             color: var(--text-secondary);
             font-weight: 700;
@@ -1173,7 +1153,7 @@
 
         /* ========== Sales History ========== */
         .sale-card {
-            background: var(--bg-card);
+            background: var(--bg-elevated);
             backdrop-filter: blur(14px);
             border: 1px solid var(--border-card);
             border-radius: 16px;
