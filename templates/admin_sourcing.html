@@ -1591,7 +1591,7 @@
                 btn_confirm: "Delete Now",
                 btn_cancel: "Cancel",
                 lbl_full_name: "Full Name",
-                lbl_current_balance: "Current Balance",
+                btn_ban_user: "Ban User",
                 btn_unban_user: "Unban User",
                 lbl_pending_balance: "Pending Balance",
                 ph_amount: "Amount..."
@@ -1861,6 +1861,7 @@
             document.getElementById('manage-balance').innerText = `$${Number(u.balance_sourcing).toFixed(2)}`;
             document.getElementById('manage-pending').innerText = `$${Number(u.pending_balance || 0).toFixed(2)}`;
             document.getElementById('manage-sold').innerText = u.sold_count || 0;
+            document.getElementById('manage-sold-label').innerText = currentLang === 'ar' ? 'أرقام باعها' : 'Numbers Sold';
             document.getElementById('adjust-amount').value = '';
 
             const banBtn = document.getElementById('manage-ban-btn');
@@ -2220,7 +2221,7 @@
                         <span data-i18n="lbl_pending_balance" style="color: var(--text-secondary);">Pending</span>: <span id="manage-pending" style="color: #ff9f0a; font-weight: 700;">$0.00</span>
                     </div>
                     <div style="background: rgba(255,255,255,0.03); padding: 8px 12px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
-                        <span style="color: var(--text-secondary);">${currentLang === 'ar' ? 'أرقام باعها' : 'Numbers Sold'}</span>: <span id="manage-sold" style="color: var(--text-primary); font-weight: 700;">0</span>
+                        <span id="manage-sold-label" style="color: var(--text-secondary);">Numbers Sold</span>: <span id="manage-sold" style="color: var(--text-primary); font-weight: 700;">0</span>
                     </div>
                 </div>
 

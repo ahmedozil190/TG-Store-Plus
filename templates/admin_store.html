@@ -1617,6 +1617,7 @@
                 btn_unban_user: "Unban User",
                 lbl_spent: "Total Spent",
                 lbl_purchased: "Purchased",
+                lbl_pending_balance: "Pending Balance",
                 ph_amount: "Amount..."
             },
             ar: {
@@ -1669,6 +1670,7 @@
                 btn_unban_user: "إلغاء حظر المستخدم",
                 lbl_spent: "إجمالي المنفق",
                 lbl_purchased: "أرقام اشتراها",
+                lbl_pending_balance: "الرصيد المعلق",
                 ph_amount: "المبلغ..."
             }
         };
@@ -1890,6 +1892,10 @@
                             <span style="color: #30d158; font-weight: 900; font-size: 1.1rem;">$${Number(u.balance_store).toFixed(2)}</span>
                         </div>
                         <div style="background: var(--bg-elevated); border: 1px solid var(--border); padding: 14px 18px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center;">
+                            <span style="color: var(--text-secondary); font-size: 0.8rem; font-weight: 700; text-transform: uppercase;">${currentLang === 'ar' ? 'الرصيد المعلق' : 'Pending'}</span>
+                            <span style="color: #ff9f0a; font-weight: 800; font-size: 1rem;">$${Number(u.pending_balance || 0).toFixed(2)}</span>
+                        </div>
+                        <div style="background: var(--bg-elevated); border: 1px solid var(--border); padding: 14px 18px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center;">
                             <span style="color: var(--text-secondary); font-size: 0.8rem; font-weight: 700; text-transform: uppercase;">${currentLang === 'ar' ? 'أرقام اشتراها' : 'Purchased'}</span>
                             <span style="color: #ffcc00; font-weight: 800; font-size: 1rem;">${u.purchased_count || 0}</span>
                         </div>
@@ -1943,6 +1949,7 @@
             document.getElementById('manage-name').innerText = (u.full_name || 'N/A').toUpperCase();
             document.getElementById('manage-id').innerText = '@' + (u.username || u.id);
             document.getElementById('manage-balance').innerText = `$${Number(u.balance_store).toFixed(2)}`;
+            document.getElementById('manage-pending').innerText = `$${Number(u.pending_balance || 0).toFixed(2)}`;
             document.getElementById('manage-purchased').innerText = u.purchased_count || 0;
             document.getElementById('adjust-amount').value = '';
 
@@ -2230,8 +2237,13 @@
                     </button>
                 </div>
 
-                <div style="text-align: center; margin-bottom: 25px; color: var(--text-secondary); font-size: 0.9rem;">
-                    <span data-i18n="lbl_purchased">Purchased</span>: <span id="manage-purchased" style="color: var(--text-primary); font-weight: 700;">0</span>
+                <div style="text-align: center; margin-bottom: 25px; color: var(--text-secondary); font-size: 0.9rem; display: flex; flex-direction: column; gap: 8px;">
+                    <div>
+                        <span data-i18n="lbl_pending_balance">Pending Balance</span>: <span id="manage-pending" style="color: #ff9f0a; font-weight: 700;">$0.00</span>
+                    </div>
+                    <div>
+                        <span data-i18n="lbl_purchased">Purchased</span>: <span id="manage-purchased" style="color: var(--text-primary); font-weight: 700;">0</span>
+                    </div>
                 </div>
 
                 <div class="manage-actions">
