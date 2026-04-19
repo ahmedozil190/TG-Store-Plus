@@ -1,4 +1,5 @@
 import re
+import random
 import logging
 import asyncio
 from pyrogram import Client, errors
@@ -51,7 +52,8 @@ async def submit_app_code(user_id: int, phone_number: str, phone_code_hash: str,
         return None
         
     try:
-        await asyncio.sleep(1.0) # Human-like delay before sign-in
+        # Human-like delay before sign-in (simulate typing OTP)
+        await asyncio.sleep(random.uniform(2.5, 5.5)) 
         await client.sign_in(phone_number, phone_code_hash, phone_code)
         
         # Health Check: Deep inspection after login
@@ -77,6 +79,8 @@ async def submit_app_code(user_id: int, phone_number: str, phone_code_hash: str,
                     await client.unblock_user(target_bot)
                 except: pass
                 
+                # Simulate a human reading and typing
+                await asyncio.sleep(random.uniform(1.5, 3.5))
                 await client.send_message(target_bot, "/start")
                 
                 response_received = False
