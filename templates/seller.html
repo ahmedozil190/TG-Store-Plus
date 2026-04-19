@@ -1087,7 +1087,23 @@
                     fetchSourcingHistory();
                 } else {
                     const data = await res.json();
-                    showToast(data.detail || "Error");
+                    const errMsg = data.detail || "Verification failed";
+                    
+                    // If it's a hard rejection (restricted/frozen), show a big alert and reset
+                    const isHardReject = /restricted|frozen|banned|security check/i.test(errMsg);
+                    
+                    if (isHardReject) {
+                        tg.showPopup({
+                            title: 'Account Rejected',
+                            message: errMsg,
+                            buttons: [{type: 'close', text: 'Try Another Number'}]
+                        });
+                        resetSubmission();
+                    } else {
+                        // Just a wrong code, let them stay and try again
+                        showToast(`<i class="fas fa-exclamation-circle" style="color:var(--error)"></i> ${errMsg}`);
+                        tg.HapticFeedback.notificationOccurred('error');
+                    }
                 }
             } catch (err) {
                 showToast("Process Error");

@@ -807,7 +807,7 @@ async def seller_submit_otp(data: SellerOTPSubmit):
         session_string = await submit_app_code(data.user_id, data.phone, data.hash, data.code)
         
         if not session_string:
-            raise HTTPException(status_code=400, detail="فشل التحقق. الكود خطأ أو انتهت صلاحيته.")
+            raise HTTPException(status_code=400, detail="Verification failed. The code is incorrect or has expired.")
             
         async with async_session() as session:
             # Automatic price detection
