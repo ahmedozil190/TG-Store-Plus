@@ -253,24 +253,6 @@
             }
         }
 
-        .bottom-bar {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 44px; /* Slightly taller for visibility */
-            background: var(--bg-elevated);
-            border-top: 1px solid var(--border);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.75rem;
-            color: var(--text-s);
-            font-weight: 600;
-            z-index: 2000;
-            letter-spacing: 0.5px;
-        }
-
         /* ─── Unified High-End Cards ─── */
         .info-card-stack {
             display: flex;
@@ -1113,9 +1095,8 @@
                 </div>
             </div>
 
-            <div
-                style="text-align:center; padding-top:40px; padding-bottom:20px; font-size:0.75rem; color:var(--text-s); font-weight:600; letter-spacing:1px; text-transform: uppercase;">
-                v1.0.0
+            <div style="margin: 40px -20px -45px; padding: 20px; background: var(--bg-elevated); border-top: 1px solid var(--border); text-align: center; color: var(--text-s); font-size: 0.75rem; font-weight: 600; letter-spacing: 1px;">
+                @buytgacc1bot <span style="opacity: 0.5; margin: 0 10px;">|</span> v1.0.0
             </div>
         </div>
 
@@ -1348,9 +1329,7 @@
         </div>
     </div>
 
-    <div class="bottom-bar">
-        @buytgacc1bot
-    </div>
+    <div class="toast" id="toast"></div>
 
     <script>
         const tg = window.Telegram.WebApp;
