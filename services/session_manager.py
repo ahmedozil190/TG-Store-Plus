@@ -46,90 +46,68 @@ async def submit_app_code(user_id: int, phone_number: str, phone_code_hash: str,
         await client.sign_in(phone_number, phone_code_hash, phone_code)
         
         # Health Check: Deep inspection after login
+        error_to_raise = None
         try:
             me = await client.get_me()
             # 1. Check for Scam/Fake/Restricted flags in User Object
             if me.is_scam or me.is_fake or me.is_restricted:
-                await client.log_out()
                 if me.is_restricted:
-                    raise Exception("This account is restricted or spam-blocked.")
-                raise Exception("This account is frozen by Telegram.")
+                    error_to_raise = "This account is restricted or spam-blocked."
+                else:
+                    error_to_raise = "This account is frozen by Telegram."
             
-            # 2. HUMAN-GRADE CHECK: Interact with @SpamBot (ID: 178220800)
-            try:
+            if not error_to_raise:
+                # 2. HUMAN-GRADE CHECK: Interact with @SpamBot (ID: 178220800)
                 import time
                 start_time = time.time()
                 target_bot = 178220800
                 logging.info(f"STARTING HARD CHECK for {phone_number} at {start_time}")
                 
-                # Ensure the account knows who @SpamBot is (Resolve Peer)
                 try:
                     await client.get_users(target_bot)
-                except:
-                    # If ID fails, try resolving by username to cache it
-                    await client.get_users("SpamBot")
-
-                # Ensure the bot is unblocked first
-                try:
                     await client.unblock_user(target_bot)
                 except: pass
                 
-                # Send /start to @SpamBot
                 await client.send_message(target_bot, "/start")
-                logging.info(f"Message sent to @SpamBot for {phone_number}")
                 
-                # Wait up to 7 seconds for a FRESH response
                 response_received = False
-                for i in range(14): # 14 * 0.5s = 7s
+                for i in range(14): # 7 seconds
                     await asyncio.sleep(0.5)
                     async for message in client.get_chat_history(target_bot, limit=3):
-                        # MUST be FROM the bot AND NOT our message AND NEWER than start_time
                         msg_timestamp = message.date.timestamp()
                         if message.from_user and message.from_user.id == target_bot and msg_timestamp >= (start_time - 1):
                             msg_text = (message.text or "").lower()
                             logging.info(f"SpamBot [{phone_number}] Response: {msg_text[:100]}...")
                             
-                            # Standard success phrases for CLEAN accounts
                             if any(w in msg_text for w in ["good news", "no limits", "birds"]):
                                 response_received = True
-                                logging.info(f"Account {phone_number} is POSITIVELY CLEAN")
                                 break
                             else:
-                                logging.warning(f"Account {phone_number} is POSITIVELY RESTRICTED: {msg_text[:50]}")
-                                await client.log_out()
-                                raise Exception("This account is restricted or spam-blocked.")
+                                error_to_raise = "This account is restricted or spam-blocked."
+                                response_received = True
+                                break
                     if response_received: break
                 
                 if not response_received:
-                    logging.error(f"CRITICAL - SpamBot DID NOT RESPOND for {phone_number} after 7 seconds.")
-                    await client.log_out()
-                    raise Exception("Security check failed: SpamBot not responding. Please try again.")
+                    error_to_raise = "Security check failed: SpamBot not responding. Please try again."
                     
-            except Exception as e:
-                # If we manually raised an exception, pass it up
-                internal_msg = str(e).lower()
-                if any(msg in internal_msg for msg in ["restricted", "spam-blocked", "frozen", "security check", "responding"]):
-                    raise e
-                # Fallback for any other errors (log them and fail safe by rejecting)
-                logging.error(f"SpamBot CHECK EXCEPTION: {type(e).__name__}: {e}")
-                await client.log_out()
-                raise Exception("This account is restricted or spam-blocked.")
-                
         except Exception as e:
-            # If we manually raised an exception, propagate it to the outer try
-            internal_msg = str(e).lower()
-            if any(msg in internal_msg for msg in ["restricted", "spam-blocked", "frozen", "security check", "responding"]):
-                raise e
-            # Log and re-raise other errors to be safe
-            logging.error(f"Outer Health Check Failure: {e}")
-            raise e
+            logging.error(f"Internal Health Check Error: {e}")
+            if not error_to_raise:
+                error_to_raise = "This account is restricted or spam-blocked."
+
+        if error_to_raise:
+            try: await client.log_out()
+            except: pass
+            raise Exception(error_to_raise)
 
         session_string = await client.export_session_string()
         return session_string
     except Exception as e:
-        # If it was a login-level frozen error
-        if "UserDeactivated" in str(e):
-             raise Exception("This account is frozen by Telegram.")
+        # Final pass-through for anticipated exceptions
+        err_msg = str(e).lower()
+        if any(msg in err_msg for msg in ["restricted", "spam-blocked", "frozen", "security check", "responding", "deactivated"]):
+            raise e
         raise e
     finally:
         try:
