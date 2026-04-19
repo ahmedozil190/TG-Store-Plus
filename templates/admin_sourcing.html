@@ -822,12 +822,15 @@
 
         .manage-card {
             background: var(--bg-elevated);
-            width: 85%;
-            max-width: 380px;
+            width: 95%;
+            max-width: 440px;
             border-radius: 28px;
             border: 1px solid var(--border);
-            padding: 24px 18px;
+            padding: 30px 25px;
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
             transform: scale(0.9);
             transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
@@ -840,12 +843,13 @@
             background: var(--card-glass);
             border: 1px solid var(--border);
             border-radius: 16px;
-            padding: 12px 10px;
-            margin-bottom: 10px;
+            padding: 10px 15px;
             text-align: center;
             display: flex;
             align-items: center;
             justify-content: center;
+            width: 100%;
+            box-sizing: border-box;
         }
 
         .manage-avatar {
@@ -2209,7 +2213,7 @@
             </div>
 
             <!-- Balance Box -->
-            <div class="manage-data-box" style="margin-bottom: 20px; padding: 18px 10px;">
+            <div class="manage-data-box" style="margin-bottom: 8px; padding: 15px 10px;">
                 <div id="manage-balance" class="manage-stat-value">$0.00</div>
             </div>
 
