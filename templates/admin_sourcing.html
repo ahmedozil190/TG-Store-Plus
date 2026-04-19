@@ -221,10 +221,22 @@
             font-size: 0.85rem;
             font-weight: 900;
             color: var(--text-primary);
-            border: 2px solid #0f1116;
-            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+            border: 2px solid var(--bg);
             z-index: 5;
         }
+
+        .user-card {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 24px 20px 20px;
+            position: relative;
+            margin-top: 15px;
+            transition: transform 0.2s;
+        }
+        .user-card:active { transform: scale(0.98); }
+
+        .no-shadow { box-shadow: none !important; }
 
         /* ========== Confirm Modal ========== */
         .confirm-overlay {
@@ -1127,11 +1139,11 @@
             <section id="section-users" class="view-section">
                 <!-- User Stats -->
                 <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 25px;">
-                    <div class="card stat-row">
+                    <div class="card stat-row no-shadow">
                         <span class="label" data-i18n="stat_total_users">TOTAL USERS</span>
                         <span class="value" id="user-count" style="color: var(--success);">0</span>
                     </div>
-                    <div class="card stat-row">
+                    <div class="card stat-row no-shadow">
                         <span class="label" data-i18n="stat_banned">BANNED</span>
                         <span class="value" id="banned-count" style="color: var(--danger);">0</span>
                     </div>
@@ -1468,44 +1480,44 @@
                     <div class="user-card-index">${idx}</div>
                     <div style="display: flex; flex-direction: column; gap: 10px;">
                         <!-- Account Status -->
-                        <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); padding: 14px 18px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center;">
+                        <div style="background: var(--bg-elevated); border: 1px solid var(--border); padding: 14px 18px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center;">
                             <span style="color: var(--text-secondary); font-size: 0.8rem; font-weight: 700; text-transform: uppercase;">${currentLang === 'ar' ? 'الحالة' : 'Status'}</span>
                             <span style="color: ${statusColor}; font-weight: 900; font-size: 0.9rem; display: flex; align-items: center; gap: 8px; letter-spacing: 0.5px;">
                                 ${statusIcon} ${statusText}
                             </span>
                         </div>
                         <!-- Name -->
-                        <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); padding: 14px 18px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center;">
+                        <div style="background: var(--bg-elevated); border: 1px solid var(--border); padding: 14px 18px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center;">
                             <span style="color: var(--text-secondary); font-size: 0.8rem; font-weight: 700; text-transform: uppercase;">${currentLang === 'ar' ? 'الاسم' : 'Name'}</span>
                             <span style="color: #00d2ff; font-weight: 700; font-size: 1rem;">${u.full_name ? u.full_name.split(' ')[0] : 'N/A'}</span>
                         </div>
                         <!-- Username -->
-                        <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); padding: 14px 18px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center;">
+                        <div style="background: var(--bg-elevated); border: 1px solid var(--border); padding: 14px 18px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center;">
                             <span style="color: var(--text-secondary); font-size: 0.8rem; font-weight: 700; text-transform: uppercase;">${currentLang === 'ar' ? 'المعرف' : 'Username'}</span>
                             <span style="color: #bf5af2; font-weight: 700; font-size: 1rem;">${u.username}</span>
                         </div>
                         <!-- User ID -->
-                        <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); padding: 14px 18px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center;">
+                        <div style="background: var(--bg-elevated); border: 1px solid var(--border); padding: 14px 18px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center;">
                             <span style="color: var(--text-secondary); font-size: 0.8rem; font-weight: 700; text-transform: uppercase;">${currentLang === 'ar' ? 'رقم المعرف' : 'User ID'}</span>
                             <span style="color: #ff9f0a; font-weight: 800; font-size: 1rem;">${u.id}</span>
                         </div>
                         <!-- Balance -->
-                        <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); padding: 14px 18px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center;">
+                        <div style="background: var(--bg-elevated); border: 1px solid var(--border); padding: 14px 18px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center;">
                             <span style="color: var(--text-secondary); font-size: 0.8rem; font-weight: 700; text-transform: uppercase;">${currentLang === 'ar' ? 'الرصيد' : 'Balance'}</span>
                             <span style="color: #30d158; font-weight: 900; font-size: 1.1rem;">$${u.balance_sourcing}</span>
                         </div>
                         <!-- Sold Count -->
-                        <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); padding: 14px 18px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center;">
+                        <div style="background: var(--bg-elevated); border: 1px solid var(--border); padding: 14px 18px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center;">
                             <span style="color: var(--text-secondary); font-size: 0.8rem; font-weight: 700; text-transform: uppercase;">${currentLang === 'ar' ? 'أرقام باعها' : 'Numbers Sold'}</span>
                             <span style="color: #ffcc00; font-weight: 800; font-size: 1rem;">${u.sold_count}</span>
                         </div>
                         <!-- Accepted Count -->
-                        <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); padding: 14px 18px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center;">
+                        <div style="background: var(--bg-elevated); border: 1px solid var(--border); padding: 14px 18px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center;">
                             <span style="color: var(--text-secondary); font-size: 0.8rem; font-weight: 700; text-transform: uppercase;">${currentLang === 'ar' ? 'أرقام مقبولة' : 'Accepted'}</span>
                             <span style="color: #5eeb8b; font-weight: 800; font-size: 1rem;">${u.accepted_count}</span>
                         </div>
                         <!-- Rejected Count -->
-                        <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); padding: 14px 18px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center;">
+                        <div style="background: var(--bg-elevated); border: 1px solid var(--border); padding: 14px 18px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center;">
                             <span style="color: var(--text-secondary); font-size: 0.8rem; font-weight: 700; text-transform: uppercase;">${currentLang === 'ar' ? 'أرقام مرفوضة' : 'Rejected'}</span>
                             <span style="color: #ff453a; font-weight: 800; font-size: 1rem;">${u.rejected_count}</span>
                         </div>
