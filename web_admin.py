@@ -418,6 +418,18 @@ async def get_sourcing_data():
 async def get_admin_store_data():
     try:
         async with async_session() as session:
+            bot_name = "Bot"
+            try:
+                from config import STORE_BOT_TOKEN
+                import urllib.request, json
+                req = urllib.request.Request(f"https://api.telegram.org/bot{STORE_BOT_TOKEN}/getMe")
+                with urllib.request.urlopen(req, timeout=3) as r:
+                    res_data = json.loads(r.read().decode())
+                    if res_data.get("ok"):
+                        bot_name = res_data["result"].get("first_name", "Bot")
+            except Exception:
+                pass
+
             user_count = (await session.execute(select(func.count(User.id)).where(User.is_active_store == True))).scalar() or 0
             stock_count = (await session.execute(select(func.count(Account.id)).where(Account.status == AccountStatus.AVAILABLE))).scalar() or 0
             total_balance = (await session.execute(select(func.sum(User.balance_store)))).scalar() or 0.0

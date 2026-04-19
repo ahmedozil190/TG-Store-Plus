@@ -1022,14 +1022,14 @@
             <i class="fas fa-bars"></i>
         </button>
         <div class="page-title" id="page-title" data-i18n="nav_dashboard">Dashboard</div>
-        <div class="user-avatar">AD</div>
+        <div class="user-avatar" id="userInitial">AD</div>
     </div>
 
     <!-- Sidebar Drawer -->
     <div class="sidebar" id="navSidebar">
         <div class="side-brand">
             <div class="side-brand-dot"></div>
-            <span class="side-brand-name" data-i18n="panel_title">Sourcing Panel</span>
+            <span class="side-brand-name" id="sideBrandName">Sourcing Panel</span>
         </div>
 
         <div class="side-nav">
@@ -1044,9 +1044,6 @@
             </div>
             <div class="nav-item" id="menu-history" onclick="switchNav('history', this)">
                 <i class="fas fa-clock-rotate-left"></i> <span data-i18n="nav_history">Operations History</span>
-            </div>
-            <div class="nav-item" id="menu-settings" onclick="switchNav('settings', this)">
-                <i class="fas fa-cog"></i> <span data-i18n="nav_settings">Settings</span>
             </div>
         </div>
     </div>
@@ -1380,10 +1377,11 @@
         function switchNav(id, btn, skipToggle = false) {
             document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
             document.getElementById('section-' + id).classList.add('active');
-            document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(m => m.classList.remove('active'));
             if (btn) btn.classList.add('active');
 
             sessionStorage.setItem('last_view_admin_sourcing', id);
+            if (!skipToggle) closeNav();
 
             // Update page title
             const titleMap = { home: 'nav_dashboard', prices: 'nav_prices', users: 'nav_users', history: 'nav_history', settings: 'nav_settings' };
