@@ -467,8 +467,8 @@
         }
 
         .container {
-            padding: 20px;
-            max-width: 500px;
+            padding: 25px 20px;
+            max-width: 500px !important;
             margin: 0 auto;
         }
 
@@ -514,13 +514,11 @@
         /* ========== Glass Card ========== */
         .card {
             background: var(--bg-card);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
             border: 1px solid var(--border-card);
             border-radius: var(--radius);
             padding: 20px;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            box-shadow: var(--shadow);
         }
 
         /* ========== Stat Row Card ========== */
@@ -565,7 +563,8 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            transition: all 0.3s var(--ease);
+            box-shadow: var(--shadow);
+            transition: transform 0.3s var(--ease), background 0.4s var(--ease);
         }
 
         .info-card-l {
@@ -1311,7 +1310,7 @@
             <section id="section-users" class="view-section">
                 <!-- User Stats -->
                 <div style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 25px;">
-                    <div class="info-card no-shadow">
+                    <div class="info-card">
                         <div class="info-card-l">
                             <span class="info-card-lbl" data-i18n="stat_total_users">TOTAL USERS</span>
                             <div class="info-card-val"><span id="user-count">0</span> <span
@@ -1321,7 +1320,7 @@
                             <i class="fas fa-users"></i>
                         </div>
                     </div>
-                    <div class="info-card no-shadow">
+                    <div class="info-card">
                         <div class="info-card-l">
                             <span class="info-card-lbl" data-i18n="stat_banned">BANNED USERS</span>
                             <div class="info-card-val"><span id="banned-count">0</span> <span
