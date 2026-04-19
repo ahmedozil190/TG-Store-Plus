@@ -17,8 +17,6 @@ async def create_client(session_string: str = None) -> Client:
         "device_model": "Samsung SM-S918B", # Galaxy S23 Ultra
         "system_version": "Android 14", # Modern Android version
         "app_version": "10.14.5", # Recent Telegram version
-        "system_lang_code": "en-US", # Forces system language to English
-        "lang_pack": "android",
         "lang_code": "en" # Forces Telegram messages/OTPs to English
     }
     if session_string:
