@@ -1526,7 +1526,8 @@
                 lbl_current_balance: "Current Balance",
                 btn_edit_balance: "Update Balance",
                 btn_ban_user: "Ban User",
-                btn_unban_user: "Unban User"
+                btn_unban_user: "Unban User",
+                lbl_pending_balance: "Pending Balance"
             },
             ar: {
                 nav_dashboard: "الرئيسية",
@@ -1575,7 +1576,8 @@
                 lbl_current_balance: "الرصيد الحالي",
                 btn_edit_balance: "تعديل الرصيد",
                 btn_ban_user: "حظر المستخدم",
-                btn_unban_user: "إلغاء حظر المستخدم"
+                btn_unban_user: "إلغاء حظر المستخدم",
+                lbl_pending_balance: "الرصيد المعلق"
             }
         };
 
@@ -1750,11 +1752,6 @@
                             <span style="color: var(--text-secondary); font-size: 0.8rem; font-weight: 700; text-transform: uppercase;">${currentLang === 'ar' ? 'أرقام مقبولة' : 'Accepted'}</span>
                             <span style="color: #5eeb8b; font-weight: 800; font-size: 1rem;">${u.accepted_count}</span>
                         </div>
-                        <!-- Rejected Count -->
-                        <div style="background: var(--bg-elevated); border: 1px solid var(--border); padding: 14px 18px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center;">
-                            <span style="color: var(--text-secondary); font-size: 0.8rem; font-weight: 700; text-transform: uppercase;">${currentLang === 'ar' ? 'أرقام مرفوضة' : 'Rejected'}</span>
-                            <span style="color: #ff453a; font-weight: 800; font-size: 1rem;">${u.rejected_count}</span>
-                        </div>
                     </div>
                 </div>`;
             }).join('');
@@ -1789,6 +1786,7 @@
             document.getElementById('manage-name').innerText = u.full_name || 'N/A';
             document.getElementById('manage-id').innerText = '@' + (u.username || u.id);
             document.getElementById('manage-balance').innerText = `$${Number(u.balance_sourcing).toFixed(2)}`;
+            document.getElementById('manage-pending').innerText = `$${Number(u.pending_balance || 0).toFixed(2)}`;
 
             const banBtn = document.getElementById('manage-ban-btn');
             if (u.banned) {
@@ -2104,6 +2102,10 @@
                 <div class="manage-stat-box">
                     <div class="manage-stat-label" data-i18n="lbl_current_balance">Current Balance</div>
                     <div id="manage-balance" class="manage-stat-value">$0.00</div>
+                </div>
+                <div class="manage-stat-box">
+                    <div class="manage-stat-label" data-i18n="lbl_pending_balance">Pending Balance</div>
+                    <div id="manage-pending" class="manage-stat-value">$0.00</div>
                 </div>
                 <div class="manage-actions">
                     <button class="manage-btn primary" onclick="manageBalance()">

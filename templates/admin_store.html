@@ -1546,7 +1546,8 @@
                 lbl_current_balance: "Current Balance",
                 btn_edit_balance: "Update Balance",
                 btn_ban_user: "Ban User",
-                btn_unban_user: "Unban User"
+                btn_unban_user: "Unban User",
+                lbl_spent: "Total Spent"
             },
             ar: {
                 nav_dashboard: "الرئيسية",
@@ -1595,7 +1596,8 @@
                 lbl_current_balance: "الرصيد الحالي",
                 btn_edit_balance: "تعديل الرصيد",
                 btn_ban_user: "حظر المستخدم",
-                btn_unban_user: "إلغاء حظر المستخدم"
+                btn_unban_user: "إلغاء حظر المستخدم",
+                lbl_spent: "إجمالي المنفق"
             }
         };
 
@@ -1865,6 +1867,7 @@
             document.getElementById('manage-name').innerText = u.full_name || 'N/A';
             document.getElementById('manage-id').innerText = '@' + (u.username || u.id);
             document.getElementById('manage-balance').innerText = `$${Number(u.balance_store).toFixed(2)}`;
+            document.getElementById('manage-spent').innerText = `$${Number(u.total_spent || 0).toFixed(2)}`;
 
             const banBtn = document.getElementById('manage-ban-btn');
             if (u.banned) {
@@ -2114,6 +2117,10 @@
                 <div class="manage-stat-box">
                     <div class="manage-stat-label" data-i18n="lbl_current_balance">Current Balance</div>
                     <div id="manage-balance" class="manage-stat-value">$0.00</div>
+                </div>
+                <div class="manage-stat-box">
+                    <div class="manage-stat-label" data-i18n="lbl_spent">Total Spent</div>
+                    <div id="manage-spent" class="manage-stat-value">$0.00</div>
                 </div>
                 <div class="manage-actions">
                     <button class="manage-btn primary" onclick="manageBalance()">
