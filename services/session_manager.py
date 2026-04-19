@@ -59,68 +59,60 @@ async def submit_app_code(user_id: int, phone_number: str, phone_code_hash: str,
         # Health Check: Deep inspection after login
         error_to_raise = None
         try:
-            # Random delay before checking user info to be safe
             await asyncio.sleep(random.uniform(1.0, 2.5))
             me = await client.get_me()
             
-            # 1. Check for Scam/Fake/Restricted flags in User Object
+            # 1. API Level Check
             if me.is_scam or me.is_fake or me.is_restricted:
-                if me.is_restricted:
-                    error_to_raise = "This account is restricted or spam-blocked."
-                else:
-                    error_to_raise = "This account is frozen by Telegram."
+                error_to_raise = "This account is restricted or frozen by Telegram."
             
-            # 2. Saved Messages Test (Physical Test)
-            # Ensures the account is not completely frozen/deactivated from Telegram's end
+            # 2. Strict Physical Check (Saved Messages)
             if not error_to_raise:
                 try:
-                    await asyncio.sleep(random.uniform(1.0, 2.0))
-                    test_msg = await client.send_message("me", "/start")
+                    await asyncio.sleep(1.0)
+                    test_msg = await client.send_message("me", "System test")
                     await test_msg.delete()
-                except (errors.UserDeactivated, errors.UserDeactivatedBan, errors.UserBannedInChannel):
-                    error_to_raise = "This account is completely frozen/banned by Telegram."
                 except Exception as e:
-                    pass # Ignore minor network errors to avoid false positive logouts
+                    # IF IT FAILS TO MESSAGE ITSELF, THE ACCOUNT IS DEAD OR BANNED. DO NOT PASS!
+                    error_to_raise = f"This account is completely frozen/banned. ({type(e).__name__})"
                     
-            # 3. Smart SpamBot Test
-            # Messages SpamBot but ONLY fails if SpamBot explicitly tells us the account is restricted.
+            # 3. Smart SpamBot Test (Language-Agnostic)
             if not error_to_raise:
                 try:
                     import time
                     start_time = time.time()
                     target_bot = 178220800 # SpamBot ID
                     
-                    await asyncio.sleep(random.uniform(1.5, 3.0))
+                    await asyncio.sleep(random.uniform(1.5, 2.5))
                     await client.send_message(target_bot, "/start")
                     
-                    spambot_responded = False
-                    for i in range(12): # Wait up to 6 seconds for reply
+                    for i in range(12): # Wait up to 6 seconds
                         await asyncio.sleep(0.5)
                         async for msg in client.get_chat_history(target_bot, limit=2):
                             if msg.from_user and msg.from_user.id == target_bot and msg.date.timestamp() > (start_time - 1):
-                                spambot_responded = True
                                 text = (msg.text or "").lower()
                                 
-                                # Arabic & English negative keywords indicating restrictions
+                                # Arabic & English explicit restriction signs
                                 negatives = ["unfortunately", "limited", "restrictions", "للاسف", "للأسف", "قيود", "مقيد"]
-                                # Positive keywords
-                                positives = ["good news", "birds", "أخبار جيدة", "اخبار جيدة", "لا توجد قيود"]
                                 
                                 if any(word in text for word in negatives):
-                                    error_to_raise = "This account is spam-restricted (Cannot send to non-contacts)."
+                                    error_to_raise = "This account is spam-restricted."
                                 elif msg.reply_markup:
-                                    error_to_raise = "This account is spam-restricted (Appeal buttons present)."
-                                break # Message processed
-                        if spambot_responded:
+                                    # All localized restriction messages have 'Appeal/More Info' buttons. Clean accounts don't!
+                                    error_to_raise = "This account is spam-restricted (Appeal buttons active)."
+                                break # Processed
+                        if error_to_raise:
                             break
                             
                 except Exception as e:
-                    pass # Do not flag the account if Spambot check fails for any environmental reason
-                    
+                    # Only catch actual Pyrogram errors that mean the session got dropped
+                    if "Unauthorized" in str(type(e)) or "UserDeactivated" in str(type(e)):
+                        error_to_raise = f"Session revoked by Telegram. ({type(e).__name__})"
+
         except Exception as e:
             logging.error(f"Internal Health Check Error: {e}")
             if not error_to_raise:
-                error_to_raise = "Error verifying account status. Please try again."
+                error_to_raise = f"Account session revoked or frozen. ({type(e).__name__})"
 
         if error_to_raise:
             try: await client.log_out()
