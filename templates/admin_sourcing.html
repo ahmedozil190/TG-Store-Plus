@@ -90,7 +90,7 @@
         }
 
         body {
-            background-color: var(--bg-main);
+            background-color: var(--bg);
             color: var(--text-primary);
             height: 100vh;
             overflow: hidden;
@@ -98,6 +98,13 @@
             flex-direction: column;
         }
 
+        #app-content-scroller {
+            overflow-y: auto;
+            overflow-x: hidden;
+            flex: 1;
+            scroll-behavior: smooth;
+            background: var(--bg);
+        }
         /* Background removed */
 
         /* ========== Loader ========== */
