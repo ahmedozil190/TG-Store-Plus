@@ -933,6 +933,7 @@ async def detect_country(phone: str):
         if not phone.startswith("+"): phone = "+" + phone
         parsed = phonenumbers.parse(phone)
         country_code = str(parsed.country_code)
+        iso_code = phonenumbers.region_code_for_number(parsed)
         
         async with async_session() as session:
             stmt = select(CountryPrice).where(CountryPrice.country_code == country_code)
@@ -942,7 +943,7 @@ async def detect_country(phone: str):
                 return {
                     "found": True,
                     "name": cp.country_name,
-                    "flag": get_flag_emoji(pycountry.countries.get(numeric=cp.country_name).alpha_2 if cp.country_name.isdigit() else "US"), # Placeholder logic
+                    "flag": get_flag_emoji(iso_code) if iso_code else "🌐",
                     "price": cp.buy_price
                 }
     except:
