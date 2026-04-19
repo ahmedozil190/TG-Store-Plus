@@ -40,7 +40,7 @@
             --sidebar-bg: var(--bg-elevated);
             --modal-bg: #09090b;
             --input-bg: #09090b;
-            --shadow: 0 10px 40px rgba(0,0,0,0.4);
+            --shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
             --tab-bg: rgba(255, 255, 255, 0.05);
         }
 
@@ -56,7 +56,7 @@
             --sidebar-bg: var(--bg-elevated);
             --modal-bg: #ffffff;
             --input-bg: #f1f2f6;
-            --shadow: 0 10px 40px rgba(0,0,0,0.06);
+            --shadow: 0 10px 40px rgba(0, 0, 0, 0.06);
             --tab-bg: rgba(0, 0, 0, 0.05);
         }
 
@@ -137,8 +137,6 @@
             padding: 0 20px;
             z-index: 1000;
             flex-shrink: 0;
-            position: sticky;
-            top: 0;
         }
 
         .nav-trigger {
@@ -232,30 +230,12 @@
             font-size: 1.2rem;
             font-weight: 800;
         }
-        .main-container {
-            flex: 1;
+
+        .side-nav {
             display: flex;
             flex-direction: column;
-            overflow: hidden;
-            position: relative;
-        }
-
-        .bottom-bar {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 40px;
-            background: var(--bg-elevated);
-            border-top: 1px solid var(--border);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.75rem;
-            color: var(--text-secondary);
-            font-weight: 600;
-            z-index: 2000;
-            letter-spacing: 0.5px;
+            gap: 10px;
+            flex: 1;
         }
 
         .nav-item {
@@ -609,20 +589,46 @@
         }
 
         .pagination-ctrls {
-            display: flex; justify-content: space-between; align-items: center;
-            margin-top: 20px; padding: 12px; background: rgba(255,255,255,0.02);
-            border-radius: 12px; border: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 12px;
+            border: 1px solid var(--border);
         }
+
         .pg-btn {
-            background: var(--bg-elevated); color: var(--text-p);
-            border: 1px solid var(--border); padding: 8px 16px;
-            border-radius: 8px; font-size: 0.8rem; font-weight: 600;
-            cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 6px;
+            background: var(--bg-elevated);
+            color: var(--text-p);
+            border: 1px solid var(--border);
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
             outline: none;
         }
-        .pg-btn:hover:not(:disabled) { background: var(--border); }
-        .pg-btn:disabled { opacity: 0.3; cursor: not-allowed; }
-        .pg-info { font-size: 0.75rem; color: var(--text-s); font-weight: 500; }
+
+        .pg-btn:hover:not(:disabled) {
+            background: var(--border);
+        }
+
+        .pg-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .pg-info {
+            font-size: 0.75rem;
+            color: var(--text-s);
+            font-weight: 500;
+        }
 
         .list-item:hover {
             transform: scale(1.02);
@@ -1417,10 +1423,6 @@
 
         </div>
     </main>
-
-    <div class="bottom-bar">
-        @buytgacc1bot
-    </div>
 
     <!-- ===== Price Modal ===== -->
     <div id="price-modal" class="modal-overlay" onclick="closePriceModal(event)">
