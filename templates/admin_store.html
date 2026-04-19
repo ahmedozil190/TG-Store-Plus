@@ -46,6 +46,7 @@
             --input-bg: #09090b;
             --shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
             --card-glass: rgba(255, 255, 255, 0.02);
+            --stat-val-color: #ffffff;
         }
 
         .light-mode {
@@ -65,6 +66,7 @@
             --input-bg: #f1f2f6;
             --shadow: 0 10px 40px rgba(0, 0, 0, 0.06);
             --card-glass: rgba(0, 0, 0, 0.02);
+            --stat-val-color: #000000;
         }
 
         * {
@@ -594,9 +596,9 @@
         }
 
         .info-card-val {
-            font-size: 2.2rem;
+            font-size: 1.8rem !important;
             font-weight: 800;
-            color: var(--text-p);
+            color: var(--stat-val-color) !important;
             line-height: 1;
         }
 
@@ -1276,9 +1278,9 @@
             <section id="section-users" class="view-section">
                 <!-- User Stats -->
                 <div style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 25px;">
-                    <div class="info-card no-shadow" style="background: #ff00ff !important;">
+                    <div class="info-card no-shadow">
                         <div class="info-card-l">
-                            <span class="info-card-lbl" style="color: white !important;">(TESTING) TOTAL USERS</span>
+                            <span class="info-card-lbl" data-i18n="stat_total_users">TOTAL USERS</span>
                             <div class="info-card-val"><span id="user-count">0</span> <span
                                     data-i18n="unit_users">USERS</span></div>
                         </div>
