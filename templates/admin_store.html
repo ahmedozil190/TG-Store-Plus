@@ -610,6 +610,23 @@
             font-size: 1.1rem;
         }
 
+        .pagination-ctrls {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-top: 20px; padding: 12px; background: rgba(255,255,255,0.02);
+            border-radius: 12px; border: 1px solid var(--border);
+        }
+        .pg-btn {
+            background: var(--bg-elevated); color: var(--text-p);
+            border: 1px solid var(--border); padding: 8px 16px;
+            border-radius: 8px; font-size: 0.8rem; font-weight: 600;
+            cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 6px;
+            outline: none;
+        }
+        .pg-btn:hover:not(:disabled) { background: var(--border); }
+        .pg-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+        .pg-info { font-size: 0.75rem; color: var(--text-s); font-weight: 500; }
+        .pag-btn-new { display: none; }
+
         .list-item:hover {
             transform: scale(1.02);
         }
@@ -1317,14 +1334,13 @@
                     </div>
                     <div class="list-container" id="user-list"></div>
                     <!-- Pagination -->
-                    <div id="user-pagination" class="pagination"
-                        style="display: none; justify-content: center; align-items: center; gap: 15px; margin-top: 20px;">
-                        <button class="pag-btn-new" onclick="prevPage()">
-                            <i class="fas fa-chevron-left"></i>
+                    <div id="user-pagination" class="pagination-ctrls" style="display: none;">
+                        <button class="pg-btn" onclick="prevPage()">
+                            <i class="fas fa-chevron-left"></i> <span data-i18n="pg_prev">Prev</span>
                         </button>
-                        <span id="page-info" style="font-size: 0.9rem; font-weight: 600;">Page 1 of 1</span>
-                        <button class="pag-btn-new" onclick="nextPage()">
-                            <i class="fas fa-chevron-right"></i>
+                        <span id="page-info" class="pg-info">Page 1 of 1</span>
+                        <button class="pg-btn" onclick="nextPage()">
+                            <span data-i18n="pg_next">Next</span> <i class="fas fa-chevron-right"></i>
                         </button>
                     </div>
                 </div>
@@ -1361,15 +1377,15 @@
                         </button>
                     </div>
                     <div class="list-container" id="price-list"></div>
-                    <!-- Pagination -->
-                    <div class="pagination" id="price-pagination"
-                        style="display: none; justify-content: center; align-items: center; gap: 15px; margin-top: 20px;">
-                        <button class="pag-btn-new" onclick="prevPricePage()"><i
-                                class="fas fa-chevron-left"></i></button>
-                        <span class="pag-info" id="price-page-info"
-                            style="color: #fff; font-weight: 600; font-size: 0.9rem;">Page 1</span>
-                        <button class="pag-btn-new" onclick="nextPricePage()"><i
-                                class="fas fa-chevron-right"></i></button>
+                    <!-- Prices Pagination -->
+                    <div id="price-pagination" class="pagination-ctrls" style="display: none;">
+                        <button class="pg-btn" onclick="prevPricePage()">
+                            <i class="fas fa-chevron-left"></i> <span data-i18n="pg_prev">Prev</span>
+                        </button>
+                        <span id="price-page-info" class="pg-info">Page 1 of 1</span>
+                        <button class="pg-btn" onclick="nextPricePage()">
+                            <span data-i18n="pg_next">Next</span> <i class="fas fa-chevron-right"></i>
+                        </button>
                     </div>
                 </div>
             </section>
@@ -1477,7 +1493,9 @@
                 tab_recent: "Recent",
                 no_users: "No users found",
                 nav_settings: "Settings",
-                lbl_bot_name: "Bot Name",
+                pg_prev: "Prev",
+                pg_next: "Next",
+                stat_active: "Active Users",
                 btn_save_settings: "Save Settings",
                 stat_total_countries: "TOTAL COUNTRIES",
                 search_countries_ph: "Search countries...",
@@ -1524,7 +1542,9 @@
                 tab_recent: "الأخيرة",
                 no_users: "لا يوجد مستخدمين",
                 nav_settings: "الإعدادات",
-                lbl_bot_name: "اسم البوت",
+                pg_prev: "السابق",
+                pg_next: "التالي",
+                stat_active: "المستخدمون النشطون",
                 btn_save_settings: "حفظ الإعدادات",
                 stat_total_countries: "إجمالي الدول",
                 search_countries_ph: "بحث عن دولة...",
@@ -1766,10 +1786,8 @@
                 document.getElementById('page-info').innerText = `Page ${currentPage} of ${totalPages}`;
                 const prevBtn = pagContainer.querySelector('button[onclick="prevPage()"]');
                 const nextBtn = pagContainer.querySelector('button[onclick="nextPage()"]');
-                if (currentPage === 1) { prevBtn.style.opacity = '0.3'; prevBtn.style.cursor = 'not-allowed'; }
-                else { prevBtn.style.opacity = '1'; prevBtn.style.cursor = 'pointer'; }
-                if (currentPage === totalPages) { nextBtn.style.opacity = '0.3'; nextBtn.style.cursor = 'not-allowed'; }
-                else { nextBtn.style.opacity = '1'; nextBtn.style.cursor = 'pointer'; }
+                prevBtn.disabled = (currentPage === 1);
+                nextBtn.disabled = (currentPage === totalPages);
             } else {
                 pagContainer.style.display = 'none';
             }
