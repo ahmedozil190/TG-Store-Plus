@@ -429,17 +429,19 @@
             gap: 12px;
         }
 
-        .list-item {
-            background: var(--bg-card);
-            backdrop-filter: blur(14px);
-            border: 1px solid var(--border-card);
-            border-radius: 16px;
-            padding: 18px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            transition: all 0.3s ease;
+        .no-shadow { box-shadow: none !important; }
+
+        .info-card {
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: 20px; padding: 18px 22px;
+            display: flex; align-items: center; justify-content: space-between;
+            transition: all 0.3s var(--ease);
         }
+        .info-card-l { display: flex; flex-direction: column; gap: 4px; }
+        .info-card-lbl { font-size: 0.7rem; color: var(--text-s); font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+        .info-card-val { font-size: 1.4rem; font-weight: 800; color: var(--text-p); }
+        .info-card-val span { font-size: 0.8rem; color: var(--text-s); margin-left: 4px; }
+        .info-card-icon { width: 45px; height: 45px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; }
 
         .list-item:hover {
             transform: scale(1.02);
@@ -1138,19 +1140,29 @@
             <!-- ===== Users Section ===== -->
             <section id="section-users" class="view-section">
                 <!-- User Stats -->
-                <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 25px;">
-                    <div class="card stat-row no-shadow">
-                        <span class="label" data-i18n="stat_total_users">TOTAL USERS</span>
-                        <span class="value" id="user-count" style="color: var(--success);">0</span>
+                <div style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 25px;">
+                    <div class="info-card no-shadow">
+                        <div class="info-card-l">
+                            <span class="info-card-lbl" data-i18n="stat_total_users">TOTAL USERS</span>
+                            <div class="info-card-val"><span id="user-count">0</span> <span data-i18n="unit_users">USERS</span></div>
+                        </div>
+                        <div class="info-card-icon" style="background: rgba(88, 101, 242, 0.1); color: var(--accent);">
+                            <i class="fas fa-users"></i>
+                        </div>
                     </div>
-                    <div class="card stat-row no-shadow">
-                        <span class="label" data-i18n="stat_banned">BANNED</span>
-                        <span class="value" id="banned-count" style="color: var(--danger);">0</span>
+                    <div class="info-card no-shadow">
+                        <div class="info-card-l">
+                            <span class="info-card-lbl" data-i18n="stat_banned">BANNED USERS</span>
+                            <div class="info-card-val"><span id="banned-count">0</span> <span data-i18n="unit_users">USERS</span></div>
+                        </div>
+                        <div class="info-card-icon" style="background: rgba(239, 68, 68, 0.1); color: var(--danger);">
+                            <i class="fas fa-user-slash"></i>
+                        </div>
                     </div>
                 </div>
 
                 <!-- Search -->
-                <div class="card" style="padding: 18px; margin-bottom: 25px;">
+                <div class="card no-shadow" style="padding: 18px; margin-bottom: 25px;">
                     <input class="search-input" type="text" id="user-search" placeholder="Search users..."
                         data-i18n-placeholder="search_placeholder">
                     <button class="btn-find" onclick="searchUsers()">
@@ -1162,7 +1174,7 @@
                 </div>
 
                 <!-- User Management -->
-                <div class="card" style="padding: 22px;">
+                <div class="card no-shadow" style="padding: 22px;">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
                         <h3 style="color: var(--text-secondary); font-size: 1rem; font-weight: 700;"
                             data-i18n="user_mgmt">User Management</h3>
@@ -1277,7 +1289,8 @@
                 no_countries: "No countries found",
                 buy_lbl: "Buying Price",
                 stat_total_users: "TOTAL USERS",
-                stat_banned: "BANNED",
+                stat_banned: "BANNED USERS",
+                unit_users: "USERS",
                 btn_find: "Find",
                 search_placeholder: "Search user ID...",
                 user_mgmt: "User Management",
@@ -1320,7 +1333,8 @@
                 no_countries: "لا توجد دول مضافة",
                 buy_lbl: "سعر الشراء",
                 stat_total_users: "إجمالي المستخدمين",
-                stat_banned: "محظورين",
+                stat_banned: "المحظورين",
+                unit_users: "مستخدم",
                 btn_find: "بحث",
                 search_placeholder: "بحث عن مستخدم...",
                 user_mgmt: "إدارة المستخدمين",
