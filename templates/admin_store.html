@@ -12,21 +12,58 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --bg-main: #0a0b10;
-            --bg-card: rgba(255, 255, 255, 0.02);
-            --border-card: rgba(255, 255, 255, 0.05);
-            --accent: #60a5fa;
-            --accent-dark: #3b82f6;
-            --accent-glow: rgba(96, 165, 250, 0.3);
-            --accent-purple: #a855f7;
-            --text-primary: #ffffff;
-            --text-secondary: #94a3b8;
+            --accent: #5865F2;
+            --accent-glow: rgba(88, 101, 242, 0.3);
             --success: #10b981;
             --warning: #f59e0b;
+            --error: #ef4444;
             --danger: #ef4444;
-            --sidebar-bg: #181d29;
-            --nav-bg: rgba(15, 17, 26, 0.95);
+            --accent-dark: #5865F2;
+            --accent-purple: #5865F2;
+            --radius-sm: 12px;
+            --radius-md: 20px;
+            --radius-lg: 28px;
             --radius: 18px;
+            --ease: cubic-bezier(0.16, 1, 0.3, 1);
+            --sidebar-width: 280px;
+        }
+
+        .dark-mode, :root {
+            --bg: #09090b;
+            --bg-elevated: #111113;
+            --bg-main: var(--bg);
+            --bg-card: var(--bg-elevated);
+            --border-card: rgba(255, 255, 255, 0.06);
+            --border: rgba(255, 255, 255, 0.06);
+            --text-p: #fafafa;
+            --text-s: #a1a1aa;
+            --text-primary: var(--text-p);
+            --text-secondary: var(--text-s);
+            --sidebar-bg: var(--bg-elevated);
+            --nav-bg: var(--bg);
+            --modal-bg: #09090b;
+            --input-bg: #09090b;
+            --shadow: 0 10px 40px rgba(0,0,0,0.4);
+            --card-glass: rgba(255, 255, 255, 0.02);
+        }
+
+        .light-mode {
+            --bg: #f8f9fa;
+            --bg-elevated: #ffffff;
+            --bg-main: var(--bg);
+            --bg-card: var(--bg-elevated);
+            --border: rgba(0, 0, 0, 0.06);
+            --border-card: rgba(0, 0, 0, 0.06);
+            --text-p: #0f172a;
+            --text-s: #64748b;
+            --text-primary: var(--text-p);
+            --text-secondary: var(--text-s);
+            --sidebar-bg: var(--bg-elevated);
+            --nav-bg: var(--bg);
+            --modal-bg: #ffffff;
+            --input-bg: #f1f2f6;
+            --shadow: 0 10px 40px rgba(0,0,0,0.06);
+            --card-glass: rgba(0, 0, 0, 0.02);
         }
 
         * {
@@ -1134,7 +1171,7 @@
     </style>
 </head>
 
-<body>
+<body class="dark-mode">
     <!-- Loader -->
     <div id="loader">
         <div class="spinner"></div>
@@ -1378,7 +1415,16 @@
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
-        tg.headerColor = '#0a0b10';
+
+        // ─── Native Theme Support ───
+        function applyTheme() {
+            const scheme = tg.colorScheme;
+            document.body.className = scheme === 'light' ? 'light-mode' : 'dark-mode';
+            tg.headerColor = scheme === 'light' ? '#f8f9fa' : '#09090b';
+            tg.backgroundColor = scheme === 'light' ? '#f8f9fa' : '#09090b';
+        }
+        tg.onEvent('themeChanged', applyTheme);
+        applyTheme();
 
         const translations = {
             en: {
