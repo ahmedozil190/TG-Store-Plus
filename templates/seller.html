@@ -1829,9 +1829,8 @@
             // Force Telegram Header to match current theme dynamically
             if (tg) {
                 const isDark = document.body.classList.contains('dark-mode');
-                const themeColor = isDark ? '#09090b' : '#f8f9fa';
-                tg.setHeaderColor(themeColor);
-                tg.setBackgroundColor(themeColor);
+                tg.setHeaderColor(isDark ? '#111113' : '#ffffff');
+                tg.setBackgroundColor(isDark ? '#09090b' : '#f8f9fa');
             }
 
             fetchSellerData();
