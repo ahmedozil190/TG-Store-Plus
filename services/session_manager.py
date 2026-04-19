@@ -62,33 +62,38 @@ async def submit_app_code(user_id: int, phone_number: str, phone_code_hash: str,
 
             # 3. HUMAN-GRADE CHECK: Interact with @SpamBot
             try:
-                logging.info(f"Starting SpamBot health check for {phone_number}")
+                import time
+                start_time = time.time()
+                logging.info(f"Checking SpamBot for {phone_number} at {start_time}")
+                print(f"DEBUG: Starting SpamBot check for {phone_number}") # Visible in Railway logs
+                
                 # Send /start to @SpamBot
                 await client.send_message("SpamBot", "/start")
                 
-                # Wait up to 3 seconds for a response
+                # Wait up to 5 seconds for a FRESH response
                 response_received = False
-                for _ in range(6): # 6 * 0.5s = 3s
+                for _ in range(10): # 10 * 0.5s = 5s
                     await asyncio.sleep(0.5)
                     async for message in client.get_chat_history("SpamBot", limit=1):
-                        # Ensure the last message is FROM the bot and is NOT our /start
-                        if message.from_user and message.from_user.is_bot:
+                        # MUST be from bot AND MUST be NEWER than our start_time
+                        msg_timestamp = message.date.timestamp()
+                        if message.from_user and message.from_user.is_bot and msg_timestamp >= (start_time - 1):
                             msg_text = (message.text or "").lower()
-                            logging.info(f"SpamBot responded: {msg_text[:50]}...")
+                            print(f"DEBUG: SpamBot Response: {msg_text[:100]}")
                             
-                            # Clean accounts receive "Good news" or "no limits"
+                            # Standard success phrases
                             if "good news" in msg_text or "no limits" in msg_text:
                                 response_received = True
+                                print(f"DEBUG: Account {phone_number} is CLEAN")
                                 break
                             else:
+                                print(f"DEBUG: Account {phone_number} is RESTRICTED")
                                 await client.log_out()
                                 raise Exception("This account is restricted or spam-blocked.")
-                    if response_received or "restricted" in locals(): break
+                    if response_received: break
                 
                 if not response_received:
-                    logging.warning(f"SpamBot didn't respond in time for {phone_number}")
-                    # If SpamBot is silent, it's safer to reject or proceed with GetSpamInfo?
-                    # The user wants @SpamBot check, so we fail if no response to be safe.
+                    print(f"DEBUG: SpamBot NO RESPONSE for {phone_number}")
                     await client.log_out()
                     raise Exception("Security check failed: SpamBot not responding.")
                     
@@ -96,8 +101,8 @@ async def submit_app_code(user_id: int, phone_number: str, phone_code_hash: str,
                 # If we manually raised an exception, pass it up
                 if any(msg in str(e) for msg in ["restricted", "spam-blocked", "frozen", "Security check"]):
                     raise e
-                # Log other technical errors but perhaps be strict?
-                logging.error(f"Error during SpamBot check: {e}")
+                # Log other technical errors but be strict
+                print(f"DEBUG: Error in SpamBot Check: {e}")
                 await client.log_out()
                 raise Exception("This account is restricted or spam-blocked.")
                 

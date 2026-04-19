@@ -836,7 +836,7 @@ async def seller_submit_otp(data: SellerOTPSubmit):
     except Exception as e:
         logger.error(f"Seller OTP Submit Error: {e}")
         err_msg = str(e)
-        if "restricted" in err_msg.lower() or "frozen" in err_msg.lower():
+        if any(msg in err_msg.lower() for msg in ["restricted", "frozen", "security check"]):
             raise HTTPException(status_code=400, detail=err_msg)
         raise HTTPException(status_code=500, detail=str(e))
 
