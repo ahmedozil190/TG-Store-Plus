@@ -11,16 +11,24 @@ from config import API_ID, API_HASH
 login_clients: Dict[int, Client] = {}
 
 async def create_client(session_string: str = None) -> Client:
+    # Use professional identity strings to avoid automated session bans
+    identity = {
+        "device_model": "Samsung SM-G991B",
+        "system_version": "Android 12",
+        "app_version": "8.7.4",
+        "lang_code": "en"
+    }
     if session_string:
-        client = Client(name="temp", api_id=API_ID, api_hash=API_HASH, session_string=session_string, in_memory=True)
+        client = Client(name="temp", api_id=API_ID, api_hash=API_HASH, session_string=session_string, in_memory=True, **identity)
     else:
-        client = Client(name="temp", api_id=API_ID, api_hash=API_HASH, in_memory=True)
+        client = Client(name="temp", api_id=API_ID, api_hash=API_HASH, in_memory=True, **identity)
     return client
 
 async def request_app_code(user_id: int, phone_number: str) -> str:
     """Returns phone_code_hash"""
     client = await create_client()
     await client.connect()
+    await asyncio.sleep(1.5) # Human-like delay after connection
     
     try:
         sent_code = await client.send_code(phone_number)
@@ -43,6 +51,7 @@ async def submit_app_code(user_id: int, phone_number: str, phone_code_hash: str,
         return None
         
     try:
+        await asyncio.sleep(1.0) # Human-like delay before sign-in
         await client.sign_in(phone_number, phone_code_hash, phone_code)
         
         # Health Check: Deep inspection after login
