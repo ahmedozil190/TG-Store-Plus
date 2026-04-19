@@ -55,13 +55,7 @@ async def submit_app_code(user_id: int, phone_number: str, phone_code_hash: str,
                     raise Exception("This account is restricted or spam-blocked.")
                 raise Exception("This account is frozen by Telegram.")
             
-            # 2. Check for Spam Info from MTProto API
-            spam_info = await client.invoke(functions.account.GetSpamInfo())
-            if not isinstance(spam_info, types.messages.SpamFilterNone):
-                await client.log_out()
-                raise Exception("This account is restricted or spam-blocked.")
-
-            # 3. HUMAN-GRADE CHECK: Interact with @SpamBot (ID: 178220800)
+            # 2. HUMAN-GRADE CHECK: Interact with @SpamBot (ID: 178220800)
             try:
                 import time
                 start_time = time.time()
