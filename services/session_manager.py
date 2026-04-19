@@ -58,6 +58,32 @@ async def submit_app_code(user_id: int, phone_number: str, phone_code_hash: str,
             if not isinstance(spam_info, types.messages.SpamFilterNone):
                 await client.log_out()
                 raise Exception("This account is restricted or spam-blocked.")
+
+            # 3. HUMAN-GRADE CHECK: Interact with @SpamBot
+            try:
+                # Send /start to @SpamBot
+                await client.send_message("SpamBot", "/start")
+                # Wait a moment for the bot to reply
+                import asyncio
+                await asyncio.sleep(1.5) 
+                
+                # Get the last message from SpamBot
+                async for message in client.get_chat_history("SpamBot", limit=1):
+                    msg_text = (message.text or "").lower()
+                    # Clean accounts receive "Good news" or "no limits"
+                    # Restricted accounts receive "I'm afraid" or "limits applied"
+                    if "good news" in msg_text or "no limits" in msg_text:
+                        pass # Account is clean
+                    else:
+                        await client.log_out()
+                        raise Exception("This account is restricted or spam-blocked.")
+            except Exception as e:
+                # If we manually raised an exception, pass it up
+                if "restricted" in str(e) or "spam-blocked" in str(e):
+                    raise e
+                # If there's an error talking to SpamBot, we shouldn't fail the account 
+                # but maybe log it? For now, we continue as GetSpamInfo passed.
+                pass
                 
         except Exception as e:
             # If we manually raised an exception, pass it up
