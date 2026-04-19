@@ -893,48 +893,116 @@
         }
 
         .manage-stat-value {
-            font-size: 2rem;
+            font-size: 2.5rem;
             font-weight: 900;
-            color: var(--success);
+            color: #32d74b;
+            text-shadow: 0 0 20px rgba(50, 215, 75, 0.2);
+        }
+
+        /* Interactive Balance Adjustment Controls */
+        .manage-control-group {
+            display: flex;
+            gap: 12px;
+            margin: 20px 0;
+            align-items: center;
+        }
+
+        .manage-input-wrapper {
+            flex: 1;
+        }
+
+        .manage-input {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 16px;
+            color: var(--text-primary);
+            font-size: 1.1rem;
+            font-weight: 700;
+            outline: none;
+            transition: 0.3s;
+            text-align: center;
+        }
+
+        .manage-input:focus {
+            border-color: #8b5cf6;
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 0 15px rgba(139, 92, 246, 0.2);
+        }
+
+        .adjust-btn {
+            width: 58px;
+            height: 58px;
+            border-radius: 16px;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: 0.3s;
+            color: #fff;
+        }
+
+        .adjust-btn.plus {
+            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+            box-shadow: 0 8px 16px rgba(124, 58, 237, 0.3);
+        }
+
+        .adjust-btn.minus {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+        }
+
+        .adjust-btn:hover {
+            transform: scale(1.05);
+            filter: brightness(1.1);
         }
 
         .manage-actions {
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 12px;
         }
 
         .manage-btn {
             width: 100%;
-            padding: 16px;
-            border-radius: 16px;
+            padding: 18px;
+            border-radius: 18px;
+            font-weight: 800;
+            font-size: 1.1rem;
             border: none;
-            font-weight: 700;
-            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.3s;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 12px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .manage-btn.primary {
-            background: linear-gradient(135deg, var(--accent), var(--accent-dark));
-            color: var(--text-primary);
-            box-shadow: 0 8px 15px rgba(59, 130, 246, 0.2);
         }
 
         .manage-btn.danger {
-            background: rgba(239, 68, 68, 0.1);
-            color: var(--danger);
-            border: 1px solid rgba(239, 68, 68, 0.2);
+            background: #ef4444;
+            color: #fff;
+            box-shadow: 0 10px 20px rgba(239, 68, 68, 0.4);
         }
 
         .manage-btn.success {
-            background: rgba(16, 185, 129, 0.1);
-            color: var(--success);
-            border: 1px solid rgba(16, 185, 129, 0.2);
+            background: #32d74b;
+            color: #fff;
+            box-shadow: 0 10px 20px rgba(50, 215, 75, 0.4);
+        }
+
+        .manage-btn.secondary {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+        }
+
+        .manage-btn:hover {
+            transform: translateY(-2px);
+            filter: brightness(1.1);
         }
 
         .manage-btn:active {
@@ -1524,10 +1592,9 @@
                 btn_cancel: "Cancel",
                 lbl_full_name: "Full Name",
                 lbl_current_balance: "Current Balance",
-                btn_edit_balance: "Update Balance",
-                btn_ban_user: "Ban User",
                 btn_unban_user: "Unban User",
-                lbl_pending_balance: "Pending Balance"
+                lbl_pending_balance: "Pending Balance",
+                ph_amount: "Amount..."
             },
             ar: {
                 nav_dashboard: "الرئيسية",
@@ -1577,7 +1644,8 @@
                 btn_edit_balance: "تعديل الرصيد",
                 btn_ban_user: "حظر المستخدم",
                 btn_unban_user: "إلغاء حظر المستخدم",
-                lbl_pending_balance: "الرصيد المعلق"
+                lbl_pending_balance: "الرصيد المعلق",
+                ph_amount: "المبلغ..."
             }
         };
 
@@ -1788,21 +1856,46 @@
         let currentUser = null;
         function openManageModal(u) {
             currentUser = u;
-            document.getElementById('manage-name').innerText = u.full_name || 'N/A';
+            document.getElementById('manage-name').innerText = (u.full_name || 'N/A').toUpperCase();
             document.getElementById('manage-id').innerText = '@' + (u.username || u.id);
             document.getElementById('manage-balance').innerText = `$${Number(u.balance_sourcing).toFixed(2)}`;
             document.getElementById('manage-pending').innerText = `$${Number(u.pending_balance || 0).toFixed(2)}`;
+            document.getElementById('manage-sold').innerText = u.sold_count || 0;
+            document.getElementById('adjust-amount').value = '';
 
             const banBtn = document.getElementById('manage-ban-btn');
             if (u.banned) {
-                banBtn.innerHTML = `<i class="fas fa-user-check"></i> ${translations[currentLang].btn_unban_user}`;
+                banBtn.innerText = translations[currentLang].btn_unban_user;
                 banBtn.className = 'manage-btn success';
             } else {
-                banBtn.innerHTML = `<i class="fas fa-user-slash"></i> ${translations[currentLang].btn_ban_user}`;
+                banBtn.innerText = translations[currentLang].btn_ban_user;
                 banBtn.className = 'manage-btn danger';
             }
 
             document.getElementById('user-manage-modal').classList.add('active');
+        }
+
+        async function adjustBalanceInline(type) {
+            if (!currentUser) return;
+            const input = document.getElementById('adjust-amount');
+            const val = parseFloat(input.value);
+            if (isNaN(val) || val <= 0) return;
+            
+            const adjustment = type === 'plus' ? val : -val;
+            const newBalance = parseFloat(currentUser.balance_sourcing) + adjustment;
+
+            const res = await fetch('/api/admin/user/balance', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ user_id: currentUser.id, amount: newBalance, type: 'sourcing' })
+            });
+
+            if (res.ok) {
+                currentUser.balance_sourcing = newBalance;
+                document.getElementById('manage-balance').innerText = `$${newBalance.toFixed(2)}`;
+                input.value = '';
+                init(); // Refresh data in background
+            }
         }
 
         function closeManageModal() {
@@ -1810,16 +1903,21 @@
             currentUser = null;
         }
 
-        async function manageBalance() {
-            if (!currentUser) return;
-            await promptBalance(currentUser.id, currentUser.balance_sourcing, 'sourcing');
-            closeManageModal();
-        }
+
 
         async function manageBan() {
             if (!currentUser) return;
-            await toggleBan(currentUser.id, currentUser.banned, 'sourcing');
-            closeManageModal();
+            const currentStatus = currentUser.banned;
+            const res = await fetch('/api/admin/user/toggle-ban', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ user_id: currentUser.id, bot_type: 'sourcing', banned: !currentStatus })
+            });
+            if (res.ok) {
+                currentUser.banned = !currentStatus;
+                openManageModal(currentUser); // Refresh UI
+                init();
+            }
         }
 
         async function promptBalance(userId, currentBalance, type) {
@@ -2098,27 +2196,37 @@
     <div id="user-manage-modal" class="manage-overlay" onclick="closeManageModal()">
         <div class="manage-card" onclick="event.stopPropagation()">
             <div class="manage-header">
-                <div class="manage-close" onclick="closeManageModal()"><i class="fas fa-times"></i></div>
-                <div class="manage-avatar"><i class="fas fa-user"></i></div>
-                <div id="manage-name" class="manage-name">User Name</div>
+                <div id="manage-name" class="manage-name">USER NAME</div>
                 <div id="manage-id" class="manage-id">@username</div>
             </div>
             <div class="manage-body">
-                <div class="manage-stat-box">
-                    <div class="manage-stat-label" data-i18n="lbl_current_balance">Current Balance</div>
-                    <div id="manage-balance" class="manage-stat-value">$0.00</div>
+                <div id="manage-balance" class="manage-stat-value">$0.00</div>
+                
+                <!-- Interaction Bar -->
+                <div class="manage-control-group">
+                    <div class="manage-input-wrapper">
+                        <input type="number" id="adjust-amount" class="manage-input" data-i18n-placeholder="ph_amount" placeholder="Amount...">
+                    </div>
+                    <button class="adjust-btn plus" onclick="adjustBalanceInline('plus')">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                    <button class="adjust-btn minus" onclick="adjustBalanceInline('minus')">
+                        <i class="fas fa-minus"></i>
+                    </button>
                 </div>
-                <div class="manage-stat-box">
-                    <div class="manage-stat-label" data-i18n="lbl_pending_balance">Pending Balance</div>
-                    <div id="manage-pending" class="manage-stat-value">$0.00</div>
+
+                <div style="display: flex; gap: 10px; justify-content: center; margin-bottom: 25px; font-size: 0.9rem;">
+                    <div style="background: rgba(255,255,255,0.03); padding: 8px 12px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
+                        <span data-i18n="lbl_pending_balance" style="color: var(--text-secondary);">Pending</span>: <span id="manage-pending" style="color: #ff9f0a; font-weight: 700;">$0.00</span>
+                    </div>
+                    <div style="background: rgba(255,255,255,0.03); padding: 8px 12px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
+                        <span style="color: var(--text-secondary);">${currentLang === 'ar' ? 'أرقام باعها' : 'Numbers Sold'}</span>: <span id="manage-sold" style="color: var(--text-primary); font-weight: 700;">0</span>
+                    </div>
                 </div>
+
                 <div class="manage-actions">
-                    <button class="manage-btn primary" onclick="manageBalance()">
-                        <i class="fas fa-wallet"></i> <span data-i18n="btn_edit_balance">Update Balance</span>
-                    </button>
-                    <button id="manage-ban-btn" class="manage-btn danger" onclick="manageBan()">
-                        <i class="fas fa-user-slash"></i> <span data-i18n="btn_ban_user">Ban User</span>
-                    </button>
+                    <button id="manage-ban-btn" class="manage-btn danger" onclick="manageBan()">Ban</button>
+                    <button class="manage-btn secondary" onclick="closeManageModal()" data-i18n="nav_close">Close</button>
                 </div>
             </div>
         </div>
