@@ -11,19 +11,22 @@
     <title>Dashboard</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&family=Plus Jakarta Sans:wght@300;400;500;600;700;800&display=swap"
         rel="stylesheet">
     <style>
-        /* ─── Variables System ─── */
         :root {
             --accent: #5865F2;
             --accent-glow: rgba(88, 101, 242, 0.3);
+            --accent-purple: #8b5cf6;
+            --accent-dark: #4338ca;
             --success: #10b981;
             --warning: #f59e0b;
             --error: #ef4444;
             --radius-sm: 12px;
             --radius-md: 20px;
             --radius-lg: 28px;
+            --radius: 18px;
             --ease: cubic-bezier(0.16, 1, 0.3, 1);
             --sidebar-width: 280px;
         }
@@ -36,9 +39,13 @@
             --border: rgba(255, 255, 255, 0.06);
             --text-p: #fafafa;
             --text-s: #a1a1aa;
+            --text-primary: var(--text-p);
+            --text-secondary: var(--text-s);
+            --sidebar-bg: var(--bg-elevated);
             --modal-bg: #09090b;
             --input-bg: #09090b;
             --shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+            --tab-bg: rgba(255, 255, 255, 0.05);
         }
 
         .light-mode {
@@ -48,9 +55,13 @@
             --border: rgba(0, 0, 0, 0.06);
             --text-p: #0f172a;
             --text-s: #64748b;
+            --text-primary: var(--text-p);
+            --text-secondary: var(--text-s);
+            --sidebar-bg: var(--bg-elevated);
             --modal-bg: #ffffff;
             --input-bg: #f1f2f6;
             --shadow: 0 10px 40px rgba(0, 0, 0, 0.06);
+            --tab-bg: rgba(0, 0, 0, 0.05);
         }
 
         * {
@@ -60,16 +71,25 @@
             -webkit-tap-highlight-color: transparent;
         }
 
+        [dir="ltr"] {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        [dir="rtl"] {
+            font-family: 'Cairo', sans-serif;
+        }
+
         body {
             background-color: var(--bg);
             color: var(--text-p);
-            font-family: 'Plus Jakarta Sans', sans-serif;
             height: 100vh;
             overflow: hidden;
-            /* Disable body scroll */
             display: flex;
             flex-direction: column;
             transition: background-color 0.4s var(--ease), color 0.4s var(--ease);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            text-rendering: optimizeLegibility;
         }
 
         /* ─── Top Bar ─── */
@@ -264,13 +284,13 @@
         .info-card {
             background: var(--bg-elevated);
             border: 1px solid var(--border);
-            border-radius: 20px;
-            padding: 22px 20px;
+            border-radius: var(--radius);
+            padding: 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             box-shadow: var(--shadow);
-            transition: transform 0.3s var(--ease), background 0.4s var(--ease);
+            transition: all 0.3s var(--ease);
         }
 
         .info-card-l {
