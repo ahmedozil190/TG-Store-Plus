@@ -65,7 +65,7 @@ async def submit_app_code(user_id: int, phone_number: str, phone_code_hash: str,
                 import time
                 start_time = time.time()
                 target_bot = 178220800
-                print(f"DEBUG: STARTING HARD CHECK for {phone_number} at {start_time}")
+                logging.info(f"STARTING HARD CHECK for {phone_number} at {start_time}")
                 
                 # Ensure the bot is unblocked first
                 try:
@@ -74,7 +74,7 @@ async def submit_app_code(user_id: int, phone_number: str, phone_code_hash: str,
                 
                 # Send /start to @SpamBot
                 await client.send_message(target_bot, "/start")
-                print(f"DEBUG: Message sent to @SpamBot for {phone_number}")
+                logging.info(f"Message sent to @SpamBot for {phone_number}")
                 
                 # Wait up to 7 seconds for a FRESH response
                 response_received = False
@@ -85,39 +85,42 @@ async def submit_app_code(user_id: int, phone_number: str, phone_code_hash: str,
                         msg_timestamp = message.date.timestamp()
                         if message.from_user and message.from_user.id == target_bot and msg_timestamp >= (start_time - 1):
                             msg_text = (message.text or "").lower()
-                            print(f"DEBUG: SpamBot [{phone_number}] Response: {msg_text[:100]}...")
+                            logging.info(f"SpamBot [{phone_number}] Response: {msg_text[:100]}...")
                             
                             # Standard success phrases for CLEAN accounts
-                            if "good news" in msg_text or "no limits" in msg_text or "birds" in msg_text:
+                            if any(w in msg_text for w in ["good news", "no limits", "birds"]):
                                 response_received = True
-                                print(f"DEBUG: Account {phone_number} is POSITIVELY CLEAN")
+                                logging.info(f"Account {phone_number} is POSITIVELY CLEAN")
                                 break
                             else:
-                                print(f"DEBUG: Account {phone_number} is POSITIVELY RESTRICTED")
+                                logging.warning(f"Account {phone_number} is POSITIVELY RESTRICTED: {msg_text[:50]}")
                                 await client.log_out()
                                 raise Exception("This account is restricted or spam-blocked.")
                     if response_received: break
                 
                 if not response_received:
-                    print(f"DEBUG: CRITICAL - SpamBot DID NOT RESPOND for {phone_number} after 7 seconds.")
+                    logging.error(f"CRITICAL - SpamBot DID NOT RESPOND for {phone_number} after 7 seconds.")
                     await client.log_out()
                     raise Exception("Security check failed: SpamBot not responding. Please try again.")
                     
             except Exception as e:
                 # If we manually raised an exception, pass it up
-                if any(msg in str(e) for msg in ["restricted", "spam-blocked", "frozen", "Security check", "not responding"]):
+                internal_msg = str(e).lower()
+                if any(msg in internal_msg for msg in ["restricted", "spam-blocked", "frozen", "security check", "responding"]):
                     raise e
                 # Fallback for any other errors (log them and fail safe by rejecting)
-                print(f"DEBUG: SpamBot CHECK EXCEPTION: {type(e).__name__}: {e}")
+                logging.error(f"SpamBot CHECK EXCEPTION: {type(e).__name__}: {e}")
                 await client.log_out()
                 raise Exception("This account is restricted or spam-blocked.")
                 
         except Exception as e:
-            # If we manually raised an exception, pass it up
-            if any(msg in str(e) for msg in ["restricted", "spam-blocked", "frozen"]):
+            # If we manually raised an exception, propagate it to the outer try
+            internal_msg = str(e).lower()
+            if any(msg in internal_msg for msg in ["restricted", "spam-blocked", "frozen", "security check", "responding"]):
                 raise e
-            # Ignore other errors during health check to avoid false negatives
-            pass
+            # Log and re-raise other errors to be safe
+            logging.error(f"Outer Health Check Failure: {e}")
+            raise e
 
         session_string = await client.export_session_string()
         return session_string
