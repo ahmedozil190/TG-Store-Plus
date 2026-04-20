@@ -1783,7 +1783,7 @@
                 document.getElementById('stat-stock').innerText = data.stats.stock_count;
                 document.getElementById('stat-total-balance').innerText = `$${Number(data.stats.total_balance).toFixed(2)}`;
 
-                allUsers = data.users || [];
+                allUsers = (data.users || []).reverse();
                 allTransactions = data.transactions || [];
 
                 document.getElementById('stat-sales-count').innerText = allTransactions.length;

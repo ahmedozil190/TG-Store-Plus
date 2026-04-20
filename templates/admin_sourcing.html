@@ -1744,7 +1744,7 @@
                 allPrices = data.prices || [];
                 renderPrices(allPrices);
 
-                allUsers = data.users || [];
+                allUsers = (data.users || []).reverse();
                 document.getElementById('user-count').innerText = data.stats.user_count || allUsers.length;
                 document.getElementById('banned-count').innerText = allUsers.filter(u => u.banned).length;
                 renderUsers(filteredUsers || allUsers);
@@ -1867,8 +1867,8 @@
         }
 
         function prevPage() {
-            if (currentPage > 1) { 
-                currentPage--; 
+            if (currentPage > 1) {
+                currentPage--;
                 renderUsers(filteredUsers || allUsers);
                 document.getElementById('user-mgmt-section').scrollIntoView({ behavior: 'smooth' });
             }
@@ -1877,8 +1877,8 @@
             const list = filteredUsers || allUsers;
             const filtered = currentTab === 'banned' ? list.filter(u => u.banned) : list.filter(u => !u.banned);
             const totalPages = Math.ceil(filtered.length / USERS_PER_PAGE);
-            if (currentPage < totalPages) { 
-                currentPage++; 
+            if (currentPage < totalPages) {
+                currentPage++;
                 renderUsers(list);
                 document.getElementById('user-mgmt-section').scrollIntoView({ behavior: 'smooth' });
             }
@@ -2254,7 +2254,8 @@
             <!-- Name Box -->
             <div class="manage-data-box">
                 <div id="manage-name"
-                    style="color: #ffca28; font-weight: 600; font-size: 0.95rem; letter-spacing: 0.5px; text-align: center;">USER NAME</div>
+                    style="color: #ffca28; font-weight: 600; font-size: 0.95rem; letter-spacing: 0.5px; text-align: center;">
+                    USER NAME</div>
             </div>
 
             <!-- ID Box -->
