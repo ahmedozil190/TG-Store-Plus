@@ -1110,11 +1110,11 @@
 
         /* ========== Buttons ========== */
         .btn-add {
-            background: linear-gradient(135deg, var(--accent-dark), #2563eb);
-            color: var(--text-primary);
+            background: linear-gradient(135deg, var(--accent), var(--accent-purple));
+            color: #ffffff;
             border: none;
             padding: 12px 20px;
-            border-radius: 12px;
+            border-radius: 14px;
             font-weight: 700;
             display: flex;
             align-items: center;
@@ -1122,6 +1122,8 @@
             cursor: pointer;
             font-size: 0.9rem;
             transition: 0.2s;
+            height: 42px;
+            box-shadow: 0 4px 15px rgba(96, 165, 250, 0.2);
         }
 
         .btn-add:active {
@@ -1397,10 +1399,16 @@
 
             <!-- ===== Prices Section ===== -->
             <section id="section-prices" class="view-section">
-                <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px;">
-                    <div class="card stat-row">
-                        <span class="label" data-i18n="stat_total_countries">TOTAL COUNTRIES</span>
-                        <span class="value" id="stat-total-countries" style="color: var(--accent);">0</span>
+                <div style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 25px;">
+                    <div class="info-card">
+                        <div class="info-card-l">
+                            <span class="info-card-lbl" data-i18n="stat_total_countries">TOTAL COUNTRIES</span>
+                            <div class="info-card-val"><span id="stat-total-countries">0</span> <span
+                                    data-i18n="unit_countries">COUNTRIES</span></div>
+                        </div>
+                        <div class="info-card-icon" style="background: rgba(139, 92, 246, 0.1); color: var(--accent-purple);">
+                            <i class="fas fa-globe"></i>
+                        </div>
                     </div>
                 </div>
 
@@ -2046,13 +2054,21 @@
         }
 
         function prevPricePage() {
-            if (currentPricePage > 1) { currentPricePage--; renderPrices(filteredPrices || allPrices); }
+            if (currentPricePage > 1) { 
+                currentPricePage--; 
+                renderPrices(filteredPrices || allPrices);
+                document.getElementById('section-prices').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
         }
 
         function nextPricePage() {
             const list = filteredPrices || allPrices;
             const totalPages = Math.ceil(list.length / PRICES_PER_PAGE);
-            if (currentPricePage < totalPages) { currentPricePage++; renderPrices(list); }
+            if (currentPricePage < totalPages) { 
+                currentPricePage++; 
+                renderPrices(list);
+                document.getElementById('section-prices').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
         }
 
         function renderPrices(list) {
@@ -2062,8 +2078,8 @@
 
             if (!list || !list.length) {
                 container.innerHTML = `
-                <div style="text-align: center; padding: 40px 20px; background: rgba(0,0,0,0.15); border-radius: 16px; border: 1px dashed rgba(255,255,255,0.05); margin-top: 10px;">
-                    <i class="fas fa-tags" style="font-size: 2.5rem; color: rgba(255,255,255,0.1); margin-bottom: 12px;"></i>
+                <div style="text-align: center; padding: 40px 20px; background: var(--card-glass); border-radius: 16px; border: 1px dashed var(--border); margin-top: 10px; backdrop-filter: blur(10px);">
+                    <i class="fas fa-tags" style="font-size: 2.5rem; color: var(--text-secondary); opacity: 0.15; margin-bottom: 12px;"></i>
                     <p style="color: var(--text-secondary); font-weight: 600; font-size: 0.95rem;">${translations[currentLang].no_countries}</p>
                 </div>`;
                 pagContainer.style.display = 'none';
