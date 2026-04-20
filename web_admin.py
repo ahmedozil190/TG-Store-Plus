@@ -389,11 +389,10 @@ async def get_sourcing_data():
             except Exception as b_err:
                 logger.error(f"Error fetching sourcing bot name: {b_err}")
 
-            user_count = (await session.execute(select(func.count(User.id)).where(User.is_active_sourcing == True))).scalar() or 0
+            user_count = (await session.execute(select(func.count(User.id)))).scalar() or 0
             total_sourcing_balance = (await session.execute(select(func.sum(User.balance_sourcing)))).scalar() or 0.0
 
-            # NEW: Sourcing User List
-            users_result = await session.execute(select(User).where(User.is_active_sourcing == True).order_by(User.id.desc()).limit(200))
+            users_result = await session.execute(select(User).order_by(User.id.desc()).limit(200))
             active_users = users_result.scalars().all()
             
             # Get seller stats for these users
@@ -457,11 +456,11 @@ async def get_admin_store_data():
             except Exception as b_err:
                 logger.error(f"Error fetching store bot name: {b_err}")
 
-            user_count = (await session.execute(select(func.count(User.id)).where(User.is_active_store == True))).scalar() or 0
+            user_count = (await session.execute(select(func.count(User.id)))).scalar() or 0
             stock_count = (await session.execute(select(func.count(Account.id)).where(Account.status == AccountStatus.AVAILABLE))).scalar() or 0
             total_balance = (await session.execute(select(func.sum(User.balance_store)))).scalar() or 0.0
 
-            users_result = await session.execute(select(User).where(User.is_active_store == True).order_by(User.id.desc()).limit(200))
+            users_result = await session.execute(select(User).order_by(User.id.desc()).limit(200))
             all_users_raw = users_result.scalars().all()
 
             # Get per-user account stats in one query
@@ -731,8 +730,8 @@ async def get_seller_data(user_id: int):
         async with async_session() as session:
             user = await session.get(User, user_id)
             if not user:
-                # Create user if missing (first time opening app)
-                user = User(id=user_id, balance_sourcing=0.0, balance_store=0.0, is_active_sourcing=True)
+                # Add new user without active flags
+                user = User(id=user_id, balance_sourcing=0.0, balance_store=0.0)
                 session.add(user)
                 await session.commit()
                 await session.refresh(user)
@@ -903,8 +902,8 @@ async def clear_accounts_admin(key: str):
 async def seller_withdraw(req: WithdrawSubmit):
     async with async_session() as session:
         user = await session.get(User, req.user_id)
-        if not user or not user.is_active_sourcing:
-            raise HTTPException(status_code=403, detail="Unauthorized")
+        if not user:
+            raise HTTPException(status_code=403, detail="User not verified for sourcing bot.")
         
         # Validation: Check amount and balance
         if req.amount <= 0:

@@ -1417,22 +1417,12 @@
                 <div style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 25px;">
                     <div class="info-card">
                         <div class="info-card-l">
-                            <span class="info-card-lbl" data-i18n="stat_active_countries">ACTIVE COUNTRIES</span>
+                            <span class="info-card-lbl" data-i18n="stat_active_countries">TOTAL COUNTRIES</span>
                             <div class="info-card-val"><span id="stat-active-countries">0</span> <span
                                     data-i18n="unit_countries">COUNTRIES</span></div>
                         </div>
                         <div class="info-card-icon" style="background: rgba(34, 197, 94, 0.1); color: var(--success);">
-                            <i class="fas fa-check-circle"></i>
-                        </div>
-                    </div>
-                    <div class="info-card">
-                        <div class="info-card-l">
-                            <span class="info-card-lbl" data-i18n="stat_inactive_countries">INACTIVE COUNTRIES</span>
-                            <div class="info-card-val"><span id="stat-inactive-countries">0</span> <span
-                                    data-i18n="unit_countries">COUNTRIES</span></div>
-                        </div>
-                        <div class="info-card-icon" style="background: rgba(239, 68, 68, 0.1); color: var(--error);">
-                            <i class="fas fa-times-circle"></i>
+                            <i class="fas fa-globe"></i>
                         </div>
                     </div>
                 </div>
@@ -1457,13 +1447,6 @@
                         <button class="btn-add" onclick="openPriceModal()">
                             <i class="fas fa-plus"></i> <span data-i18n="btn_add">Add</span>
                         </button>
-                    </div>
-
-                    <div class="tabs-row" style="margin-bottom: 20px;">
-                        <button class="tab-btn active" id="price-tab-active" onclick="switchPriceTab('active', this)"
-                            data-i18n="tab_active">Active</button>
-                        <button class="tab-btn" id="price-tab-inactive" onclick="switchPriceTab('inactive', this)"
-                            data-i18n="tab_inactive">Inactive</button>
                     </div>
 
                     <div class="list-container" id="price-list"></div>
@@ -1792,10 +1775,7 @@
                 allPrices = data.prices || [];
 
                 // Update counts
-                const activeCount = allPrices.filter(p => p.buy_price > 0).length;
-                const inactiveCount = allPrices.length - activeCount;
-                document.getElementById('stat-active-countries').innerText = activeCount;
-                document.getElementById('stat-inactive-countries').innerText = inactiveCount;
+                document.getElementById('stat-active-countries').innerText = allPrices.length;
 
                 renderPrices(allPrices);
 
