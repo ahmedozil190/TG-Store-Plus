@@ -487,9 +487,10 @@
         }
 
         .section-header h2 {
-            font-size: 1rem;
-            font-weight: 600;
-            letter-spacing: 0.5px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin: 0;
         }
 
         /* ========== Sections ========== */
@@ -653,6 +654,7 @@
             align-items: center;
             gap: 6px;
             outline: none;
+            height: 42px;
         }
 
         .pg-btn:hover:not(:disabled) {
@@ -741,6 +743,7 @@
             align-items: center;
             justify-content: center;
             gap: 8px;
+            height: 42px;
         }
 
         .tab-btn.active {
@@ -761,6 +764,7 @@
             outline: none;
             transition: 0.3s;
             margin-bottom: 12px;
+            height: 42px;
         }
 
         .search-input::placeholder {
@@ -788,6 +792,7 @@
             box-shadow: 0 4px 15px var(--accent-glow);
             cursor: pointer;
             transition: 0.3s;
+            height: 42px;
         }
 
         .btn-find:active {
@@ -849,9 +854,6 @@
             gap: 10px;
             transform: scale(0.9);
             transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-        .dark-mode .manage-card {
-            background: var(--bg-elevated);
         }
         .dark-mode .manage-card {
             background: var(--bg-elevated);
@@ -954,6 +956,7 @@
             outline: none;
             transition: 0.3s;
             text-align: center;
+            height: 42px;
         }
 
         .manage-input:focus {
@@ -1012,18 +1015,18 @@
             align-items: center;
             justify-content: center;
             gap: 12px;
+            height: 42px !important;
+            box-shadow: none !important;
         }
 
         .manage-btn.danger {
-            background: #ef4444;
-            color: #fff;
-            box-shadow: 0 10px 20px rgba(239, 68, 68, 0.4);
+            background: var(--error);
+            color: #ffffff;
         }
 
         .manage-btn.success {
             background: #32d74b;
             color: #fff;
-            box-shadow: 0 10px 20px rgba(50, 215, 75, 0.4);
         }
 
         .manage-btn.secondary {
@@ -1122,6 +1125,7 @@
             cursor: pointer;
             font-size: 0.9rem;
             transition: 0.2s;
+            height: 42px;
         }
 
         .btn-add:active {
@@ -1235,6 +1239,7 @@
             outline: none;
             font-size: 0.95rem;
             transition: 0.3s;
+            height: 42px;
         }
 
         .input-field:focus {
@@ -1249,15 +1254,15 @@
             border: none;
             border-radius: 14px;
             font-weight: 700;
-            font-size: 1rem;
+            font-size: 0.95rem;
             cursor: pointer;
-            box-shadow: 0 4px 15px var(--accent-glow);
-            transition: 0.2s;
-            height: 42px;
+            transition: 0.3s;
+            height: 42px !important;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 8px;
+            box-shadow: none !important;
         }
 
         .primary-btn:active {
