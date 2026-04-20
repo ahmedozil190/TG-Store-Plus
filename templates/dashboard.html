@@ -521,7 +521,7 @@
             </div>
             <div class="input-group">
                 <label>تأخير الموافقة التلقائية (ثواني)</label>
-                <input type="number" id="price-delay-val" placeholder="60">
+                <input type="number" id="price-delay-val" placeholder="0">
             </div>
             <button class="btn" onclick="savePrice()">حفظ السعر</button>
             <button class="btn btn-outline" style="margin-top: 10px;" onclick="closeModal(null, 'modal-price')">إلغاء</button>
@@ -753,7 +753,7 @@
             document.getElementById('price-country-name').value = '';
             document.getElementById('price-val').value = '';
             document.getElementById('price-buy-val').value = '';
-            document.getElementById('price-delay-val').value = '0';
+            document.getElementById('price-delay-val').value = '';
             document.getElementById('modal-price').style.display = 'flex';
         }
 
