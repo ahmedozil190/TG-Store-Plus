@@ -12,6 +12,7 @@ from phonenumbers import geocoder
 from fastapi import FastAPI, Request, HTTPException, Depends
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
+from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.future import select
 from sqlalchemy import select, delete, update, func, text
 from database.engine import async_session
@@ -52,6 +53,17 @@ class WithdrawSubmit(BaseModel):
 # Setup logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+app = FastAPI(title="Store Dashboard Admin")
+
+# Add CORS Middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 def generate_transaction_id():
     chars = string.ascii_uppercase + string.digits
@@ -114,7 +126,7 @@ def clean_display_name(raw_name: str) -> str:
     clean = re.sub(r'\s*[\(\[]?[A-Z]{2,3}[\)\]]?\s*$', '', raw_name)
     return clean.strip()
 
-app = FastAPI(title="Store Admin Panel")
+
 
 @app.get("/seller", response_class=HTMLResponse)
 async def get_seller_panel(request: Request):

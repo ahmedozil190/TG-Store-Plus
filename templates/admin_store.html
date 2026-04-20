@@ -1829,40 +1829,52 @@
 
         async function init() {
             try {
-                const res = await fetch('/api/admin/store/data');
+                // Cache busting to prevent old data issues
+                const res = await fetch('/api/admin/store/data?t=' + new Date().getTime());
+                if (!res.ok) throw new Error("Server returned " + res.status);
                 const data = await res.json();
 
-                document.getElementById('stat-total-users').innerText = data.stats.user_count;
-                if (data.bot_name) document.getElementById('sideBrandName').textContent = data.bot_name;
+                if (document.getElementById('stat-total-users')) document.getElementById('stat-total-users').innerText = data.stats.user_count || 0;
+                if (data.bot_name && document.getElementById('sideBrandName')) document.getElementById('sideBrandName').textContent = data.bot_name;
+                
                 const uname = tg.initDataUnsafe?.user?.first_name || "AD";
                 const uIEl = document.getElementById('userInitial');
                 if (uIEl) uIEl.textContent = uname.charAt(0).toUpperCase();
-                document.getElementById('stat-stock').innerText = data.stats.stock_count;
-                document.getElementById('stat-total-balance').innerText = `$${Number(data.stats.total_balance).toFixed(2)}`;
+
+                if (document.getElementById('stat-stock')) document.getElementById('stat-stock').innerText = data.stats.stock_count || 0;
+                if (document.getElementById('stat-total-balance')) document.getElementById('stat-total-balance').innerText = `$${Number(data.stats.total_balance || 0).toFixed(2)}`;
 
                 allUsers = (data.users || []).reverse();
                 allTransactions = data.transactions || [];
 
-                document.getElementById('stat-sales-count').innerText = allTransactions.length;
-                document.getElementById('user-count').innerText = allUsers.length;
-                document.getElementById('banned-count').innerText = allUsers.filter(u => u.banned).length;
+                if (document.getElementById('stat-sales-count')) document.getElementById('stat-sales-count').innerText = allTransactions.length;
+                if (document.getElementById('user-count')) document.getElementById('user-count').innerText = allUsers.length;
+                if (document.getElementById('banned-count')) document.getElementById('banned-count').innerText = allUsers.filter(u => u.banned).length;
 
                 renderSales(allTransactions);
                 renderSalesList(allTransactions);
                 renderUsers(filteredUsers || allUsers);
 
-                // Fetch sell prices from store endpoint (Sorted by newest first on server)
                 allPrices = data.prices || [];
                 
-                // Update counts using isolated flags
                 const activeCount = allPrices.filter(p => p.is_active_store).length;
                 const inactiveCount = allPrices.length - activeCount;
-                document.getElementById('stat-active-countries').innerText = activeCount;
-                document.getElementById('stat-inactive-countries').innerText = inactiveCount;
+                if (document.getElementById('stat-active-countries')) document.getElementById('stat-active-countries').innerText = activeCount;
+                if (document.getElementById('stat-inactive-countries')) document.getElementById('stat-inactive-countries').innerText = inactiveCount;
 
                 renderPrices(allPrices);
-            } catch (e) { console.error(e); }
-            finally { document.getElementById('loader').style.display = 'none'; }
+            } catch (e) { 
+                console.error("Dashboard Init Error:", e);
+                // Visual feedback for the user if it fails
+                const errorBox = document.createElement('div');
+                errorBox.style.cssText = "position:fixed; top:20px; left:20px; right:20px; background:rgba(255,0,0,0.8); color:white; padding:15px; border-radius:10px; z-index:9999; text-align:center; font-weight:bold;";
+                errorBox.innerHTML = "<i class='fas fa-exclamation-triangle'></i> Error loading data: " + e.message;
+                document.body.appendChild(errorBox);
+            }
+            finally { 
+                const loader = document.getElementById('loader');
+                if (loader) loader.style.display = 'none'; 
+            }
         }
 
         // ===== Sales =====
