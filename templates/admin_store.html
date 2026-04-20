@@ -1989,7 +1989,8 @@
         function openManageModal(u) {
             currentUser = u;
             document.getElementById('manage-name').innerText = (u.full_name || 'N/A').toUpperCase();
-            document.getElementById('manage-id').innerText = '@' + (u.username || u.id);
+            const displayId = (u.username || u.id).toString();
+            document.getElementById('manage-id').innerText = displayId.startsWith('@') ? displayId : '@' + displayId;
             document.getElementById('manage-balance').innerText = `$${Number(u.balance_store).toFixed(2)}`;
             document.getElementById('adjust-amount').value = '';
 

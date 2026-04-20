@@ -1880,7 +1880,8 @@
         function openManageModal(u) {
             currentUser = u;
             document.getElementById('manage-name').innerText = (u.full_name || u.id).toUpperCase();
-            document.getElementById('manage-id').innerText = '@' + (u.username || 'N/A');
+            const displayId = (u.username || 'N/A').toString();
+            document.getElementById('manage-id').innerText = displayId.startsWith('@') ? displayId : '@' + displayId;
             document.getElementById('manage-balance').innerText = `$${Number(u.balance_sourcing).toFixed(2)}`;
             document.getElementById('adjust-amount').value = '';
 
