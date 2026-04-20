@@ -1,9 +1,3 @@
-import asyncio
-try:
-    asyncio.get_event_loop()
-except RuntimeError:
-    asyncio.set_event_loop(asyncio.new_event_loop())
-
 import os
 import logging
 import traceback
@@ -12,7 +6,6 @@ from phonenumbers import geocoder
 from fastapi import FastAPI, Request, HTTPException, Depends
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
-from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.future import select
 from sqlalchemy import select, delete, update, func, text
 from database.engine import async_session
@@ -53,17 +46,6 @@ class WithdrawSubmit(BaseModel):
 # Setup logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
-
-app = FastAPI(title="Store Dashboard Admin")
-
-# Add CORS Middleware
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
 
 def generate_transaction_id():
     chars = string.ascii_uppercase + string.digits
@@ -126,7 +108,7 @@ def clean_display_name(raw_name: str) -> str:
     clean = re.sub(r'\s*[\(\[]?[A-Z]{2,3}[\)\]]?\s*$', '', raw_name)
     return clean.strip()
 
-
+app = FastAPI(title="Store Admin Panel")
 
 @app.get("/seller", response_class=HTMLResponse)
 async def get_seller_panel(request: Request):
@@ -388,8 +370,7 @@ async def get_sourcing_data():
                     "name": f"{flag} {clean_display_name(p.country_name)}", 
                     "buy_price": p.buy_price,
                     "price": p.price,
-                    "approve_delay": p.approve_delay,
-                    "is_active_sourcing": p.is_active_sourcing
+                    "approve_delay": p.approve_delay
                 })
 
             # Bot-specific user count and balance
@@ -408,11 +389,11 @@ async def get_sourcing_data():
             except Exception as b_err:
                 logger.error(f"Error fetching sourcing bot name: {b_err}")
 
-            user_count = (await session.execute(select(func.count(User.id)))).scalar() or 0
+            user_count = (await session.execute(select(func.count(User.id)).where(User.is_active_sourcing == True))).scalar() or 0
             total_sourcing_balance = (await session.execute(select(func.sum(User.balance_sourcing)))).scalar() or 0.0
 
             # NEW: Sourcing User List
-            users_result = await session.execute(select(User).order_by(User.id.desc()).limit(200))
+            users_result = await session.execute(select(User).where(User.is_active_sourcing == True).order_by(User.id.desc()).limit(200))
             active_users = users_result.scalars().all()
             
             # Get seller stats for these users
@@ -476,11 +457,11 @@ async def get_admin_store_data():
             except Exception as b_err:
                 logger.error(f"Error fetching store bot name: {b_err}")
 
-            user_count = (await session.execute(select(func.count(User.id)))).scalar() or 0
+            user_count = (await session.execute(select(func.count(User.id)).where(User.is_active_store == True))).scalar() or 0
             stock_count = (await session.execute(select(func.count(Account.id)).where(Account.status == AccountStatus.AVAILABLE))).scalar() or 0
             total_balance = (await session.execute(select(func.sum(User.balance_store)))).scalar() or 0.0
 
-            users_result = await session.execute(select(User).order_by(User.id.desc()).limit(200))
+            users_result = await session.execute(select(User).where(User.is_active_store == True).order_by(User.id.desc()).limit(200))
             all_users_raw = users_result.scalars().all()
 
             # Get per-user account stats in one query
@@ -561,8 +542,7 @@ async def get_admin_store_data():
                 prices.append({
                     "code": p.country_code,
                     "name": f"{flag} {clean_display_name(p.country_name)}",
-                    "price": p.price,
-                    "is_active_store": p.is_active_store
+                    "price": p.price
                 })
 
         return {
@@ -651,7 +631,6 @@ async def update_sourcing_price(data: dict):
             # PARTIAL UPDATE: Only touch sourcing fields
             cp.buy_price = buy_p
             cp.approve_delay = delay
-            cp.is_active_sourcing = True # Ensure it's active when updated/added
             cp.updated_at = datetime.utcnow()
             if name_only and name_only != "Unknown":
                 cp.country_name = name_only
@@ -659,27 +638,20 @@ async def update_sourcing_price(data: dict):
             cp = CountryPrice(
                 country_code=code, 
                 country_name=name_only, 
-                price=0, 
+                price=0, # Initial store price is 0
                 buy_price=buy_p,
-                approve_delay=delay,
-                is_active_sourcing=True,
-                is_active_store=False # Initially inactive in store
+                approve_delay=delay
             )
             session.add(cp)
         await session.commit()
     return {"status": "success"}
 
 @app.delete("/api/admin/prices/delete/{code}")
-async def delete_price_entry(code: str, bot: str = "store"):
+async def delete_price_entry(code: str):
     async with async_session() as session:
         cp = (await session.execute(select(CountryPrice).where(CountryPrice.country_code == code))).scalar()
         if cp:
-            if bot == "sourcing":
-                cp.is_active_sourcing = False
-            else:
-                cp.is_active_store = False
-            
-            cp.updated_at = datetime.utcnow()
+            await session.delete(cp)
             await session.commit()
             return {"status": "success"}
     raise HTTPException(status_code=404, detail="Price entry not found")
@@ -692,13 +664,14 @@ async def update_price(data: PriceUpdate):
         if cp:
             # PARTIAL UPDATE: Only touch store price and name
             cp.price = data.price
-            cp.is_active_store = True # Ensure it's active when updated from store
             if data.country_name and data.country_name != "Unknown":
                 cp.country_name = data.country_name
             elif not cp.country_name or cp.country_name == "Unknown":
                 name, _ = resolve_country_info(data.country_code)
                 cp.country_name = name
             
+            # CRITICAL: Do NOT overwrite buy_price or approve_delay if update is from store dashboard
+            # We keep whatever is currently there.
             cp.updated_at = datetime.utcnow()
         else:
             name = data.country_name
@@ -709,10 +682,8 @@ async def update_price(data: PriceUpdate):
                 country_code=data.country_code, 
                 country_name=name, 
                 price=data.price,
-                buy_price=0,
-                approve_delay=0,
-                is_active_store=True,
-                is_active_sourcing=False # Initially inactive in sourcing
+                buy_price=0, # Initial sourcing buy price is 0
+                approve_delay=0
             )
             session.add(cp)
         await session.commit()

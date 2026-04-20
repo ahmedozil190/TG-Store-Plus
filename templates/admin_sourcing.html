@@ -1421,8 +1421,7 @@
                             <div class="info-card-val"><span id="stat-active-countries">0</span> <span
                                     data-i18n="unit_countries">COUNTRIES</span></div>
                         </div>
-                        <div class="info-card-icon"
-                            style="background: rgba(34, 197, 94, 0.1); color: var(--success);">
+                        <div class="info-card-icon" style="background: rgba(34, 197, 94, 0.1); color: var(--success);">
                             <i class="fas fa-check-circle"></i>
                         </div>
                     </div>
@@ -1432,8 +1431,7 @@
                             <div class="info-card-val"><span id="stat-inactive-countries">0</span> <span
                                     data-i18n="unit_countries">COUNTRIES</span></div>
                         </div>
-                        <div class="info-card-icon"
-                            style="background: rgba(239, 68, 68, 0.1); color: var(--error);">
+                        <div class="info-card-icon" style="background: rgba(239, 68, 68, 0.1); color: var(--error);">
                             <i class="fas fa-times-circle"></i>
                         </div>
                     </div>
@@ -1779,48 +1777,34 @@
 
         async function init() {
             try {
-                // Cache busting to prevent old data issues
-                const res = await fetch('/api/admin/sourcing/data?t=' + new Date().getTime());
-                if (!res.ok) throw new Error("Server returned " + res.status);
+                const res = await fetch('/api/admin/sourcing/data');
                 const data = await res.json();
-
-                if (document.getElementById('stat-total-sourced')) document.getElementById('stat-total-sourced').innerText = data.stats.total_sourced || 0;
-                if (data.bot_name && document.getElementById('sideBrandName')) document.getElementById('sideBrandName').textContent = data.bot_name;
-                
+                document.getElementById('stat-total-sourced').innerText = data.stats.total_sourced;
+                if (data.bot_name) document.getElementById('sideBrandName').textContent = data.bot_name;
                 const uname = tg.initDataUnsafe?.user?.first_name || "AD";
                 const uIEl = document.getElementById('userInitial');
                 if (uIEl) uIEl.textContent = uname.charAt(0).toUpperCase();
+                document.getElementById('stat-pending').innerText = data.stats.pending_count;
+                document.getElementById('stat-total-balance').innerText = `$${Number(data.stats.total_balance).toFixed(2)}`;
 
-                if (document.getElementById('stat-pending')) document.getElementById('stat-pending').innerText = data.stats.pending_count || 0;
-                if (document.getElementById('stat-total-balance')) document.getElementById('stat-total-balance').innerText = `$${Number(data.stats.total_balance || 0).toFixed(2)}`;
-
-                renderRecent(data.recent || []);
-                renderHistory(data.recent || []);
+                renderRecent(data.recent);
+                renderHistory(data.recent);
                 allPrices = data.prices || [];
-                
-                const activeCount = allPrices.filter(p => p.is_active_sourcing).length;
+
+                // Update counts
+                const activeCount = allPrices.filter(p => p.buy_price > 0).length;
                 const inactiveCount = allPrices.length - activeCount;
-                if (document.getElementById('stat-active-countries')) document.getElementById('stat-active-countries').innerText = activeCount;
-                if (document.getElementById('stat-inactive-countries')) document.getElementById('stat-inactive-countries').innerText = inactiveCount;
+                document.getElementById('stat-active-countries').innerText = activeCount;
+                document.getElementById('stat-inactive-countries').innerText = inactiveCount;
 
                 renderPrices(allPrices);
 
                 allUsers = (data.users || []).reverse();
-                if (document.getElementById('user-count')) document.getElementById('user-count').innerText = data.stats.user_count || allUsers.length;
-                if (document.getElementById('banned-count')) document.getElementById('banned-count').innerText = allUsers.filter(u => u.banned).length;
+                document.getElementById('user-count').innerText = data.stats.user_count || allUsers.length;
+                document.getElementById('banned-count').innerText = allUsers.filter(u => u.banned).length;
                 renderUsers(filteredUsers || allUsers);
-            } catch (e) { 
-                console.error("Dashboard Init Error:", e);
-                // Visual feedback for the user
-                const errorBox = document.createElement('div');
-                errorBox.style.cssText = "position:fixed; top:20px; left:20px; right:20px; background:rgba(255,0,0,0.8); color:white; padding:15px; border-radius:10px; z-index:9999; text-align:center; font-weight:bold;";
-                errorBox.innerHTML = "<i class='fas fa-exclamation-triangle'></i> Error loading data: " + e.message;
-                document.body.appendChild(errorBox);
-            }
-            finally { 
-                const loader = document.getElementById('loader');
-                if (loader) loader.style.display = 'none'; 
-            }
+            } catch (e) { console.error(e); }
+            finally { document.getElementById('loader').style.display = 'none'; }
         }
 
         function switchTab(tab, btn) {
@@ -2143,10 +2127,10 @@
         }
 
         function renderPrices(list) {
-            // Filter based on tab using isolated flag
+            // Filter based on tab
             const filteredByTab = list.filter(p => {
-                if (currentPriceTab === 'active') return p.is_active_sourcing;
-                return !p.is_active_sourcing;
+                if (currentPriceTab === 'active') return p.buy_price > 0;
+                return p.buy_price <= 0;
             });
             const container = document.getElementById('price-list');
             const pagContainer = document.getElementById('price-pagination');
@@ -2265,7 +2249,7 @@
                 renderPrices(filteredPrices || allPrices);
 
                 // Perform deletion in background
-                fetch(`/api/admin/prices/delete/${code}?bot=sourcing`, { method: 'DELETE' }).catch(e => {
+                fetch(`/api/admin/prices/delete/${code}`, { method: 'DELETE' }).catch(e => {
                     console.error("Delete failed:", e);
                     init(); // Re-sync if error
                 });
