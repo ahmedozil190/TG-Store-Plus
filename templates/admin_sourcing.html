@@ -822,7 +822,7 @@
         }
 
         .manage-card {
-            background: var(--bg-main);
+            background: var(--bg);
             width: 95%;
             max-width: 440px;
             border-radius: 28px;
@@ -846,7 +846,7 @@
         }
 
         .manage-data-box {
-            background: var(--card-glass);
+            background: var(--bg-elevated) !important;
             border: 1px solid var(--border);
             border-radius: 14px;
             padding: 0 15px;
@@ -1796,7 +1796,7 @@
 
             container.innerHTML = paged.map((u, i) => {
                 const idx = start + i + 1;
-                const statusColor = u.banned ? 'var(--danger)' : 'var(--success)';
+                const statusColor = u.banned ? 'var(--error)' : 'var(--success)';
                 const statusIcon = u.banned ? '<i class="fas fa-times" style="font-size: 0.9rem;"></i>' : '<i class="fas fa-check" style="font-size: 0.9rem;"></i>';
                 const statusText = u.banned
                     ? (currentLang === 'ar' ? 'محظور' : 'BANNED')
