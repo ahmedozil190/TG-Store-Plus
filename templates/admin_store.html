@@ -2305,7 +2305,7 @@
                 renderPrices(filteredPrices || allPrices);
 
                 // Perform deletion in background
-                fetch(`/api/admin/prices/delete/${code}`, { method: 'DELETE' }).catch(e => {
+                fetch(`/api/admin/prices/delete/${code}?bot=store`, { method: 'DELETE' }).catch(e => {
                     console.error("Delete failed:", e);
                     init(); // Re-sync if error
                 });

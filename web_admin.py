@@ -355,8 +355,8 @@ async def get_sourcing_data():
                 })
 
             prices_result = await session.execute(
-                select(CountryPrice)
-                .order_by(CountryPrice.updated_at.desc())
+                select(CountryPrice).where(CountryPrice.buy_price > 0)
+                .order_by(CountryPrice.country_name.asc())
             )
             prices = []
             for p in prices_result.scalars().all():
@@ -528,8 +528,8 @@ async def get_admin_store_data():
 
             # Fetch all prices (Filtering handled by frontend tabs)
             prices_result = await session.execute(
-                select(CountryPrice)
-                .order_by(CountryPrice.updated_at.desc())
+                select(CountryPrice).where(CountryPrice.price > 0)
+                .order_by(CountryPrice.country_name.asc())
             )
             prices = []
             for p in prices_result.scalars().all():
@@ -646,11 +646,18 @@ async def update_sourcing_price(data: dict):
     return {"status": "success"}
 
 @app.delete("/api/admin/prices/delete/{code}")
-async def delete_price_entry(code: str):
+async def delete_price_entry(code: str, bot: str = "store"):
     async with async_session() as session:
         cp = (await session.execute(select(CountryPrice).where(CountryPrice.country_code == code))).scalar()
         if cp:
-            await session.delete(cp)
+            if bot == "sourcing":
+                cp.buy_price = 0
+            else:
+                cp.price = 0
+            
+            if cp.price == 0 and cp.buy_price == 0:
+                await session.delete(cp)
+                
             await session.commit()
             return {"status": "success"}
     raise HTTPException(status_code=404, detail="Price entry not found")
