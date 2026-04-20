@@ -168,8 +168,7 @@
             font-size: 1rem;
             font-weight: 800;
             letter-spacing: 0.5px;
-            color: var(--text-primary);
-            opacity: 1;
+            opacity: 0.9;
         }
 
         .user-avatar {
@@ -835,6 +834,9 @@
             align-items: center;
             opacity: 0;
             transition: all 0.4s ease;
+            padding: 20px;
+        }
+
         .manage-overlay.active {
             display: flex;
             opacity: 1;
@@ -938,7 +940,6 @@
             gap: 12px;
             margin: 20px 0;
             align-items: center;
-            width: 100%;
         }
 
         .manage-input-wrapper {
@@ -957,7 +958,7 @@
             outline: none;
             transition: 0.3s;
             text-align: center;
-            box-sizing: border-box;
+            height: 42px;
         }
 
         .manage-input:focus {
@@ -1027,7 +1028,7 @@
 
         .manage-btn.success {
             background: #32d74b;
-            color: #ffffff;
+            color: #fff;
         }
 
         .manage-btn.secondary {
