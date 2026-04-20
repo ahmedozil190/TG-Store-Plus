@@ -1,12 +1,16 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Numbers Store</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Tajawal:wght@400;500;700;800&display=swap"
+        rel="stylesheet">
     <style>
         :root {
             --bg-primary: #0a0a0f;
@@ -32,7 +36,9 @@
         }
 
         * {
-            margin: 0; padding: 0; box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
             -webkit-tap-highlight-color: transparent;
         }
 
@@ -46,26 +52,47 @@
 
         /* ─── Splash Loader ─── */
         .splash {
-            position: fixed; inset: 0; z-index: 9999;
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
             background: var(--bg-primary);
-            display: flex; flex-direction: column;
-            justify-content: center; align-items: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
             transition: opacity 0.5s, visibility 0.5s;
         }
-        .splash.hide { opacity: 0; visibility: hidden; pointer-events: none; }
+
+        .splash.hide {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
 
         .splash-logo {
-            width: 70px; height: 70px;
+            width: 70px;
+            height: 70px;
             background: linear-gradient(135deg, var(--accent), var(--accent-light));
             border-radius: 20px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 1.8rem; color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            color: white;
             animation: pulse-logo 1.5s ease-in-out infinite;
             box-shadow: 0 10px 40px var(--accent-glow);
         }
+
         @keyframes pulse-logo {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.08); }
+
+            0%,
+            100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.08);
+            }
         }
 
         .splash-text {
@@ -77,19 +104,39 @@
 
         .splash-dots {
             margin-top: 25px;
-            display: flex; gap: 6px;
+            display: flex;
+            gap: 6px;
         }
+
         .splash-dots span {
-            width: 6px; height: 6px;
+            width: 6px;
+            height: 6px;
             background: var(--accent);
             border-radius: 50%;
             animation: dot-bounce 1.2s ease-in-out infinite;
         }
-        .splash-dots span:nth-child(2) { animation-delay: 0.15s; }
-        .splash-dots span:nth-child(3) { animation-delay: 0.3s; }
+
+        .splash-dots span:nth-child(2) {
+            animation-delay: 0.15s;
+        }
+
+        .splash-dots span:nth-child(3) {
+            animation-delay: 0.3s;
+        }
+
         @keyframes dot-bounce {
-            0%, 80%, 100% { opacity: 0.3; transform: scale(0.8); }
-            40% { opacity: 1; transform: scale(1.2); }
+
+            0%,
+            80%,
+            100% {
+                opacity: 0.3;
+                transform: scale(0.8);
+            }
+
+            40% {
+                opacity: 1;
+                transform: scale(1.2);
+            }
         }
 
         /* ─── Header ─── */
@@ -99,28 +146,40 @@
         }
 
         .header-top {
-            display: flex; align-items: center; justify-content: space-between;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
             margin-bottom: 18px;
         }
 
         .brand {
-            display: flex; align-items: center; gap: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
         }
 
         .brand-icon {
-            width: 42px; height: 42px;
+            width: 42px;
+            height: 42px;
             background: linear-gradient(135deg, var(--accent), var(--accent-light));
             border-radius: 14px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 1.2rem; color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            color: white;
             box-shadow: 0 4px 15px var(--accent-glow);
         }
 
         .brand-text {
-            font-size: 1.15rem; font-weight: 800;
+            font-size: 1.15rem;
+            font-weight: 800;
             letter-spacing: -0.5px;
         }
-        .brand-text span { color: var(--accent-light); }
+
+        .brand-text span {
+            color: var(--accent-light);
+        }
 
         .header-badge {
             background: var(--bg-card);
@@ -130,15 +189,30 @@
             font-size: 0.7rem;
             color: var(--green);
             font-weight: 600;
-            display: flex; align-items: center; gap: 5px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
         }
+
         .header-badge .dot {
-            width: 6px; height: 6px;
+            width: 6px;
+            height: 6px;
             background: var(--green);
             border-radius: 50%;
             animation: blink 2s infinite;
         }
-        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+        @keyframes blink {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.3;
+            }
+        }
 
         /* Balance Widget */
         .balance-widget {
@@ -146,19 +220,27 @@
             border: 1px solid var(--border);
             border-radius: var(--radius-md);
             padding: 16px 20px;
-            display: flex; align-items: center; justify-content: space-between;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
         }
 
         .balance-left {
-            display: flex; align-items: center; gap: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
         }
 
         .balance-icon {
-            width: 40px; height: 40px;
+            width: 40px;
+            height: 40px;
             background: linear-gradient(135deg, var(--green), #55efc4);
             border-radius: 12px;
-            display: flex; align-items: center; justify-content: center;
-            color: white; font-size: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1rem;
         }
 
         .balance-label {
@@ -181,11 +263,15 @@
 
         .stock-info {
             text-align: left;
-            display: flex; flex-direction: column; align-items: flex-end; gap: 2px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 2px;
         }
 
         .stock-count {
-            font-size: 1.2rem; font-weight: 800;
+            font-size: 1.2rem;
+            font-weight: 800;
             color: var(--accent-light);
         }
 
@@ -198,7 +284,9 @@
         /* ─── Search ─── */
         .search-wrapper {
             padding: 0 20px 12px;
-            position: sticky; top: 0; z-index: 100;
+            position: sticky;
+            top: 0;
+            z-index: 100;
             background: linear-gradient(180deg, var(--bg-primary) 60%, transparent);
             padding-top: 10px;
         }
@@ -231,21 +319,23 @@
 
         .search-box .search-icon {
             position: absolute;
-            left: 16px; top: 50%;
+            left: 16px;
+            top: 50%;
             transform: translateY(-50%);
             color: var(--text-dim);
             font-size: 0.9rem;
             transition: color 0.3s;
         }
 
-        .search-box input:focus ~ .search-icon {
+        .search-box input:focus~.search-icon {
             color: var(--accent);
         }
 
         /* ─── Stats Bar ─── */
         .stats-bar {
             padding: 0 20px 15px;
-            display: flex; gap: 10px;
+            display: flex;
+            gap: 10px;
         }
 
         .stat-chip {
@@ -258,7 +348,8 @@
         }
 
         .stat-chip .stat-val {
-            font-size: 1.1rem; font-weight: 800;
+            font-size: 1.1rem;
+            font-weight: 800;
             color: var(--accent-light);
         }
 
@@ -281,7 +372,8 @@
 
         .countries-grid {
             padding: 0 20px 100px;
-            display: flex; flex-direction: column;
+            display: flex;
+            flex-direction: column;
             gap: 10px;
         }
 
@@ -290,7 +382,9 @@
             border: 1px solid var(--border);
             border-radius: var(--radius-md);
             padding: 16px;
-            display: flex; align-items: center; justify-content: space-between;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
             cursor: pointer;
             transition: all 0.25s ease;
             position: relative;
@@ -315,36 +409,46 @@
         }
 
         .card-left {
-            display: flex; align-items: center; gap: 14px;
-            position: relative; z-index: 1;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            position: relative;
+            z-index: 1;
         }
 
         .flag {
             font-size: 2.2rem;
             line-height: 1;
-            filter: drop-shadow(0 2px 6px rgba(0,0,0,0.4));
+            filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.4));
         }
 
         .card-info h3 {
-            font-size: 0.95rem; font-weight: 700;
+            font-size: 0.95rem;
+            font-weight: 700;
             margin-bottom: 3px;
         }
 
         .card-info .stock-text {
             font-size: 0.75rem;
             color: var(--text-secondary);
-            display: flex; align-items: center; gap: 5px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
         }
 
         .card-info .stock-text .stock-dot {
-            width: 5px; height: 5px;
+            width: 5px;
+            height: 5px;
             border-radius: 50%;
             background: var(--green);
         }
 
         .card-right {
-            position: relative; z-index: 1;
-            display: flex; align-items: center; gap: 10px;
+            position: relative;
+            z-index: 1;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
         .price-tag {
@@ -387,19 +491,30 @@
             border: 1px solid var(--border);
             border-radius: var(--radius-md);
             padding: 16px;
-            display: flex; align-items: center; justify-content: space-between;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
         }
 
-        .skel-left { display: flex; align-items: center; gap: 14px; }
+        .skel-left {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
 
         .skel-circle {
-            width: 45px; height: 45px;
+            width: 45px;
+            height: 45px;
             border-radius: 12px;
             background: var(--bg-elevated);
             animation: shimmer 1.5s infinite;
         }
 
-        .skel-lines { display: flex; flex-direction: column; gap: 8px; }
+        .skel-lines {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
 
         .skel-line {
             height: 12px;
@@ -407,11 +522,19 @@
             background: var(--bg-elevated);
             animation: shimmer 1.5s infinite;
         }
-        .skel-line.w1 { width: 100px; }
-        .skel-line.w2 { width: 65px; animation-delay: 0.15s; }
+
+        .skel-line.w1 {
+            width: 100px;
+        }
+
+        .skel-line.w2 {
+            width: 65px;
+            animation-delay: 0.15s;
+        }
 
         .skel-price {
-            width: 65px; height: 36px;
+            width: 65px;
+            height: 36px;
             border-radius: var(--radius-sm);
             background: var(--bg-elevated);
             animation: shimmer 1.5s infinite;
@@ -419,21 +542,38 @@
         }
 
         @keyframes shimmer {
-            0% { opacity: 0.4; }
-            50% { opacity: 0.8; }
-            100% { opacity: 0.4; }
+            0% {
+                opacity: 0.4;
+            }
+
+            50% {
+                opacity: 0.8;
+            }
+
+            100% {
+                opacity: 0.4;
+            }
         }
 
         /* ─── Modal Overlay ─── */
         .modal-overlay {
-            position: fixed; inset: 0; z-index: 5000;
+            position: fixed;
+            inset: 0;
+            z-index: 5000;
             background: rgba(0, 0, 0, 0.75);
             backdrop-filter: blur(8px);
-            display: flex; align-items: flex-end; justify-content: center;
-            opacity: 0; visibility: hidden;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
             transition: all 0.3s;
         }
-        .modal-overlay.show { opacity: 1; visibility: visible; }
+
+        .modal-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
 
         .modal-sheet {
             width: 100%;
@@ -444,10 +584,14 @@
             transform: translateY(100%);
             transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
         }
-        .modal-overlay.show .modal-sheet { transform: translateY(0); }
+
+        .modal-overlay.show .modal-sheet {
+            transform: translateY(0);
+        }
 
         .modal-handle {
-            width: 40px; height: 4px;
+            width: 40px;
+            height: 4px;
             background: var(--text-dim);
             border-radius: 4px;
             margin: 0 auto 24px;
@@ -460,17 +604,21 @@
         }
 
         .confirm-icon {
-            width: 64px; height: 64px;
+            width: 64px;
+            height: 64px;
             margin: 0 auto 16px;
             background: linear-gradient(135deg, var(--accent-glow), rgba(108, 92, 231, 0.1));
             border: 2px solid rgba(108, 92, 231, 0.3);
             border-radius: 20px;
-            display: flex; align-items: center; justify-content: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             font-size: 2rem;
         }
 
         .confirm-header h2 {
-            font-size: 1.2rem; font-weight: 800;
+            font-size: 1.2rem;
+            font-weight: 800;
         }
 
         .confirm-header p {
@@ -488,7 +636,9 @@
         }
 
         .detail-row {
-            display: flex; justify-content: space-between; align-items: center;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             padding: 10px 0;
         }
 
@@ -512,7 +662,8 @@
         }
 
         .modal-actions {
-            display: flex; gap: 10px;
+            display: flex;
+            gap: 10px;
         }
 
         .btn {
@@ -527,7 +678,9 @@
             transition: all 0.2s;
         }
 
-        .btn:active { transform: scale(0.97); }
+        .btn:active {
+            transform: scale(0.97);
+        }
 
         .btn-cancel {
             background: var(--bg-card);
@@ -548,8 +701,9 @@
 
         .btn-confirm .spinner-small {
             display: inline-block;
-            width: 16px; height: 16px;
-            border: 2px solid rgba(255,255,255,0.3);
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
             border-top-color: white;
             border-radius: 50%;
             animation: spin 0.6s linear infinite;
@@ -557,23 +711,36 @@
             margin-left: 8px;
         }
 
-        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
 
         /* ─── Success Modal ─── */
         .success-icon {
-            width: 72px; height: 72px;
+            width: 72px;
+            height: 72px;
             margin: 0 auto 16px;
             background: var(--green-glow);
             border: 2px solid rgba(0, 184, 148, 0.4);
             border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 2rem; color: var(--green);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: var(--green);
             animation: success-pop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
         @keyframes success-pop {
-            0% { transform: scale(0); }
-            100% { transform: scale(1); }
+            0% {
+                transform: scale(0);
+            }
+
+            100% {
+                transform: scale(1);
+            }
         }
 
         .phone-display {
@@ -602,19 +769,29 @@
 
         .copy-btn {
             position: absolute;
-            top: 12px; left: 12px;
-            width: 36px; height: 36px;
+            top: 12px;
+            left: 12px;
+            width: 36px;
+            height: 36px;
             background: var(--bg-elevated);
             border: 1px solid var(--border);
             border-radius: 10px;
             color: var(--text-secondary);
-            display: flex; align-items: center; justify-content: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             cursor: pointer;
             transition: all 0.2s;
         }
 
-        .copy-btn:active { transform: scale(0.9); }
-        .copy-btn.copied { color: var(--green); border-color: var(--green); }
+        .copy-btn:active {
+            transform: scale(0.9);
+        }
+
+        .copy-btn.copied {
+            color: var(--green);
+            border-color: var(--green);
+        }
 
         .success-steps {
             background: var(--bg-card);
@@ -625,16 +802,23 @@
         }
 
         .step {
-            display: flex; align-items: flex-start; gap: 12px;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
             padding: 8px 0;
         }
 
         .step-num {
-            width: 24px; height: 24px; min-width: 24px;
+            width: 24px;
+            height: 24px;
+            min-width: 24px;
             background: var(--accent-glow);
             border-radius: 8px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 0.7rem; font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            font-weight: 800;
             color: var(--accent-light);
         }
 
@@ -659,12 +843,15 @@
             transition: all 0.2s;
         }
 
-        .btn-done:active { transform: scale(0.97); }
+        .btn-done:active {
+            transform: scale(0.97);
+        }
 
         /* ─── Toast ─── */
         .toast {
             position: fixed;
-            bottom: 30px; left: 50%;
+            bottom: 30px;
+            left: 50%;
             transform: translateX(-50%) translateY(100px);
             background: var(--bg-elevated);
             border: 1px solid var(--border);
@@ -676,10 +863,13 @@
             transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
             white-space: nowrap;
         }
-        .toast.show { transform: translateX(-50%) translateY(0); }
 
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+        }
     </style>
 </head>
+
 <body>
 
     <!-- Splash Screen -->
@@ -746,10 +936,46 @@
     <!-- Countries List -->
     <div class="countries-grid" id="countriesGrid">
         <!-- Skeleton cards while loading -->
-        <div class="skeleton-card"><div class="skel-left"><div class="skel-circle"></div><div class="skel-lines"><div class="skel-line w1"></div><div class="skel-line w2"></div></div></div><div class="skel-price"></div></div>
-        <div class="skeleton-card"><div class="skel-left"><div class="skel-circle"></div><div class="skel-lines"><div class="skel-line w1"></div><div class="skel-line w2"></div></div></div><div class="skel-price"></div></div>
-        <div class="skeleton-card"><div class="skel-left"><div class="skel-circle"></div><div class="skel-lines"><div class="skel-line w1"></div><div class="skel-line w2"></div></div></div><div class="skel-price"></div></div>
-        <div class="skeleton-card"><div class="skel-left"><div class="skel-circle"></div><div class="skel-lines"><div class="skel-line w1"></div><div class="skel-line w2"></div></div></div><div class="skel-price"></div></div>
+        <div class="skeleton-card">
+            <div class="skel-left">
+                <div class="skel-circle"></div>
+                <div class="skel-lines">
+                    <div class="skel-line w1"></div>
+                    <div class="skel-line w2"></div>
+                </div>
+            </div>
+            <div class="skel-price"></div>
+        </div>
+        <div class="skeleton-card">
+            <div class="skel-left">
+                <div class="skel-circle"></div>
+                <div class="skel-lines">
+                    <div class="skel-line w1"></div>
+                    <div class="skel-line w2"></div>
+                </div>
+            </div>
+            <div class="skel-price"></div>
+        </div>
+        <div class="skeleton-card">
+            <div class="skel-left">
+                <div class="skel-circle"></div>
+                <div class="skel-lines">
+                    <div class="skel-line w1"></div>
+                    <div class="skel-line w2"></div>
+                </div>
+            </div>
+            <div class="skel-price"></div>
+        </div>
+        <div class="skeleton-card">
+            <div class="skel-left">
+                <div class="skel-circle"></div>
+                <div class="skel-lines">
+                    <div class="skel-line w1"></div>
+                    <div class="skel-line w2"></div>
+                </div>
+            </div>
+            <div class="skel-price"></div>
+        </div>
     </div>
 
     <!-- Empty State -->
@@ -850,7 +1076,7 @@
                 const data = await res.json();
 
                 userBalance = data.user.balance;
-                document.getElementById('userBalance').innerHTML = 
+                document.getElementById('userBalance').innerHTML =
                     `${userBalance.toFixed(2)} <span class="currency">USD</span>`;
 
                 countriesData = data.countries;
@@ -1020,19 +1246,27 @@
         window.onload = fetchStoreData;
 
         // Close modals on overlay click
-        document.getElementById('confirmModal').addEventListener('click', function(e) {
+        document.getElementById('confirmModal').addEventListener('click', function (e) {
             if (e.target === this) closeModal();
         });
-        document.getElementById('successModal').addEventListener('click', function(e) {
+        document.getElementById('successModal').addEventListener('click', function (e) {
             if (e.target === this) document.getElementById('successModal').classList.remove('show');
         });
     </script>
 
     <style>
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
     </style>
 </body>
+
 </html>
