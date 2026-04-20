@@ -185,6 +185,10 @@ async def run_migrations():
             try:
                 await conn.execute(sqlalchemy.text("ALTER TABLE country_prices ADD COLUMN approve_delay INTEGER DEFAULT 0"))
             except: pass
+            try:
+                await conn.execute(sqlalchemy.text("ALTER TABLE country_prices ADD COLUMN updated_at DATETIME"))
+                await conn.execute(sqlalchemy.text("UPDATE country_prices SET updated_at = '" + datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S') + "' WHERE updated_at IS NULL"))
+            except: pass
         logger.info("DB migration check complete.")
     except Exception as e:
         logger.warning(f"Migration warning: {e}")
@@ -353,7 +357,7 @@ async def get_sourcing_data():
             prices_result = await session.execute(
                 select(CountryPrice)
                 .where(CountryPrice.buy_price > 0)
-                .order_by(CountryPrice.id.desc())
+                .order_by(CountryPrice.updated_at.desc())
             )
             prices = []
             for p in prices_result.scalars().all():
@@ -528,7 +532,7 @@ async def get_admin_store_data():
             prices_result = await session.execute(
                 select(CountryPrice)
                 .where(CountryPrice.price > 0)
-                .order_by(CountryPrice.id.desc())
+                .order_by(CountryPrice.updated_at.desc())
             )
             prices = []
             for p in prices_result.scalars().all():
@@ -629,6 +633,7 @@ async def update_sourcing_price(data: dict):
             # PARTIAL UPDATE: Only touch sourcing fields
             cp.buy_price = buy_p
             cp.approve_delay = delay
+            cp.updated_at = datetime.utcnow()
             if name_only and name_only != "Unknown":
                 cp.country_name = name_only
         else:
@@ -669,6 +674,7 @@ async def update_price(data: PriceUpdate):
             
             # CRITICAL: Do NOT overwrite buy_price or approve_delay if update is from store dashboard
             # We keep whatever is currently there.
+            cp.updated_at = datetime.utcnow()
         else:
             name = data.country_name
             if not name or name == "Unknown":
