@@ -1814,14 +1814,14 @@
                             </span>
                         </div>
                         <!-- Name -->
-                        <div style="background: var(--bg-elevated); border: 1px solid var(--border); padding: 14px 18px; border-radius: 12px; display: flex; flex-direction: column; align-items: flex-start; gap: 6px;">
-                            <span style="color: var(--text-secondary); font-size: 0.75rem; font-weight: 700; text-transform: uppercase;">${currentLang === 'ar' ? 'الاسم' : 'Name'}</span>
-                            <span style="color: #00d2ff; font-weight: 700; font-size: 1.05rem; word-break: break-word; line-height: 1.4;">${u.full_name || 'N/A'}</span>
+                        <div style="background: var(--bg-elevated); border: 1px solid var(--border); padding: 14px 18px; border-radius: 12px; display: flex; justify-content: space-between; align-items: flex-start; gap: 20px;">
+                            <span style="color: var(--text-secondary); font-size: 0.8rem; font-weight: 700; text-transform: uppercase; flex-shrink: 0;">${currentLang === 'ar' ? 'الاسم' : 'Name'}</span>
+                            <span style="color: #00d2ff; font-weight: 700; font-size: 1rem; text-align: right; word-break: break-word;">${u.full_name || 'N/A'}</span>
                         </div>
                         <!-- Username -->
-                        <div style="background: var(--bg-elevated); border: 1px solid var(--border); padding: 14px 18px; border-radius: 12px; display: flex; flex-direction: column; align-items: flex-start; gap: 6px;">
-                            <span style="color: var(--text-secondary); font-size: 0.75rem; font-weight: 700; text-transform: uppercase;">${currentLang === 'ar' ? 'المعرف' : 'Username'}</span>
-                            <span style="color: #bf5af2; font-weight: 700; font-size: 1.05rem; word-break: break-all; line-height: 1.4;">${u.username ? '@' + u.username : 'N/A'}</span>
+                        <div style="background: var(--bg-elevated); border: 1px solid var(--border); padding: 14px 18px; border-radius: 12px; display: flex; justify-content: space-between; align-items: flex-start; gap: 20px;">
+                            <span style="color: var(--text-secondary); font-size: 0.8rem; font-weight: 700; text-transform: uppercase; flex-shrink: 0;">${currentLang === 'ar' ? 'المعرف' : 'Username'}</span>
+                            <span style="color: #bf5af2; font-weight: 700; font-size: 1rem; text-align: right; word-break: break-all;">${u.username ? '@' + u.username : 'N/A'}</span>
                         </div>
                         <!-- User ID -->
                         <div style="background: var(--bg-elevated); border: 1px solid var(--border); padding: 14px 18px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center;">
@@ -2241,10 +2241,10 @@
         else switchNav(savedView, null, true);
     </script>
     <div id="user-manage-modal" class="manage-overlay" onclick="closeManageModal()">
-        <div class="manage-card" onclick="event.stopPropagation()">
+        <div class="manage-card" onclick="event.stopPropagation()" style="display: flex; flex-wrap: wrap; gap: 10px;">
 
             <!-- Name Box -->
-            <div class="manage-data-box">
+            <div class="manage-data-box" style="flex: 1 1 100%;">
                 <div id="manage-name"
                     style="color: #ffca28; font-weight: 600; font-size: 0.95rem; letter-spacing: 0.5px; text-align: center;">USER NAME</div>
             </div>
