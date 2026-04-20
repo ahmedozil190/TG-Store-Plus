@@ -1783,8 +1783,8 @@
 
             if (!filtered.length) {
                 container.innerHTML = `
-                <div style="text-align: center; padding: 40px 20px; background: rgba(0,0,0,0.15); border-radius: 16px; border: 1px dashed rgba(255,255,255,0.05); margin-top: 10px;">
-                    <i class="fas fa-users-slash" style="font-size: 2.5rem; color: rgba(255,255,255,0.1); margin-bottom: 12px;"></i>
+                <div style="text-align: center; padding: 40px 20px; background: var(--card-glass); border-radius: 16px; border: 1px dashed var(--border); margin-top: 10px; backdrop-filter: blur(10px);">
+                    <i class="fas fa-users-slash" style="font-size: 2.5rem; color: var(--text-secondary); opacity: 0.3; margin-bottom: 12px;"></i>
                     <p style="color: var(--text-secondary); font-weight: 600; font-size: 0.95rem;">${translations[currentLang].no_users}</p>
                 </div>`;
                 document.getElementById('user-pagination').style.display = 'none';
@@ -1867,13 +1867,21 @@
         }
 
         function prevPage() {
-            if (currentPage > 1) { currentPage--; renderUsers(filteredUsers || allUsers); }
+            if (currentPage > 1) { 
+                currentPage--; 
+                renderUsers(filteredUsers || allUsers);
+                document.getElementById('section-users').scrollIntoView({ behavior: 'smooth' });
+            }
         }
         function nextPage() {
             const list = filteredUsers || allUsers;
             const filtered = currentTab === 'banned' ? list.filter(u => u.banned) : list.filter(u => !u.banned);
             const totalPages = Math.ceil(filtered.length / USERS_PER_PAGE);
-            if (currentPage < totalPages) { currentPage++; renderUsers(list); }
+            if (currentPage < totalPages) { 
+                currentPage++; 
+                renderUsers(list);
+                document.getElementById('section-users').scrollIntoView({ behavior: 'smooth' });
+            }
         }
 
         let currentUser = null;
