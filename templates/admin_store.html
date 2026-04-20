@@ -1813,8 +1813,8 @@
                 renderSalesList(allTransactions);
                 renderUsers(filteredUsers || allUsers);
 
-                // Fetch sell prices from store endpoint (Show newest first)
-                allPrices = (data.prices || []).reverse();
+                // Fetch sell prices from store endpoint (Sorted by newest first on server)
+                allPrices = data.prices || [];
                 renderPrices(allPrices);
             } catch (e) { console.error(e); }
             finally { document.getElementById('loader').style.display = 'none'; }

@@ -353,7 +353,7 @@ async def get_sourcing_data():
             prices_result = await session.execute(
                 select(CountryPrice)
                 .where(CountryPrice.buy_price > 0)
-                .order_by(CountryPrice.country_name)
+                .order_by(CountryPrice.id.desc())
             )
             prices = []
             for p in prices_result.scalars().all():
@@ -528,7 +528,7 @@ async def get_admin_store_data():
             prices_result = await session.execute(
                 select(CountryPrice)
                 .where(CountryPrice.price > 0)
-                .order_by(CountryPrice.country_name)
+                .order_by(CountryPrice.id.desc())
             )
             prices = []
             for p in prices_result.scalars().all():

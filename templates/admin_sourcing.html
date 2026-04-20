@@ -1764,7 +1764,7 @@
 
                 renderRecent(data.recent);
                 renderHistory(data.recent);
-                allPrices = (data.prices || []).reverse();
+                allPrices = data.prices || [];
                 renderPrices(allPrices);
 
                 allUsers = (data.users || []).reverse();
