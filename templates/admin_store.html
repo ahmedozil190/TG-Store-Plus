@@ -1816,6 +1816,17 @@
             titleEl.innerText = translations[currentLang][titleMap[id]];
         }
 
+        async function confirmDeletePrice() {
+            if (!confirm(translations[currentLang].confirm_delete_msg)) return;
+            try {
+                const r = await fetch(`/api/admin/prices/delete/${selectedCountryCode}?bot=store`, { method: 'DELETE' });
+                if (r.ok) {
+                    closePriceModal();
+                    init();
+                }
+            } catch (e) { console.error(e); }
+        }
+
         async function init() {
             try {
                 const res = await fetch('/api/admin/store/data');
@@ -1843,8 +1854,8 @@
                 // Fetch sell prices from store endpoint (Sorted by newest first on server)
                 allPrices = data.prices || [];
                 
-                // Update counts
-                const activeCount = allPrices.filter(p => p.price > 0).length;
+                // Update counts using isolated flags
+                const activeCount = allPrices.filter(p => p.is_active_store).length;
                 const inactiveCount = allPrices.length - activeCount;
                 document.getElementById('stat-active-countries').innerText = activeCount;
                 document.getElementById('stat-inactive-countries').innerText = inactiveCount;
@@ -2193,10 +2204,10 @@
         }
 
         function renderPrices(list) {
-            // Filter based on tab
+            // Filter based on tab using isolated flag
             const filteredByTab = list.filter(p => {
-                if (currentPriceTab === 'active') return p.price > 0;
-                return p.price <= 0;
+                if (currentPriceTab === 'active') return p.is_active_store;
+                return !p.is_active_store;
             });
             const container = document.getElementById('price-list');
             const pagContainer = document.getElementById('price-pagination');

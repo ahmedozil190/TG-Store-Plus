@@ -32,9 +32,7 @@ class User(Base):
     full_name = Column(String, nullable=True)
     username = Column(String, nullable=True)
     
-    # Isolation flags
-    is_active_store = Column(Boolean, default=False)
-    is_active_sourcing = Column(Boolean, default=False)
+    # Isolation (Ban) flags
     is_banned_store = Column(Boolean, default=False)
     is_banned_sourcing = Column(Boolean, default=False)
 
@@ -66,6 +64,11 @@ class CountryPrice(Base):
     price = Column(Float, nullable=False, default=1.0) # Selling Price
     buy_price = Column(Float, nullable=False, default=0.5) # Buying Price from people
     approve_delay = Column(Integer, nullable=False, default=0) # Auto-approval delay in seconds
+    
+    # Independent Display flags
+    is_active_store = Column(Boolean, default=True)
+    is_active_sourcing = Column(Boolean, default=True)
+
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
 class WithdrawalRequest(Base):

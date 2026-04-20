@@ -1793,8 +1793,8 @@
                 renderHistory(data.recent);
                 allPrices = data.prices || [];
                 
-                // Update counts
-                const activeCount = allPrices.filter(p => p.buy_price > 0).length;
+                // Update counts using isolated flags
+                const activeCount = allPrices.filter(p => p.is_active_sourcing).length;
                 const inactiveCount = allPrices.length - activeCount;
                 document.getElementById('stat-active-countries').innerText = activeCount;
                 document.getElementById('stat-inactive-countries').innerText = inactiveCount;
@@ -2129,10 +2129,10 @@
         }
 
         function renderPrices(list) {
-            // Filter based on tab
+            // Filter based on tab using isolated flag
             const filteredByTab = list.filter(p => {
-                if (currentPriceTab === 'active') return p.buy_price > 0;
-                return p.buy_price <= 0;
+                if (currentPriceTab === 'active') return p.is_active_sourcing;
+                return !p.is_active_sourcing;
             });
             const container = document.getElementById('price-list');
             const pagContainer = document.getElementById('price-pagination');
@@ -2251,7 +2251,7 @@
                 renderPrices(filteredPrices || allPrices);
 
                 // Perform deletion in background
-                fetch(`/api/admin/prices/delete/${code}`, { method: 'DELETE' }).catch(e => {
+                fetch(`/api/admin/prices/delete/${code}?bot=sourcing`, { method: 'DELETE' }).catch(e => {
                     console.error("Delete failed:", e);
                     init(); // Re-sync if error
                 });
