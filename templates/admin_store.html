@@ -1196,7 +1196,7 @@
         }
 
         .modal-card {
-            background: rgba(19, 23, 34, 0.98);
+            background: var(--modal-bg);
             backdrop-filter: blur(15px);
             border: 1px solid var(--border);
             border-radius: 30px;
@@ -1205,7 +1205,7 @@
             max-width: 380px;
             transform: scale(0.9);
             transition: transform 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.25);
-            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6);
+            box-shadow: var(--shadow);
         }
 
         .modal-overlay.active .modal-card {
@@ -1236,11 +1236,11 @@
 
         .input-field {
             width: 100%;
-            background: var(--bg-elevated);
-            border: 1px solid #2e3248;
+            background: var(--input-bg);
+            border: 1px solid var(--border);
             color: var(--text-primary);
             padding: 12px;
-            border-radius: 10px;
+            border-radius: 12px;
             outline: none;
             font-size: 0.95rem;
             transition: 0.3s;
@@ -1630,7 +1630,7 @@
                 btn_add: "Add",
                 btn_save: "Save Selling Price",
                 btn_reset: "Reset",
-                modal_title: "Selling Price Manager",
+                modal_title: "Add New Country",
                 lbl_code: "Code",
                 lbl_sell: "Price",
                 stat_total_users: "TOTAL USERS",
@@ -1683,7 +1683,7 @@
                 btn_add: "إضافة",
                 btn_save: "حفظ سعر البيع",
                 btn_reset: "إعادة ضبط",
-                modal_title: "إدارة أسعار البيع",
+                modal_title: "إضافة دولة جديدة",
                 lbl_code: "كود",
                 lbl_sell: "السعر",
                 stat_total_users: "إجمالي المستخدمين",
@@ -2161,7 +2161,7 @@
                 <div class="user-card" style="position: relative; margin-top: 25px; margin-bottom: 15px; cursor: default;">
                     <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px;">
                         <!-- Name -->
-                        <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); padding: 14px 18px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center;">
+                        <div style="background: var(--card-glass); border: 1px solid var(--border); padding: 14px 18px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center;">
                             <span style="color: var(--text-secondary); font-size: 0.8rem; font-weight: 700; text-transform: uppercase;">${currentLang === 'ar' ? 'الاسم' : 'Name'}</span>
                             <span style="color: var(--success); font-weight: 800; font-size: 1.1rem;">${(() => {
                         let n = p.name || '';
@@ -2176,12 +2176,12 @@
                     })()}</span>
                         </div>
                         <!-- Code -->
-                        <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); padding: 14px 18px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center;">
+                        <div style="background: var(--card-glass); border: 1px solid var(--border); padding: 14px 18px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center;">
                             <span style="color: var(--text-secondary); font-size: 0.8rem; font-weight: 700; text-transform: uppercase;">${currentLang === 'ar' ? 'كود' : 'Code'}</span>
                             <span style="color: var(--accent-purple); font-weight: 800; font-size: 1.1rem;">+${p.code}</span>
                         </div>
                         <!-- Price -->
-                        <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); padding: 14px 18px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center;">
+                        <div style="background: var(--card-glass); border: 1px solid var(--border); padding: 14px 18px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center;">
                             <span style="color: var(--text-secondary); font-size: 0.8rem; font-weight: 700; text-transform: uppercase;">${currentLang === 'ar' ? 'السعر' : 'Price'}</span>
                             <span style="color: var(--accent); font-weight: 900; font-size: 1.1rem;">$${Number(p.price).toFixed(2)}</span>
                         </div>
