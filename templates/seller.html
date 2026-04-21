@@ -682,6 +682,24 @@
             z-index: 9999;
         }
 
+        .no-shadow {
+            box-shadow: none !important;
+        }
+
+        .user-card {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 24px 20px 20px;
+            position: relative;
+            margin-top: 15px;
+            transition: transform 0.2s;
+        }
+
+        .user-card:active {
+            transform: scale(0.98);
+        }
+
         #loader.hide {
             display: none !important;
         }
@@ -1823,15 +1841,18 @@
                     const item = document.createElement('div');
                     item.className = 'user-card';
                     item.style = "margin-bottom: 25px; padding-top: 24px; display: flex; flex-direction: column; gap: 10px;";
-
+                    
                     let statusColor = '#f59e0b';
                     let statusIcon = 'fa-clock';
+                    let statusClass = 'badge-warning';
                     if (acc.status === 'AVAILABLE' || acc.status === 'SOLD') {
                         statusColor = '#10b981';
                         statusIcon = 'fa-check-circle';
+                        statusClass = 'badge-success';
                     } else if (acc.status === 'REJECTED') {
                         statusColor = '#ef4444';
                         statusIcon = 'fa-times-circle';
+                        statusClass = 'badge-danger';
                     }
 
                     const isRtl = document.dir === 'rtl';
@@ -1849,8 +1870,8 @@
                     item.innerHTML = `
                         <div style="${rowS}">
                             <span style="${lblS}">${labels.status}</span>
-                            <div style="font-size: 0.7rem; font-weight: 800; padding: 4px 10px; border-radius: 20px; background: ${statusColor}15; color: ${statusColor}; border: 1px solid ${statusColor}30; text-transform: uppercase;">
-                                <i class="fas ${statusIcon}" style="margin-right: 4px; font-size: 0.6rem;"></i> ${acc.status}
+                            <div class="badge ${statusClass}" style="font-size: 0.75rem; font-weight: 800; padding: 5px 12px; border-radius: 20px; background: ${statusColor}15; color: ${statusColor}; border: 1px solid ${statusColor}30; text-transform: uppercase;">
+                                <i class="fas ${statusIcon}" style="margin-right: 4px; font-size: 0.65rem;"></i> ${acc.status}
                             </div>
                         </div>
                         <div style="${rowS}">
@@ -1867,7 +1888,7 @@
                         </div>
                         <div style="${rowS}">
                             <span style="${lblS}">${labels.date}</span>
-                            <span style="color: var(--text-secondary); font-size: 1.1rem; font-weight: 800; text-align: right;">${acc.date}</span>
+                            <span style="color: var(--text-secondary); font-weight: 800; font-size: 1.1rem; text-align: right;">${acc.date}</span>
                         </div>
                     `;
                     list.appendChild(item);
