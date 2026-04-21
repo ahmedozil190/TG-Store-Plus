@@ -194,8 +194,16 @@ async def run_migrations():
             try:
                 await conn.execute(sqlalchemy.text("ALTER TABLE country_prices ADD COLUMN approve_delay INTEGER DEFAULT 0"))
             except: pass
+            # Add iso_code to country_prices if missing
+            try:
+                await conn.execute(sqlalchemy.text("ALTER TABLE country_prices ADD COLUMN iso_code TEXT DEFAULT 'XX'"))
+            except: pass
+            
             try:
                 await conn.execute(sqlalchemy.text("ALTER TABLE country_prices ADD COLUMN updated_at DATETIME"))
+            except: pass
+
+            try:
                 await conn.execute(sqlalchemy.text("UPDATE country_prices SET updated_at = '" + datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S') + "' WHERE updated_at IS NULL"))
             except: pass
         logger.info("DB migration check complete.")
