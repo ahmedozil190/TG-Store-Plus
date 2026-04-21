@@ -635,7 +635,29 @@
             border-radius: 18px;
             padding: 24px 20px 20px;
             width: 100%;
+            transition: all 0.3s ease;
         }
+
+        .user-card:hover {
+            transform: translateY(-2px);
+            border-color: var(--accent);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            background: rgba(255, 255, 255, 0.01);
+        }
+
+        .badge {
+            padding: 6px 14px;
+            border-radius: 10px;
+            font-size: 0.7rem;
+            font-weight: 800;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .badge-success { background: rgba(16, 185, 129, 0.1); color: var(--success); }
+        .badge-warning { background: rgba(245, 158, 11, 0.1); color: var(--warning); }
+        .badge-danger { background: rgba(239, 68, 68, 0.1); color: var(--error); }
 
         .m-icon {
             font-size: 1.4rem;
@@ -1864,7 +1886,7 @@
                 data.accounts.forEach(acc => {
                     const item = document.createElement('div');
                     item.className = 'user-card';
-                    item.style = "margin-bottom: 25px; padding-top: 24px; background: transparent;";
+                    item.style = "margin-bottom: 25px; padding-top: 24px; transition: all 0.3s ease-out;";
                     
                     let statusClass = 'badge-warning';
                     let statusIcon = 'fa-clock';
