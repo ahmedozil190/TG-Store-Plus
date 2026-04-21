@@ -37,8 +37,12 @@ async def auto_approve_task(bot_seller: Bot):
                     try:
                         p = phonenumbers.parse(acc.phone_number)
                         country_code = str(p.country_code)
+                        target_iso = phonenumbers.region_code_for_number(p) or 'XX'
                         
-                        cp_stmt = select(CountryPrice).where(CountryPrice.country_code == country_code)
+                        cp_stmt = select(CountryPrice).where(
+                            CountryPrice.country_code == country_code,
+                            CountryPrice.iso_code == target_iso
+                        )
                         cp = (await session.execute(cp_stmt)).scalar()
                         if not cp: continue
                         

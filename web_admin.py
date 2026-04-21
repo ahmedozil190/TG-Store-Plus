@@ -950,9 +950,13 @@ async def seller_request_otp(data: SellerOTPRequest):
             parsed = phonenumbers.parse(phone)
             cc = str(parsed.country_code)
             async with async_session() as session:
-                cp_stmt = select(CountryPrice).where(CountryPrice.country_code == cc)
+                target_iso = phonenumbers.region_code_for_number(parsed) or 'XX'
+                cp_stmt = select(CountryPrice).where(
+                    CountryPrice.country_code == cc,
+                    CountryPrice.iso_code == target_iso
+                )
                 cp = (await session.execute(cp_stmt)).scalar()
-                if not cp:
+                if not cp or cp.buy_price <= 0:
                     raise HTTPException(status_code=400, detail="Sorry, this country is not requested at the moment.")
         except HTTPException as he: raise he
         except: 
@@ -983,9 +987,13 @@ async def seller_submit_otp(data: SellerOTPSubmit):
             try:
                 parsed = phonenumbers.parse(data.phone if data.phone.startswith("+") else "+" + data.phone)
                 cc = str(parsed.country_code)
-                cp_stmt = select(CountryPrice).where(CountryPrice.country_code == cc)
+                target_iso = phonenumbers.region_code_for_number(parsed) or 'XX'
+                cp_stmt = select(CountryPrice).where(
+                    CountryPrice.country_code == cc,
+                    CountryPrice.iso_code == target_iso
+                )
                 cp = (await session.execute(cp_stmt)).scalar()
-                if cp: price = cp.buy_price
+                if cp and cp.buy_price > 0: price = cp.buy_price
             except: pass
 
             new_acc = Account(
@@ -1121,26 +1129,22 @@ async def detect_country(phone: str):
     try:
         parsed = phonenumbers.parse(phone if phone.startswith('+') else f"+{phone}")
         country_code = str(parsed.country_code)
-        target_iso = phonenumbers.region_code_for_number(parsed)
+        target_iso = phonenumbers.region_code_for_number(parsed) or 'XX'
         
         async with async_session() as session:
-            # Try exact match for ISO code (most precise for +1, +7, etc)
+            # Enforce exact match for ISO code (crucial for shared codes like +1, +7)
             stmt = select(CountryPrice).where(
                 CountryPrice.country_code == country_code,
                 CountryPrice.iso_code == target_iso
             )
             cp = (await session.execute(stmt)).scalar()
             
-            # Fallback to any match for the country_code if specific ISO not found
-            if not cp:
-                stmt = select(CountryPrice).where(CountryPrice.country_code == country_code)
-                cp = (await session.execute(stmt)).scalar()
-            
-            if cp:
+            # Ensure the country actually has an active buying price
+            if cp and cp.buy_price > 0:
                 return {
                     "found": True,
                     "name": cp.country_name,
-                    "flag": get_flag_emoji(target_iso) if target_iso else "🌐",
+                    "flag": get_flag_emoji(target_iso) if target_iso != 'XX' else "🌐",
                     "price": cp.buy_price
                 }
     except Exception as e:
