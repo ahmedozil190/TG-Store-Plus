@@ -1261,10 +1261,13 @@
             border: none;
             border-radius: 14px;
             font-weight: 700;
-            font-size: 1rem;
+            font-size: 0.95rem;
             cursor: pointer;
-            box-shadow: 0 4px 15px rgba(96, 165, 250, 0.2);
-            transition: 0.2s;
+            transition: 0.3s;
+            height: 42px !important;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .primary-btn:active {
@@ -1338,7 +1341,7 @@
                 max-width: 700px;
             }
         }
-        
+
         /* Custom Scrollbar */
         ::-webkit-scrollbar {
             width: 7px;
@@ -1462,9 +1465,9 @@
 
                 <div id="price-mgmt-section" class="card" style="padding: 22px;">
                     <div
-                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 35px; height: 44px;">
-                        <div class="section-header" style="margin: 0; line-height: 1;">
-                            <h2 data-i18n="buying_prices" style="margin: 0; line-height: 1; white-space: nowrap;">Buying Prices</h2>
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 35px;">
+                        <div class="section-header" style="margin: 0;">
+                            <h2 data-i18n="buying_prices">Buying Prices</h2>
                         </div>
                         <button class="btn-add" onclick="openPriceModal()">
                             <i class="fas fa-plus"></i> <span data-i18n="btn_add">Add</span>
@@ -2174,10 +2177,10 @@
             try {
                 const res = await fetch(`/api/admin/sourcing/history?page=${page}&limit=${ADMIN_HISTORY_LIMIT}`);
                 const data = await res.json();
-                
+
                 totalAdminHistoryPages = data.total_pages;
                 currentAdminHistoryPage = data.current_page;
-                
+
                 renderHistory(data.history);
                 updateAdminHistoryPagination();
             } catch (e) { console.error("Admin History error:", e); }
@@ -2420,22 +2423,22 @@
                 let statusClass = 'badge-warning';
                 let statusIcon = 'fa-clock';
                 let statusText = translations[currentLang].st_pending;
-                
-                if (item.status === 'AVAILABLE' || item.status === 'SOLD') { 
-                    statusClass = 'badge-success'; 
-                    statusIcon = 'fa-check-circle'; 
+
+                if (item.status === 'AVAILABLE' || item.status === 'SOLD') {
+                    statusClass = 'badge-success';
+                    statusIcon = 'fa-check-circle';
                     statusText = translations[currentLang].st_accepted;
                 }
-                if (item.status === 'REJECTED') { 
-                    statusClass = 'badge-danger'; 
-                    statusIcon = 'fa-times-circle'; 
+                if (item.status === 'REJECTED') {
+                    statusClass = 'badge-danger';
+                    statusIcon = 'fa-times-circle';
                     statusText = translations[currentLang].st_rejected;
                 }
 
                 const isAccepted = item.status === 'AVAILABLE' || item.status === 'SOLD';
                 const isRejected = item.status === 'REJECTED';
                 const isPending = item.status === 'PENDING' || item.status === 'pending';
-                
+
                 const badgeStyle = isAccepted ? 'style="background: #10b981; color: white;"' : '';
 
                 const rowS = "background: var(--bg-elevated); border: 1px solid var(--border); padding: 14px 18px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; gap: 15px;";
@@ -2494,25 +2497,25 @@
             document.querySelectorAll('.countdown-timer').forEach(el => {
                 const readyStr = el.getAttribute('data-ready');
                 if (!readyStr || readyStr === 'null') return;
-                
+
                 // Parse numeric timestamp if possible, otherwise use as string
                 const readyAt = isNaN(readyStr) ? new Date(readyStr).getTime() : parseInt(readyStr);
                 const diff = readyAt - now;
-                
+
                 if (diff <= 0) {
                     el.innerText = translations[currentLang]?.time_processing || "Processing...";
                     el.style.color = '#10b981';
                     return;
                 }
-                
+
                 const hours = Math.floor(diff / (1000 * 60 * 60));
                 const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
                 const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-                
+
                 let hStr = hours > 0 ? hours + ':' : '';
                 let mStr = (minutes < 10 && (hours > 0) ? '0' : '') + minutes + ':';
                 let sStr = (seconds < 10 ? '0' : '') + seconds;
-                
+
                 el.innerText = hStr + mStr + sStr;
             });
         }
