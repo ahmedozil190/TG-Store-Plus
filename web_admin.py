@@ -893,9 +893,12 @@ async def get_seller_data(user_id: int):
             formatted_prices = []
             for p in prices:
                 try:
-                    name, flag, _ = resolve_country_info(p.country_code)
+                    iso = getattr(p, 'iso_code', None) or 'XX'
+                    flag = get_flag_emoji(iso)
+                    default_name = resolve_country_info(p.country_code)[0]
+                    
                     formatted_prices.append({
-                        "name": p.country_name if p.country_name and p.country_name != "Unknown" else name,
+                        "name": p.country_name if p.country_name and p.country_name != "Unknown" else default_name,
                         "flag": flag,
                         "code": p.country_code,
                         "price": p.buy_price

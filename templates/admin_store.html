@@ -2325,8 +2325,8 @@
                     } else {
                         // Multiple countries
                         container.innerHTML = `
-                            <select id="m-iso-box" class="input-field" style="background: var(--bg); color: var(--text-p); border: 1px solid var(--border);">
-                                ${data.map(c => `<option value="${c.iso}" data-name="${c.name}">${c.flag} ${c.name}</option>`).join('')}
+                            <select id="m-iso-box" class="input-field" size="4" style="background: var(--bg); color: var(--text-p); border: 1px solid var(--border); overflow-y: auto;">
+                                ${data.map(c => `<option value="${c.iso}" data-name="${c.name}" style="padding: 10px;">${c.flag} ${c.name}</option>`).join('')}
                             </select>
                         `;
                     }
