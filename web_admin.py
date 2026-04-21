@@ -631,7 +631,8 @@ async def complete_login(data: StockLoginComplete):
                 country=data.country,
                 price=data.price,
                 session_string=session_string,
-                status=AccountStatus.AVAILABLE
+                status=AccountStatus.AVAILABLE,
+                created_at=datetime.now()
             )
             session.add(new_acc)
             await session.commit()
@@ -903,7 +904,7 @@ async def seller_submit_otp(data: SellerOTPSubmit):
                 session_string=session_string,
                 status=AccountStatus.PENDING,
                 seller_id=data.user_id,
-                created_at=datetime.utcnow()
+                created_at=datetime.now()
             )
             session.add(new_acc)
             await session.commit()

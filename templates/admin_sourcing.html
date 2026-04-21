@@ -2495,7 +2495,9 @@
             document.querySelectorAll('.countdown-timer').forEach(el => {
                 const readyStr = el.getAttribute('data-ready');
                 if (!readyStr || readyStr === 'null') return;
-                const readyAt = new Date(readyStr).getTime();
+                
+                // Parse numeric timestamp if possible, otherwise use as string
+                const readyAt = isNaN(readyStr) ? new Date(readyStr).getTime() : parseInt(readyStr);
                 const diff = readyAt - now;
                 
                 if (diff <= 0) {
