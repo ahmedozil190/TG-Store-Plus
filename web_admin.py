@@ -1063,7 +1063,7 @@ async def get_seller_accounts(user_id: int, page: int = 1, limit: int = 10):
                 "status": a.status.name,
                 "country": f"{flag} {a.country}",
                 "buy_price": actual_buy_price,
-                "ready_at": ready_at.isoformat() if ready_at else None,
+                "ready_at": int(ready_at.timestamp() * 1000) if ready_at else None,
                 "date": a.created_at.strftime("%Y-%m-%d %H:%M") if a.created_at else "N/A"
             })
 
@@ -1111,7 +1111,7 @@ async def get_admin_sourcing_history(page: int = 1, limit: int = 10):
                 "buy_price": price,
                 "status": a.status.name,
                 "seller_id": a.seller_id,
-                "ready_at": ready_at.isoformat() if ready_at else None,
+                "ready_at": int(ready_at.timestamp() * 1000) if ready_at else None,
                 "date": a.created_at.strftime("%Y-%m-%d %H:%M") if a.created_at else "N/A"
             })
             
