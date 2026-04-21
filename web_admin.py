@@ -869,7 +869,7 @@ async def get_seller_data(user_id: int):
             formatted_prices = []
             for p in prices:
                 try:
-                    name, flag = resolve_country_info(p.country_code)
+                    name, flag, _ = resolve_country_info(p.country_code)
                     formatted_prices.append({
                         "name": p.country_name if p.country_name and p.country_name != "Unknown" else name,
                         "flag": flag,
