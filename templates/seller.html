@@ -1203,12 +1203,12 @@
             </div>
 
             <!-- New Sourcing History Section -->
-            <div style="margin-top:30px;">
+            <div style="margin-top:30px; width: 100%;">
                 <h3
-                    style="font-size:1rem; margin-bottom:15px; display:flex; justify-content:space-between; align-items:center; color: var(--text-secondary);">
+                    style="font-size:1rem; margin-bottom:15px; display:flex; justify-content:space-between; align-items:center; color: var(--text-secondary); width: 100%;">
                     Submission History
                 </h3>
-                <div id="sourcingHistory" style="display:flex; flex-direction:column; gap:10px">
+                <div id="sourcingHistory" style="display:flex; flex-direction:column; gap:10px; width: 100%;">
                     <!-- JS Data -->
                 </div>
                 <div id="sourcingEmpty" style="text-align:center; padding:30px; opacity:0.3; display:none">
@@ -1826,7 +1826,7 @@
                 data.accounts.forEach(acc => {
                     const item = document.createElement('div');
                     item.className = 'acc-item';
-                    item.style = "margin-bottom: 25px; display: flex; flex-direction: column; gap: 10px;";
+                    item.style = "margin-bottom: 25px; display: flex; flex-direction: column; gap: 10px; width: 100%;";
                     
                     let statusColor = '#f59e0b';
                     let statusIcon = 'fa-clock';
@@ -1847,7 +1847,7 @@
                         date: isRtl ? 'التاريخ' : 'Date'
                     };
 
-                    const rowS = "background: var(--bg-elevated); border: 1px solid var(--border); padding: 14px 18px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; gap: 10px;";
+                    const rowS = "background: var(--bg-elevated); border: 1px solid var(--border); padding: 14px 18px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; gap: 10px; width: 100%;";
                     const lblS = "color: var(--text-secondary); font-size: 0.8rem; font-weight: 700; text-transform: uppercase;";
                     const valS = "font-weight: 800; font-size: 1.1rem; text-align: right;";
 
