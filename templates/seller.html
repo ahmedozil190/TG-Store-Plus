@@ -1519,7 +1519,7 @@
             // Update Top Bar Title
             const titles = {
                 dashboard: 'Dashboard',
-                submit: 'Submit Account',
+                submit: 'Submit Numbers',
                 withdraw: 'Withdrawal',
                 pricing: 'Rate List'
             };
@@ -1985,11 +1985,10 @@
                 empty.style.display = 'none';
                 data.accounts.forEach(acc => {
                     const item = document.createElement('div');
-                    item.className = 'user-card';
-                    item.style = "margin-bottom: 25px; padding-top: 24px;";
+                    item.className = 'history-item';
+                    item.style.marginBottom = "15px";
 
                     let statusColor = '#f59e0b'; // PENDING
-                    let statusIcon = 'fa-clock';
                     let statusText = 'PENDING';
 
                     if (acc.status === 'AVAILABLE' || acc.status === 'SOLD') {
