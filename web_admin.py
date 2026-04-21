@@ -56,9 +56,12 @@ def generate_transaction_id():
 
 def get_flag_emoji(country_code: str):
     """Convert ISO country code to flag emoji."""
-    if not country_code or len(country_code) != 2:
+    try:
+        if not country_code or not isinstance(country_code, str) or len(country_code) != 2:
+            return "🌐"
+        return "".join(chr(ord(c) + 127397) for c in country_code.upper())
+    except:
         return "🌐"
-    return "".join(chr(ord(c) + 127397) for c in country_code.upper())
 
 def resolve_country_info(country_code_str: str, full_phone: str = None):
     """Resolve ISO code and Country Name. If full_phone is provided, detects specific region."""
@@ -201,6 +204,21 @@ async def run_migrations():
             
             try:
                 await conn.execute(sqlalchemy.text("ALTER TABLE country_prices ADD COLUMN updated_at DATETIME"))
+            except: pass
+
+            # One-time resolution: Fix 'XX' iso_codes for legacy data
+            try:
+                # Get all records with XX
+                cursor = await conn.execute(sqlalchemy.text("SELECT id, country_code FROM country_prices WHERE iso_code = 'XX'"))
+                rows = cursor.fetchall()
+                for row_id, c_code in rows:
+                    try:
+                        clean_code = c_code.strip().lstrip('+').lstrip('0')
+                        numeric_code = int(clean_code)
+                        detected_iso = phonenumbers.region_code_for_country_code(numeric_code)
+                        if detected_iso:
+                            await conn.execute(sqlalchemy.text("UPDATE country_prices SET iso_code = :iso WHERE id = :id"), {"iso": detected_iso, "id": row_id})
+                    except: pass
             except: pass
 
             try:

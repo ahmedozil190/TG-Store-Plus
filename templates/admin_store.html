@@ -2327,18 +2327,26 @@
         }
 
         async function saveStorePrice() {
-            const code = document.getElementById('m-code').value;
+            const codeInput = document.getElementById('m-code');
             const select = document.getElementById('m-iso-select');
+            
+            const code = codeInput.value.trim().replace('+', '');
             const selectedOpt = select.options[select.selectedIndex];
 
             const payload = {
                 country_code: code,
-                iso_code: selectedOpt ? selectedOpt.value : "XX",
-                country_name: selectedOpt ? selectedOpt.getAttribute('data-name') : "Auto",
-                price: parseFloat(document.getElementById('m-price').value),
+                iso_code: (selectedOpt && select.parentNode.style.display !== 'none') ? selectedOpt.value : "XX",
+                country_name: (selectedOpt && select.parentNode.style.display !== 'none') ? selectedOpt.getAttribute('data-name') : "Auto",
+                price: parseFloat(document.getElementById('m-price').value || 0),
                 buy_price: 0,
                 approve_delay: 0
             };
+            
+            if (!payload.country_code) {
+                alert("Please enter a country code");
+                return;
+            }
+
             await fetch('/api/admin/prices/update', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
