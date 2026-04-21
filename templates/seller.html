@@ -253,13 +253,17 @@
 
         .view-panel {
             display: none;
-            padding: 25px 20px;
+            animation: viewIn 0.5s var(--ease);
         }
 
         .view-panel.active {
             display: block;
-            animation: viewIn 0.5s var(--ease);
         }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 10px; }
 
         @keyframes viewIn {
             from {
@@ -1450,6 +1454,7 @@
             document.getElementById('navOverlay').classList.remove('show');
         }
         function changeView(viewId) {
+            window.scrollTo(0, 0); // Reset scroll position
             closeNav();
             document.querySelectorAll('.view-panel').forEach(v => v.classList.remove('active'));
             document.querySelectorAll('.nav-item').forEach(v => v.classList.remove('active'));
