@@ -1839,12 +1839,15 @@
                     
                     let statusColor = '#f59e0b';
                     let statusIcon = 'fa-clock';
-                    if (acc.status === 'AVAILABLE' || acc.status === 'SOLD') {
-                        statusColor = '#10b981';
-                        statusIcon = 'fa-check-circle';
-                    } else if (acc.status === 'REJECTED') {
-                        statusColor = '#ef4444';
-                        statusIcon = 'fa-times-circle';
+                    if (acc.status === 'AVAILABLE') { 
+                        statusColor = '#10b981'; 
+                        statusIcon = 'fa-check-circle'; 
+                    } else if (acc.status === 'SOLD') { 
+                        statusColor = '#3b82f6'; 
+                        statusIcon = 'fa-shopping-cart'; 
+                    } else if (acc.status === 'REJECTED') { 
+                        statusColor = '#ef4444'; 
+                        statusIcon = 'fa-times-circle'; 
                     }
 
                     const isRtl = document.dir === 'rtl';
