@@ -320,8 +320,7 @@ async def get_store_data(user_id: int = None):
                     # but let's just find the price entry or name match
                     cp = (await session.execute(select(CountryPrice).where(CountryPrice.country_name == name))).scalar()
                     if cp:
-                        region = phonenumbers.region_code_for_country_code(int(cp.country_code))
-                        flag = get_flag_emoji(region)
+                        flag = get_flag_emoji(cp.iso_code)
                 except: pass
                 
                 countries.append({
@@ -604,13 +603,10 @@ async def get_admin_store_data():
             )
             prices = []
             for p in prices_result.scalars().all():
-                flag = "🌐"
-                try:
-                    region = phonenumbers.region_code_for_country_code(int(p.country_code))
-                    flag = get_flag_emoji(region)
-                except: pass
+                flag = get_flag_emoji(p.iso_code)
                 prices.append({
                     "code": p.country_code,
+                    "iso": p.iso_code,
                     "name": f"{flag} {clean_display_name(p.country_name)}",
                     "price": p.price
                 })
