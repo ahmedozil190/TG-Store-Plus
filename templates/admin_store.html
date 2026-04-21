@@ -2325,9 +2325,15 @@
                     } else {
                         // Multiple countries
                         container.innerHTML = `
-                            <select id="m-iso-box" class="input-field" size="4" style="background: var(--bg); color: var(--text-p); border: 1px solid var(--border); overflow-y: auto;">
-                                ${data.map(c => `<option value="${c.iso}" data-name="${c.name}" style="padding: 10px;">${c.flag} ${c.name}</option>`).join('')}
-                            </select>
+                            <div style="max-height: 160px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding-right: 5px;">
+                                ${data.map(c => `
+                                    <div class="country-option-btn" data-iso="${c.iso}" data-name="${c.name}" onclick="selectCountryOption(this)" style="padding: 10px 14px; border: 1px solid var(--border); border-radius: 8px; cursor: pointer; display: flex; align-items: center; gap: 12px; transition: 0.2s; background: var(--bg);">
+                                        <span style="font-size: 1.4rem;">${c.flag}</span>
+                                        <span style="font-weight: 600; font-size: 0.95rem; color: var(--text-p);">${c.name}</span>
+                                    </div>
+                                `).join('')}
+                            </div>
+                            <input type="hidden" id="m-iso-box" data-iso="" data-name="">
                         `;
                     }
                 } else {
@@ -2335,6 +2341,21 @@
                 }
             } catch (err) {
                 group.style.display = 'none';
+            }
+        }
+
+        function selectCountryOption(el) {
+            document.querySelectorAll('.country-option-btn').forEach(b => {
+                b.style.borderColor = 'var(--border)';
+                b.style.background = 'var(--bg)';
+            });
+            el.style.borderColor = 'var(--accent-purple)';
+            el.style.background = 'rgba(139, 92, 246, 0.1)';
+            
+            const hiddenInput = document.getElementById('m-iso-box');
+            if (hiddenInput) {
+                hiddenInput.setAttribute('data-iso', el.getAttribute('data-iso'));
+                hiddenInput.setAttribute('data-name', el.getAttribute('data-name'));
             }
         }
 
@@ -2350,7 +2371,11 @@
                 name = isoBox.getAttribute('data-name');
             } else {
                 iso = isoBox.value;
-                name = isoBox.options[isoBox.selectedIndex].getAttribute('data-name');
+                name = isoBox.options[isoBox.selectedIndex]?.getAttribute('data-name');
+            }
+
+            if (!iso) {
+                return showToast(currentLang === 'ar' ? 'الرجاء اختيار دولة من القائمة' : 'Please select a country from the list', true);
             }
 
             const payload = {
