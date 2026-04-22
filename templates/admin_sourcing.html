@@ -1620,12 +1620,12 @@
                     <!-- Pagination -->
                     <div id="withdraw-pagination" class="pagination-ctrls" style="display: none; margin-top: 20px;">
                         <button class="pg-btn" id="pgPrevWithdraw"
-                            onclick="fetchAdminWithdrawals(currentAdminWithdrawPage - 1)">
+                            onclick="fetchAdminWithdrawals(currentAdminWithdrawPage - 1, null, true)">
                             <i class="fas fa-chevron-left"></i> <span data-i18n="pg_prev">Prev</span>
                         </button>
                         <span id="pgInfoWithdraw" class="pg-info">Page 1 of 1</span>
                         <button class="pg-btn" id="pgNextWithdraw"
-                            onclick="fetchAdminWithdrawals(currentAdminWithdrawPage + 1)">
+                            onclick="fetchAdminWithdrawals(currentAdminWithdrawPage + 1, null, true)">
                             <span data-i18n="pg_next">Next</span> <i class="fas fa-chevron-right"></i>
                         </button>
                     </div>
@@ -1923,7 +1923,7 @@
         let totalAdminWithdrawPages = 1;
         let allWithdrawals = [];
 
-        async function fetchAdminWithdrawals(page = 1, status = null) {
+        async function fetchAdminWithdrawals(page = 1, status = null, doScroll = false) {
             if (status) currentAdminWithdrawStatus = status;
             currentAdminWithdrawPage = page;
             try {
@@ -1933,9 +1933,11 @@
                 renderAdminWithdrawals(allWithdrawals);
                 totalAdminWithdrawPages = data.total_pages;
                 updateWithdrawPagination();
-                // Scroll to top of the main content area
-                const scroller = document.getElementById('app-content-scroller');
-                if (scroller) scroller.scrollTo({ top: 0, behavior: 'smooth' });
+                // Scroll only if requested (e.g., from pagination arrows)
+                if (doScroll) {
+                    const scroller = document.getElementById('app-content-scroller');
+                    if (scroller) scroller.scrollTo({ top: 0, behavior: 'smooth' });
+                }
             } catch (e) { console.error(e); }
         }
 
