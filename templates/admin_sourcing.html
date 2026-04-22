@@ -517,10 +517,12 @@
         @keyframes fadeIn {
             from {
                 opacity: 0;
+                transform: translateY(25px);
             }
 
             to {
                 opacity: 1;
+                transform: translateY(0);
             }
         }
 
@@ -2150,7 +2152,7 @@
             document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
 
             const scroller = document.getElementById('app-content-scroller');
-            if (scroller) scroller.scrollTo({ top: 0, behavior: 'smooth' });
+            if (scroller) scroller.scrollTop = 0;
 
             document.getElementById('section-' + id).classList.add('active');
             document.querySelectorAll('.nav-item').forEach(m => m.classList.remove('active'));
