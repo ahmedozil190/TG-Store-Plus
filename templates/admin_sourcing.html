@@ -1927,6 +1927,7 @@
         let currentAdminWithdrawStatus = 'pending';
         let currentAdminWithdrawPage = 1;
         let totalAdminWithdrawPages = 1;
+        let allWithdrawals = [];
 
         async function fetchAdminWithdrawals(page = 1, status = null) {
             if (status) currentAdminWithdrawStatus = status;
@@ -1934,7 +1935,8 @@
             try {
                 const res = await fetch(`/api/admin/withdrawals/all?page=${page}&status=${currentAdminWithdrawStatus}`);
                 const data = await res.json();
-                renderAdminWithdrawals(data.history);
+                allWithdrawals = data.history || [];
+                renderAdminWithdrawals(allWithdrawals);
                 totalAdminWithdrawPages = data.total_pages;
                 updateWithdrawPagination();
             } catch (e) { console.error(e); }
