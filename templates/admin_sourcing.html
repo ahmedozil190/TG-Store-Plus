@@ -1585,8 +1585,8 @@
                     </div>
                     <div class="info-card">
                         <div class="info-card-l">
-                            <span class="info-card-lbl">TOTAL PAID (USD)</span>
-                            <div class="info-card-val">$<span id="stat-withdraw-total-paid">0.00</span></div>
+                            <span class="info-card-lbl">TOTAL PAID</span>
+                            <div class="info-card-val"><span id="stat-withdraw-total-paid">0.00</span> USD</div>
                         </div>
                         <div class="info-card-icon" style="background: rgba(16, 185, 129, 0.1); color: var(--success);">
                             <i class="fas fa-file-invoice-dollar"></i>
@@ -1606,12 +1606,13 @@
                 </div>
 
                 <div class="card" style="padding: 22px;">
-                    <div class="section-header" style="margin-top: 0; margin-bottom: 25px; display: flex; align-items: center; justify-content: space-between;">
+                    <div class="section-header" style="margin-top: 0; margin-bottom: 20px;">
                         <h2 data-i18n="nav_withdrawals" style="margin: 0; font-size: 1rem;">Withdrawal Requests</h2>
-                        <div class="tabs-row" style="width: 250px; margin-left: auto; margin-bottom: 0;">
-                            <button class="tab-btn active" id="withdraw-tab-pending" onclick="switchWithdrawTab('pending', this)">PENDING</button>
-                            <button class="tab-btn" id="withdraw-tab-approved" onclick="switchWithdrawTab('approved', this)">APPROVED</button>
-                        </div>
+                    </div>
+
+                    <div class="tabs-row" style="margin-bottom: 25px;">
+                        <button class="tab-btn active" id="withdraw-tab-pending" onclick="switchWithdrawTab('pending', this)">PENDING</button>
+                        <button class="tab-btn" id="withdraw-tab-approved" onclick="switchWithdrawTab('approved', this)">APPROVED</button>
                     </div>
                     <div class="list-container" id="withdrawals-list"></div>
                     <!-- Pagination -->
