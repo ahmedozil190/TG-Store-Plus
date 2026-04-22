@@ -3,17 +3,14 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport"
-        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <meta name="theme-color" content="#09090b">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#111113">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>Numbers Store</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <link
-        href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&family=Plus Jakarta Sans:wght@300;400;500;600;700;800&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&family=Plus Jakarta Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
             --accent: #5865f2;
@@ -32,7 +29,7 @@
         }
 
         .dark-mode {
-            --bg: #0c0d10;
+            --bg: #1a1a1c;
             --bg-elevated: #111113;
             --card-glass: rgba(255, 255, 255, 0.02);
             --border: rgba(255, 255, 255, 0.06);
@@ -41,35 +38,13 @@
             --text-primary: var(--text-p);
             --text-secondary: var(--text-s);
             --sidebar-bg: var(--bg-elevated);
-            --modal-bg: #0c0d10;
-            --input-bg: #0c0d10;
+            --modal-bg: #111113;
+            --input-bg: #111113;
             --shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
             --tab-bg: rgba(255, 255, 255, 0.05);
         }
 
-        .light-mode {
-            --bg: #f1f3f5;
-            --bg-elevated: #ffffff;
-            --card-glass: rgba(0, 0, 0, 0.02);
-            --border: rgba(0, 0, 0, 0.06);
-            --text-p: #0f172a;
-            --text-s: #64748b;
-            --text-primary: var(--text-p);
-            --text-secondary: var(--text-s);
-            --sidebar-bg: var(--bg-elevated);
-            --modal-bg: #ffffff;
-            --input-bg: #f1f2f6;
-            --shadow: 0 10px 40px rgba(0, 0, 0, 0.06);
-            --tab-bg: rgba(0, 0, 0, 0.05);
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         [dir="ltr"] { font-family: 'Plus Jakarta Sans', sans-serif; }
         [dir="rtl"] { font-family: 'Cairo', sans-serif; }
 
@@ -80,15 +55,12 @@
             overflow: hidden;
             display: flex;
             flex-direction: column;
-            transition: background-color 0.4s var(--ease), color 0.4s var(--ease);
             -webkit-font-smoothing: antialiased;
-            text-rendering: optimizeLegibility;
         }
 
-        /* ─── Top Bar ─── */
         .top-bar {
             height: 70px;
-            background: #0c0d10 !important;
+            background: #111113 !important;
             border-bottom: 1px solid var(--border);
             display: flex;
             align-items: center;
@@ -98,35 +70,13 @@
             flex-shrink: 0;
         }
 
-        .bottom-bar {
-            height: 60px;
-            background: #111113 !important;
-            border-top: 1px solid var(--border);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 0 20px;
-            z-index: 1000;
-            flex-shrink: 0;
-            font-size: 0.85rem;
-            color: var(--text-s);
-            font-weight: 600;
-        }
-
         .nav-trigger {
             width: 44px; height: 44px; border-radius: 12px;
             background: var(--card-glass); border: 1px solid var(--border);
-            display: flex; align-items: center; justify-content: center;
-            font-size: 1.2rem; cursor: pointer; color: var(--text-p);
+            display: flex; align-items: center; justify-content: center; font-size: 1.2rem;
+            cursor: pointer; transition: 0.3s;
         }
-
-        .page-title {
-            font-size: 1rem;
-            font-weight: 800;
-            letter-spacing: 0.5px;
-            opacity: 0.9;
-        }
-
+        .page-title { font-size: 1rem; font-weight: 800; }
         .user-avatar {
             width: 44px; height: 44px; border-radius: 12px;
             background: var(--accent); color: white;
@@ -134,7 +84,6 @@
             font-weight: 800; border: 1px solid var(--border);
         }
 
-        /* ─── Sidebar ─── */
         .sidebar {
             position: fixed; top: 0; left: 0; width: var(--sidebar-width); height: 100%;
             background: var(--bg-elevated); border: none;
@@ -158,31 +107,16 @@
         }
         .nav-item:hover, .nav-item.active { background: var(--card-glass); color: var(--text-p); }
         .nav-item.active { border: 1px solid var(--border); color: var(--accent); }
-        .nav-item i { font-size: 1.1rem; width: 24px; text-align: center; }
+        .side-brand { display: flex; align-items: center; gap: 12px; }
+        .side-brand-dot { width: 12px; height: 12px; border-radius: 50%; background: var(--accent); }
+        .side-brand-name { font-size: 1.2rem; font-weight: 800; }
+        .side-footer { border: none; padding-top: 20px; font-size: 0.75rem; color: var(--text-s); opacity: 0.6; }
 
-        .side-brand {
-            display: flex; align-items: center; gap: 12px;
-        }
-        .side-brand-dot {
-            width: 12px; height: 12px; border-radius: 50%;
-            background: var(--accent); box-shadow: 0 0 10px var(--accent);
-        }
-        .side-brand-name {
-            font-size: 1.2rem; font-weight: 800;
-        }
-        .side-footer {
-            border: none;
-            padding-top: 20px; font-size: 0.75rem;
-            color: var(--text-s); opacity: 0.6;
-        }
-
-        /* ─── Content ─── */
-        .main-content { flex: 1; overflow-y: auto; padding: 0; -webkit-overflow-scrolling: touch; }
+        .main-content { flex: 1; overflow-y: auto; padding: 0; }
         .view-panel { display: none; padding: 25px 20px; animation: viewIn 0.5s var(--ease); }
         .view-panel.active { display: block; }
         @keyframes viewIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* ─── High-End Cards ─── */
         .info-card {
             background: var(--bg-elevated); border: 1px solid var(--border);
             border-radius: var(--radius); padding: 20px;
@@ -192,60 +126,50 @@
         .info-card-val { font-size: 1.4rem; font-weight: 800; color: var(--text-p); }
         .info-card-lbl { font-size: 0.7rem; color: var(--text-s); font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
 
-        /* ─── Search ─── */
-        .search-area { position: sticky; top: -25px; background: var(--bg); padding-top: 25px; padding-bottom: 15px; z-index: 10; padding-left: 2px; padding-right: 2px; }
+        .search-area { position: sticky; top: -25px; background: var(--bg); padding-top: 25px; padding-bottom: 15px; z-index: 10; }
         .search-box {
             background: var(--bg-elevated); border: 1px solid var(--border);
             border-radius: 16px; padding: 0 18px; display: flex; align-items: center;
             gap: 12px; height: 54px; transition: all 0.3s;
         }
-        .search-box:focus-within { border-color: var(--accent); box-shadow: 0 0 15px var(--accent-glow); }
-        .search-input { background: transparent; border: none; outline: none; color: var(--text-p); font-size: 0.95rem; font-weight: 600; width: 100%; font-family: inherit; }
+        .search-input { background: transparent; border: none; outline: none; color: var(--text-p); font-size: 0.95rem; font-weight: 600; width: 100%; }
 
-        /* ─── Grid ─── */
         .grid-container { display: flex; flex-direction: column; gap: 12px; }
         .country-card {
+            background: var(--bg-elevated); border: 1px solid var(--border);
             padding: 18px 22px; border-radius: var(--radius-md);
             display: flex; align-items: center; justify-content: space-between;
             cursor: pointer; transition: all 0.2s;
         }
         .country-card:active { transform: scale(0.98); background: var(--card-glass); }
-        .c-flag { font-size: 2.2rem; }
+        .c-flag { font-size: 2.22rem; }
         .c-name { font-size: 1rem; font-weight: 800; margin-bottom: 2px; }
         .c-stock { font-size: 0.75rem; color: var(--text-s); font-weight: 600; }
-        .c-price { background: var(--accent-glow); color: var(--accent-purple); padding: 8px 16px; border-radius: 50px; font-weight: 800; }
+        .c-price { background: var(--accent-glow); color: var(--accent); padding: 8px 16px; border-radius: 50px; font-weight: 800; }
 
-        /* ─── Buttons ─── */
         .primary-btn {
             background: var(--accent); color: white; border: none;
             padding: 16px; border-radius: 16px; font-weight: 800; font-size: 1rem;
             cursor: pointer; box-shadow: 0 8px 25px var(--accent-glow); transition: 0.3s;
             width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px;
         }
-        .primary-btn:active { transform: scale(0.98); }
 
-        /* ─── Loader ─── */
-        #splash { position: fixed; inset: 0; z-index: 9999; background: var(--bg); display: flex; flex-direction: column; justify-content: center; align-items: center; }
+        #splash { position: fixed; inset: 0; z-index: 9999; background: var(--bg); display: flex; flex-direction: column; justify-content: center; align-items: center; transition: opacity 0.4s; }
         .spinner { width: 50px; height: 50px; border: 3px solid var(--border); border-top: 3px solid var(--accent); border-radius: 50%; animation: spin 1s linear infinite; }
         @keyframes spin { 100% { transform: rotate(360deg); } }
 
-        /* ─── Success Modal ─── */
         .modal-overlay { position: fixed; inset: 0; z-index: 5000; background: rgba(0,0,0,0.8); backdrop-filter: blur(8px); display: none; align-items: flex-end; justify-content: center; }
         .modal-sheet { width: 100%; max-width: 500px; background: var(--bg-elevated); border-radius: 24px 24px 0 0; padding: 30px; animation: slideUp 0.4s var(--ease); }
         @keyframes slideUp { from { transform: translateY(100%); } }
         .phone-display { background: var(--bg); border: 1px solid var(--border); border-radius: 16px; padding: 20px; text-align: center; margin: 20px 0; font-size: 1.6rem; font-weight: 800; position: relative; }
         .copy-trigger { position: absolute; top: 10px; right: 10px; color: var(--text-s); font-size: 1rem; cursor: pointer; }
-
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar { width: 5px; }
-        ::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 10px; }
     </style>
 </head>
 
 <body class="dark-mode">
     <div id="splash">
         <div class="spinner"></div>
-        <p style="margin-top: 20px; font-weight: 700; color: var(--text-s);" data-i18n="loading">Loading System...</p>
+        <p style="margin-top: 20px; font-weight: 700; color: var(--text-s);" data-i18n="loading">Loading Store...</p>
     </div>
 
     <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeNav()"></div>
@@ -269,8 +193,7 @@
                 <i class="fas fa-headset"></i> <span data-i18n="nav_support">Support</span>
             </div>
         </div>
-        <div class="side-footer">
-        </div>
+        <div class="side-footer"></div>
     </div>
 
     <header class="top-bar">
@@ -282,7 +205,6 @@
     </header>
 
     <main class="main-content">
-        <!-- Dashboard -->
         <section id="section-home" class="view-panel active">
             <div class="info-card">
                 <div style="display: flex; flex-direction: column;">
@@ -298,18 +220,16 @@
                     <span class="info-card-lbl" data-i18n="total_orders">TOTAL ORDERS</span>
                     <span class="info-card-val" id="dash-orders">0</span>
                 </div>
-                <div style="width: 45px; height: 45px; background: rgba(108, 92, 231, 0.1); color: var(--accent); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                <div style="width: 45px; height: 45px; background: rgba(88, 101, 242, 0.1); color: var(--accent); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
                     <i class="fas fa-shopping-cart"></i>
                 </div>
             </div>
-
             <h3 style="margin: 25px 0 15px; font-size: 0.9rem; text-transform: uppercase; color: var(--text-s); letter-spacing: 1px;" data-i18n="quick_buy">Quick Access</h3>
             <button class="primary-btn" onclick="switchNav('store', document.getElementById('m-store'))">
                 <i class="fas fa-rocket"></i> <span data-i18n="btn_start_shopping">Start Shopping</span>
             </button>
         </section>
 
-        <!-- Store -->
         <section id="section-store" class="view-panel">
             <div class="search-area">
                 <div class="search-box">
@@ -317,77 +237,62 @@
                     <input type="text" id="store-search" class="search-input" placeholder="Search countries..." oninput="filterStore()">
                 </div>
             </div>
-            <div class="grid-container" id="countries-grid">
-                <!-- Injected via JS -->
-            </div>
+            <div class="grid-container" id="countries-grid"></div>
         </section>
 
-        <!-- History -->
         <section id="section-history" class="view-panel">
-            <div class="grid-container" id="history-list">
-                <!-- Injected via JS -->
-            </div>
+            <div class="grid-container" id="history-list"></div>
         </section>
 
-        <!-- Support -->
         <section id="section-support" class="view-panel">
-            <div class="info-card">
-                <div style="display: flex; flex-direction: column; gap: 5px;">
-                    <span style="font-weight: 800; font-size: 1.1rem;">Technical Support</span>
-                    <span style="color: var(--text-s); font-size: 0.85rem;">Available 24/7 for your assistance.</span>
-                </div>
+            <div class="info-card" style="flex-direction: column; align-items: flex-start; gap: 15px;">
+                <h2 style="font-weight: 800;">Contact Support</h2>
+                <p style="color: var(--text-s); font-size: 0.9rem;">Need help? Our team is available 24/7 to assist you.</p>
+                <button class="primary-btn" style="width: auto; padding: 12px 25px;" onclick="window.open('https://t.me/support_link', '_blank')">
+                    <i class="fab fa-telegram"></i> Message Support
+                </button>
             </div>
-            <button class="primary-btn" onclick="tg.openTelegramLink('https://t.me/FE4EE')" style="background: #229ED9;">
-                <i class="fab fa-telegram"></i> Contact Support
-            </button>
         </section>
     </main>
 
-    <!-- Buy Confirm Modal -->
-    <div id="buy-modal" class="modal-overlay" onclick="closeModal('buy-modal')">
-        <div class="modal-sheet" onclick="event.stopPropagation()">
-            <div style="text-align: center; margin-bottom: 25px;">
-                <div style="width: 60px; height: 60px; background: var(--accent-glow); border-radius: 20px; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px; font-size: 1.5rem; color: var(--accent);">
-                    <i class="fas fa-shopping-cart"></i>
-                </div>
-                <h2 data-i18n="confirm_title">Confirm Purchase</h2>
-                <p style="color: var(--text-s); font-size: 0.9rem;" data-i18n="confirm_desc">You are about to buy a virtual number.</p>
+    <!-- Buy Modal -->
+    <div class="modal-overlay" id="buy-modal">
+        <div class="modal-sheet">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+                <h2 style="font-weight: 800;" data-i18n="confirm_title">Buy Number</h2>
+                <i class="fas fa-times" style="font-size: 1.2rem; cursor: pointer; opacity: 0.5;" onclick="closeModal('buy-modal')"></i>
             </div>
-            <div style="background: var(--bg); border: 1px solid var(--border); border-radius: 16px; padding: 15px; margin-bottom: 25px;">
-                <div style="display: flex; justify-content: space-between; padding-bottom: 10px; border-bottom: 1px solid var(--border);">
+            <div style="background: var(--bg); border-radius: 20px; padding: 20px; margin-bottom: 20px;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
                     <span style="color: var(--text-s);" data-i18n="lbl_country">Country</span>
-                    <span id="buy-country-name" style="font-weight: 800;">-</span>
+                    <span id="buy-country-name" style="font-weight: 700;">---</span>
                 </div>
-                <div style="display: flex; justify-content: space-between; padding-top: 10px;">
+                <div style="display: flex; justify-content: space-between;">
                     <span style="color: var(--text-s);" data-i18n="lbl_price">Price</span>
                     <span id="buy-price-val" style="font-weight: 800; color: var(--success);">$0.00</span>
                 </div>
             </div>
-            <button id="btn-final-buy" class="primary-btn" onclick="execBuy()">
-                <span data-i18n="btn_confirm_pay">Confirm & Pay</span>
+            <button class="primary-btn" id="btn-final-buy" onclick="execBuy()">
+                <i class="fas fa-check-circle"></i> <span data-i18n="btn_confirm_pay">Confirm Purchase</span>
             </button>
         </div>
     </div>
 
     <!-- Success Modal -->
-    <div id="success-modal" class="modal-overlay">
+    <div class="modal-overlay" id="success-modal">
         <div class="modal-sheet">
-            <div style="text-align: center;">
+            <div style="text-align: center; margin-bottom: 30px;">
                 <div style="width: 60px; height: 60px; background: rgba(16,185,129,0.1); color: var(--success); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto; font-size: 2rem;">
                     <i class="fas fa-check"></i>
                 </div>
-                <h2 style="margin-top: 15px;" data-i18n="success_title">Purchase Successful!</h2>
-                <p style="color: var(--text-s); font-size: 0.9rem; margin-top: 5px;" data-i18n="success_desc">Your number is ready to use.</p>
+                <h2 style="margin-top: 15px;" data-i18n="success_title">Success!</h2>
+                <p style="color: var(--text-s); font-size: 0.9rem; margin-top: 5px;" data-i18n="success_desc">Number purchased successfully.</p>
             </div>
             <div class="phone-display">
                 <span id="success-phone">-----------</span>
                 <i class="fas fa-copy copy-trigger" onclick="copyPhone()"></i>
             </div>
-            <div style="background: var(--bg); border: 1px solid var(--border); border-radius: 12px; padding: 12px; font-size: 0.8rem; color: var(--text-s); line-height: 1.5;">
-                <p data-i18n="step1">1. Copy the number and paste it in Telegram.</p>
-                <p data-i18n="step2">2. Wait for the OTP code to arrive in the bot.</p>
-            </div>
-            <button class="primary-btn" style="margin-top: 25px; background: var(--bg-elevated); box-shadow: none; border: 1px solid var(--border);" onclick="closeModal('success-modal')">
+            <button class="primary-btn" style="background: var(--bg-elevated); box-shadow: none; border: 1px solid var(--border);" onclick="closeModal('success-modal')">
                 <span data-i18n="btn_close">Close</span>
             </button>
         </div>
@@ -396,8 +301,8 @@
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
-        tg.setHeaderColor('#0c0d10');
-        tg.setBackgroundColor('#0c0d10');
+        tg.setHeaderColor('#111113');
+        tg.setBackgroundColor('#111113');
 
         let currentLang = 'en';
         let countries = [];
@@ -406,120 +311,72 @@
 
         const translations = {
             en: {
-                loading: "Optimizing Store...",
-                nav_home: "Dashboard",
-                nav_buy: "Store",
-                nav_history: "Orders",
-                nav_support: "Support",
-                balance: "Your Balance",
-                total_orders: "Success Orders",
-                quick_buy: "Quick Access",
-                btn_start_shopping: "Browse Numbers",
-                confirm_title: "Final Confirmation",
-                confirm_desc: "The amount will be deducted from your balance.",
-                lbl_country: "Country",
-                lbl_price: "Price",
-                btn_confirm_pay: "Buy Now",
-                success_title: "Payment Success!",
-                success_desc: "Wait for the code in your bot chat.",
-                btn_close: "Dismiss",
-                step1: "1. Paste number into Telegram.",
-                step2: "2. The OTP code will arrive shortly.",
-                available: "Available",
-                search_ph: "Search countries..."
+                loading: "Optimizing Store...", nav_home: "Dashboard", nav_buy: "Store", nav_history: "Orders", nav_support: "Support",
+                balance: "YOUR BALANCE", total_orders: "SUCCESS ORDERS", quick_buy: "Quick Access", btn_start_shopping: "Browse Numbers",
+                confirm_title: "Confirmation", lbl_country: "Country", lbl_price: "Price", btn_confirm_pay: "Buy Now",
+                success_title: "Payment Success!", success_desc: "Wait for the code in your bot chat.", btn_close: "Dismiss",
+                available: "Available", search_ph: "Search countries..."
             },
             ar: {
-                loading: "جاري تجهيز المتجر...",
-                nav_home: "الرئيسية",
-                nav_buy: "المتجر",
-                nav_history: "طلباتي",
-                nav_support: "الدعم",
-                balance: "رصيدك الحالي",
-                total_orders: "إجمالي المشتريات",
-                quick_buy: "وصول سريع",
-                btn_start_shopping: "تصفح الأرقام",
-                confirm_title: "تأكيد عملية الشراء",
-                confirm_desc: "سيتم خصم قيمة الرقم من رصيدك الحالي.",
-                lbl_country: "الدولة",
-                lbl_price: "السعر",
-                btn_confirm_pay: "إتمام الشراء",
-                success_title: "تم الشراء بنجاح!",
-                success_desc: "انتظر وصول الكود في محادثة البوت.",
-                btn_close: "إغلاق",
-                step1: "1. قم بنسخ الرقم ووضعه في التيليجرام.",
-                step2: "2. سيصلك كود التفعيل في البوت قريباً.",
-                available: "رقم متاح",
-                search_ph: "ابحث عن دولة..."
+                loading: "جاري تجهيز المتجر...", nav_home: "الرئيسية", nav_buy: "المتجر", nav_history: "طلباتي", nav_support: "الدعم",
+                balance: "رصيدك الحالي", total_orders: "إجمالي المشتريات", quick_buy: "وصول سريع", btn_start_shopping: "تصفح الأرقام",
+                confirm_title: "تأكيد الشراء", lbl_country: "الدولة", lbl_price: "السعر", btn_confirm_pay: "إتمام الشراء",
+                success_title: "تم بنجاح!", success_desc: "انتظر وصول الكود في البوت.", btn_close: "إغلاق",
+                available: "رقم متاح", search_ph: "ابحث عن دولة..."
             }
         };
 
-        function openNav() {
-            document.getElementById('navSidebar').classList.add('open');
-            document.getElementById('sidebarOverlay').classList.add('show');
-        }
-
-        function closeNav() {
-            document.getElementById('navSidebar').classList.remove('open');
-            document.getElementById('sidebarOverlay').classList.remove('show');
-        }
+        function openNav() { document.getElementById('navSidebar').classList.add('open'); document.getElementById('sidebarOverlay').classList.add('show'); }
+        function closeNav() { document.getElementById('navSidebar').classList.remove('open'); document.getElementById('sidebarOverlay').classList.remove('show'); }
 
         function switchNav(id, btn) {
             closeNav();
             document.querySelectorAll('.view-panel').forEach(p => p.classList.remove('active'));
             document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-            
             document.getElementById('section-' + id).classList.add('active');
             if(btn) btn.classList.add('active');
-            
-            const titleKey = 'nav_' + (id === 'home' ? 'home' : (id === 'store' ? 'buy' : id));
+            const titleKey = 'nav_' + id;
             document.getElementById('view-title').innerText = translations[currentLang][titleKey] || id;
-
             if(id === 'store') fetchCountries();
             if(id === 'history') fetchHistory();
         }
 
         async function init() {
             try {
+                // Identity Sync
+                const userData = tg.initDataUnsafe?.user;
+                if (userData) {
+                    const fullName = userData.first_name + (userData.last_name ? ' ' + userData.last_name : '');
+                    document.getElementById('userInitial').innerText = userData.first_name.charAt(0).toUpperCase();
+                    fetch(`/api/admin/user/sync`, {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({ user_id: userId, full_name: fullName, username: userData.username, bot_type: 'store' })
+                    }).catch(e => console.error("Sync error:", e));
+                }
+
                 const res = await fetch(`/api/store/data?user_id=${userId}`);
                 const data = await res.json();
                 
                 if (data.user) {
                     updateBalanceUI(data.user.balance || 0);
-                    document.getElementById('side-user-id').innerText = userId;
+                    document.getElementById('dash-orders').innerText = data.user.total_orders || 0;
+                    const nameForUI = (data.user.full_name && data.user.full_name !== 'Unknown') ? data.user.full_name : (userData?.first_name || "User");
+                    document.getElementById('userInitial').innerText = nameForUI.charAt(0).toUpperCase();
                 }
-
-                const displayName = (data.user?.full_name && data.user.full_name !== 'Unknown') ? data.user.full_name : (tg.initDataUnsafe?.user?.first_name || "User");
-                document.getElementById('userInitial').innerText = displayName.charAt(0).toUpperCase();
-                
-                if (data.bot_name) {
-                    const cleanName = data.bot_name.replace(/\s+/g, '');
-                    const sideHandle = document.getElementById('side-bot-handle');
-                    if (sideHandle) sideHandle.innerText = '@' + cleanName + 'bot';
-                }
-
                 countries = data.countries || [];
-                if (document.getElementById('section-store').classList.contains('active')) {
-                    renderCountries(countries);
-                }
-            } catch(e) { 
-                console.error("Init Error:", e);
-            } finally {
+                if (document.getElementById('section-store').classList.contains('active')) renderCountries(countries);
+            } catch(e) { console.error("Init Error:", e); }
+            finally {
                 updateTranslations();
                 setTimeout(() => {
                     const splash = document.getElementById('splash');
-                    if(splash) {
-                        splash.style.opacity = '0';
-                        setTimeout(() => splash.style.display = 'none', 400);
-                    }
+                    if(splash) { splash.style.opacity = '0'; setTimeout(() => splash.style.display = 'none', 400); }
                 }, 500);
             }
         }
 
-        function updateBalanceUI(val) {
-            const formatted = `$${parseFloat(val).toFixed(2)}`;
-            document.getElementById('dash-balance').innerText = formatted;
-        }
-
+        function updateBalanceUI(val) { document.getElementById('dash-balance').innerText = `$${parseFloat(val).toFixed(2)}`; }
         function updateTranslations() {
             document.documentElement.lang = currentLang;
             document.documentElement.dir = currentLang === 'ar' ? 'rtl' : 'ltr';
@@ -530,25 +387,15 @@
             document.getElementById('store-search').placeholder = translations[currentLang].search_ph;
         }
 
-        async function fetchCountries() {
-            // Data is already fetched in init, just render
-            renderCountries(countries);
-        }
-
+        async function fetchCountries() { renderCountries(countries); }
         function renderCountries(list) {
             const grid = document.getElementById('countries-grid');
-            if(!list || !list.length) {
-                grid.innerHTML = '<p style="text-align:center; padding: 40px; opacity: 0.5;">No numbers available right now</p>';
-                return;
-            }
+            if (!list || !list.length) { grid.innerHTML = '<p style="text-align:center; padding: 40px; opacity: 0.5;">No numbers available</p>'; return; }
             grid.innerHTML = list.map(c => `
                 <div class="country-card" onclick="openBuyModal(${JSON.stringify(c).replace(/"/g, '&quot;')})">
-                    <div class="card-left">
+                    <div style="display: flex; align-items: center; gap: 15px;">
                         <span class="c-flag">${c.flag}</span>
-                        <div>
-                            <div class="c-name">${c.name}</div>
-                            <div class="c-stock">${c.count} ${translations[currentLang].available}</div>
-                        </div>
+                        <div><div class="c-name">${c.name}</div><div class="c-stock">${c.count} ${translations[currentLang].available}</div></div>
                     </div>
                     <div class="c-price">$${c.buy_price.toFixed(2)}</div>
                 </div>
@@ -557,8 +404,7 @@
 
         function filterStore() {
             const q = document.getElementById('store-search').value.toLowerCase();
-            const filtered = countries.filter(c => c.name.toLowerCase().includes(q));
-            renderCountries(filtered);
+            renderCountries(countries.filter(c => c.name.toLowerCase().includes(q)));
         }
 
         function openBuyModal(c) {
@@ -567,39 +413,26 @@
             document.getElementById('buy-price-val').innerText = `$${c.buy_price.toFixed(2)}`;
             document.getElementById('buy-modal').style.display = 'flex';
         }
-
-        function closeModal(id) {
-            document.getElementById(id).style.display = 'none';
-        }
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 
         async function execBuy() {
             const btn = document.getElementById('btn-final-buy');
-            btn.disabled = true;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-            
+            btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
             try {
                 const res = await fetch('/api/store/buy', {
                     method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({
-                        user_id: userId,
-                        country: selectedCountry.name
-                    })
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ user_id: userId, country: selectedCountry.name })
                 });
                 const data = await res.json();
-                if(res.ok && data.status === 'success') {
+                if (res.ok && data.status === 'success') {
                     closeModal('buy-modal');
                     document.getElementById('success-phone').innerText = data.phone;
                     document.getElementById('success-modal').style.display = 'flex';
-                    // Refresh data
                     init();
-                } else {
-                    alert(data.detail || data.message || 'Error');
-                }
-            } catch(e) { alert(e); }
-            
-            btn.disabled = false;
-            btn.innerText = translations[currentLang].btn_confirm_pay;
+                } else { alert(data.detail || data.message || 'Error'); }
+            } catch (e) { alert(e); }
+            btn.disabled = false; btn.innerText = translations[currentLang].btn_confirm_pay;
         }
 
         async function fetchHistory() {
@@ -609,23 +442,17 @@
                 const res = await fetch(`/api/store/history?user_id=${userId}`);
                 const data = await res.json();
                 renderHistory(data);
-            } catch(e) { list.innerHTML = '<p style="text-align:center;">Error loading history</p>'; }
+            } catch (e) { list.innerHTML = '<p style="text-align:center;">Error loading history</p>'; }
         }
 
         function renderHistory(data) {
             const list = document.getElementById('history-list');
-            if(!data || !data.length) {
-                list.innerHTML = '<p style="text-align:center; padding: 40px; opacity: 0.5;">No history found</p>';
-                return;
-            }
+            if (!data || !data.length) { list.innerHTML = '<p style="text-align:center; padding: 40px; opacity: 0.5;">No history found</p>'; return; }
             list.innerHTML = data.map(h => `
                 <div class="info-card" style="padding: 15px;">
                     <div style="display: flex; align-items: center; gap: 12px;">
                         <span style="font-size: 1.5rem;">${h.flag}</span>
-                        <div>
-                            <div style="font-weight: 800; font-size: 0.95rem;">${h.phone}</div>
-                            <div style="font-size: 0.75rem; color: var(--text-s);">${h.date} - ${h.country}</div>
-                        </div>
+                        <div><div style="font-weight: 800; font-size: 0.95rem;">${h.phone}</div><div style="font-size: 0.75rem; color: var(--text-s);">${h.date} - ${h.country}</div></div>
                     </div>
                     <div style="font-weight: 700; color: var(--success);">$${h.price.toFixed(2)}</div>
                 </div>
@@ -634,13 +461,10 @@
 
         function copyPhone() {
             const txt = document.getElementById('success-phone').innerText;
-            navigator.clipboard.writeText(txt).then(() => {
-                tg.HapticFeedback.notificationOccurred('success');
-            });
+            navigator.clipboard.writeText(txt).then(() => { tg.HapticFeedback.notificationOccurred('success'); });
         }
 
         init();
     </script>
 </body>
-
 </html>
