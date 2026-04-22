@@ -1137,7 +1137,7 @@ async def get_withdrawals(user_id: int, page: int = 1):
                 "method": r.method,
                 "address": r.address,
                 "status": r.status.value,
-                "date": r.created_at.strftime("%Y-%m-%d")
+                "date": r.created_at.strftime("%Y-%m-%d %H:%M")
             })
         return {
             "history": history,
