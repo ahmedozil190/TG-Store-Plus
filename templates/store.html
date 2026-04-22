@@ -16,8 +16,8 @@
         rel="stylesheet">
     <style>
         :root {
-            --accent: #6c5ce7;
-            --accent-glow: rgba(108, 92, 231, 0.3);
+            --accent: #5865f2;
+            --accent-glow: rgba(88, 101, 242, 0.3);
             --accent-purple: #8b5cf6;
             --accent-dark: #4338ca;
             --success: #10b981;
@@ -88,7 +88,7 @@
         /* ─── Top Bar ─── */
         .top-bar {
             height: 70px;
-            background: var(--bg-elevated);
+            background: #111113 !important;
             border-bottom: 1px solid var(--border);
             display: flex;
             align-items: center;
@@ -100,7 +100,7 @@
 
         .bottom-bar {
             height: 60px;
-            background: var(--bg-elevated);
+            background: #111113 !important;
             border-top: 1px solid var(--border);
             display: flex;
             align-items: center;
@@ -205,7 +205,6 @@
         /* ─── Grid ─── */
         .grid-container { display: flex; flex-direction: column; gap: 12px; }
         .country-card {
-            background: var(--bg-elevated); border: 1px solid var(--border);
             padding: 18px 22px; border-radius: var(--radius-md);
             display: flex; align-items: center; justify-content: space-between;
             cursor: pointer; transition: all 0.2s;
@@ -271,9 +270,6 @@
             </div>
         </div>
         <div class="side-footer">
-            <div style="font-weight: 700; margin-bottom: 5px;">Numbers System</div>
-            <div id="side-bot-handle">@BotName</div>
-            <div style="margin-top: 10px; opacity: 0.5;">ID: <span id="side-user-id">0</span></div>
         </div>
     </div>
 

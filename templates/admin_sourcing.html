@@ -1595,13 +1595,16 @@
                 <div class="card" style="padding: 22px;">
                     <div class="section-header" style="margin-top: 0; margin-bottom: 25px; display: flex; align-items: center; justify-content: space-between;">
                         <h2 data-i18n="nav_withdrawals" style="margin: 0; font-size: 1rem;">Withdrawal Requests</h2>
-                        <select id="withdraw-filter" class="input-field"
-                            style="width: auto; height: 38px; padding: 0 15px; font-size: 0.85rem; margin-left: auto; background: var(--bg); border: 1px solid var(--border); border-radius: 10px; color: var(--text-p); cursor: pointer;"
-                            onchange="fetchAdminWithdrawals(1, this.value)">
-                            <option value="pending" selected>Pending</option>
-                            <option value="approved">Approved</option>
-                            <option value="rejected">Rejected</option>
-                        </select>
+                        <div style="position: relative; margin-left: auto;">
+                            <select id="withdraw-filter" class="input-field"
+                                style="width: 140px; height: 40px; padding: 0 35px 0 20px; font-size: 0.85rem; background: var(--bg); border: 1px solid var(--border); border-radius: 12px; color: var(--text-p); cursor: pointer; appearance: none; -webkit-appearance: none; font-weight: 700;"
+                                onchange="fetchAdminWithdrawals(1, this.value)">
+                                <option value="pending" selected>Pending</option>
+                                <option value="approved">Approved</option>
+                                <option value="rejected">Rejected</option>
+                            </select>
+                            <i class="fas fa-chevron-down" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); font-size: 0.7rem; color: var(--text-s); pointer-events: none;"></i>
+                        </div>
                     </div>
                     <div class="list-container" id="withdrawals-list"></div>
                     <!-- Pagination -->
@@ -1963,23 +1966,23 @@
                         </div>
                         <div style="${rowS}">
                             <span style="${lblS}">${currentLang === 'ar' ? 'معرف المستخدم' : 'User ID'}</span>
-                            <span style="${valS}; color: var(--accent);">${item.user_id}</span>
+                            <span style="${valS}; color: #ff9f0a;">${item.user_id}</span>
                         </div>
                         <div style="${rowS}">
                             <span style="${lblS}">${currentLang === 'ar' ? 'معرف العملية' : 'ID'}</span>
-                            <span style="${valS}; color: var(--accent-purple);">${item.transaction_id || item.id}</span>
+                            <span style="${valS}; color: #bf5af2;">${item.transaction_id || item.id}</span>
                         </div>
                         <div style="${rowS}">
                             <span style="${lblS}">${currentLang === 'ar' ? 'المبلغ' : 'Amount'}</span>
-                            <span style="${valS}; color: var(--success); font-weight: 800;">$${item.amount.toFixed(2)}</span>
+                            <span style="${valS}; color: #30d158; font-weight: 800;">$${item.amount.toFixed(2)}</span>
                         </div>
                         <div style="${rowS}">
                             <span style="${lblS}">${currentLang === 'ar' ? 'الطريقة' : 'Method'}</span>
-                            <span style="${valS}; color: var(--text-p); opacity: 0.8;">${item.method}</span>
+                            <span style="${valS}; color: #ffcc00; opacity: 0.9;">${item.method}</span>
                         </div>
                         <div style="${rowS}">
                             <span style="${lblS}">${currentLang === 'ar' ? 'العنوان' : 'Address'}</span>
-                            <span style="${valS}; color: var(--text-p); font-size: 0.85rem; word-break: break-all;">${item.address}</span>
+                            <span style="${valS}; color: #5ac8fa; font-size: 0.85rem; word-break: break-all;">${item.address}</span>
                         </div>
                         ${isPending ? `
                         <div style="display: flex; gap: 10px; margin-top: 5px;">
@@ -2061,10 +2064,19 @@
             if (!skipToggle) closeNav();
 
             // Update page title
-            const titleMap = { home: 'nav_dashboard', prices: 'nav_prices', users: 'nav_users', history: 'nav_history', settings: 'nav_settings' };
+            const titleMap = { 
+                home: 'nav_dashboard', 
+                prices: 'nav_prices', 
+                users: 'nav_users', 
+                history: 'nav_history', 
+                settings: 'nav_settings',
+                withdrawals: 'nav_withdrawals'
+            };
             const titleEl = document.getElementById('page-title');
             titleEl.setAttribute('data-i18n', titleMap[id]);
-            titleEl.innerText = translations[currentLang][titleMap[id]];
+            titleEl.innerText = translations[currentLang][titleMap[id]] || "Withdrawals";
+
+            if(id === 'withdrawals') fetchAdminWithdrawals(1, 'pending');
         }
 
         async function init() {
