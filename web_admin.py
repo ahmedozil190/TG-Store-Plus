@@ -1115,17 +1115,26 @@ async def seller_withdraw(req: WithdrawSubmit):
         return {"ok": True, "id": tid}
 
 @app.get("/api/seller/withdrawals")
-async def get_withdrawals(user_id: int, page: int = 1):
+async def get_withdrawals(user_id: int, page: int = 1, status: str = "all"):
     page_size = 10
     offset = (page - 1) * page_size
     async with async_session() as session:
+        # Build base filter
+        base_filters = [WithdrawalRequest.user_id == user_id]
+        if status != "all":
+            try:
+                # Convert string status to enum
+                enum_status = WithdrawalStatus(status.upper())
+                base_filters.append(WithdrawalRequest.status == enum_status)
+            except: pass
+
         # Get total count for pagination
-        count_stmt = select(func.count(WithdrawalRequest.id)).where(WithdrawalRequest.user_id == user_id)
+        count_stmt = select(func.count(WithdrawalRequest.id)).where(*base_filters)
         total_count = (await session.execute(count_stmt)).scalar() or 0
         total_pages = (total_count + page_size - 1) // page_size
 
         # Get page data
-        stmt = select(WithdrawalRequest).where(WithdrawalRequest.user_id == user_id).order_by(WithdrawalRequest.created_at.desc()).offset(offset).limit(page_size)
+        stmt = select(WithdrawalRequest).where(*base_filters).order_by(WithdrawalRequest.created_at.desc()).offset(offset).limit(page_size)
         results = (await session.execute(stmt)).scalars().all()
         
         history = []

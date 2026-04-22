@@ -1609,15 +1609,9 @@
                     <div class="section-header"
                         style="margin-top: 0; margin-bottom: 25px; display: flex; align-items: center; justify-content: space-between;">
                         <h2 data-i18n="nav_withdrawals" style="margin: 0; font-size: 1rem;">Withdrawal Requests</h2>
-                        <div style="position: relative; margin-left: auto;">
-                            <select id="withdraw-filter" class="input-field"
-                                style="width: 140px; height: 40px; padding: 0 35px 0 20px; font-size: 0.85rem; background: var(--bg); border: 1px solid var(--border); border-radius: 12px; color: var(--text-p); cursor: pointer; appearance: none; -webkit-appearance: none; font-weight: 700; transition: all 0.2s;"
-                                onchange="fetchAdminWithdrawals(1, this.value)">
-                                <option value="pending" selected>Pending</option>
-                                <option value="approved">Approved</option>
-                            </select>
-                            <i class="fas fa-chevron-down"
-                                style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); font-size: 0.7rem; color: var(--text-s); pointer-events: none;"></i>
+                        <div class="tabs-container" style="display: flex; gap: 8px; background: var(--bg); padding: 4px; border-radius: 12px; border: 1px solid var(--border); width: 220px; margin-left: auto;">
+                            <button class="tab-btn active" id="withdraw-tab-pending" onclick="switchWithdrawTab('pending', this)" style="padding: 8px; font-size: 0.75rem;">PENDING</button>
+                            <button class="tab-btn" id="withdraw-tab-approved" onclick="switchWithdrawTab('approved', this)" style="padding: 8px; font-size: 0.75rem;">APPROVED</button>
                         </div>
                     </div>
                     <div class="list-container" id="withdrawals-list"></div>
@@ -1922,19 +1916,26 @@
         let currentPricePage = 1;
         let currentPriceTab = 'active';
 
+        let currentAdminWithdrawStatus = 'pending';
         let currentAdminWithdrawPage = 1;
         let totalAdminWithdrawPages = 1;
 
         async function fetchAdminWithdrawals(page = 1, status = null) {
-            const filter = status || document.getElementById('withdraw-filter').value;
+            if (status) currentAdminWithdrawStatus = status;
+            currentAdminWithdrawPage = page;
             try {
-                const res = await fetch(`/api/admin/withdrawals/all?page=${page}&status=${filter}`);
+                const res = await fetch(`/api/admin/withdrawals/all?page=${page}&status=${currentAdminWithdrawStatus}`);
                 const data = await res.json();
-                currentAdminWithdrawPage = data.current_page;
-                totalAdminWithdrawPages = data.total_pages;
                 renderAdminWithdrawals(data.history);
+                totalAdminWithdrawPages = data.total_pages;
                 updateWithdrawPagination();
-            } catch (e) { console.error("Withdrawals fetch error:", e); }
+            } catch (e) { console.error(e); }
+        }
+
+        function switchWithdrawTab(status, btn) {
+            document.querySelectorAll('#section-withdrawals .tab-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            fetchAdminWithdrawals(1, status);
         }
 
         function updateWithdrawPagination() {
