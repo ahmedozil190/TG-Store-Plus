@@ -1961,64 +1961,54 @@
                 if (statusUpper === 'APPROVED') statusColor = '#10b981'; // SUCCESS
                 if (statusUpper === 'REJECTED') statusColor = '#ef4444'; // ERROR
 
+                const isPending = statusUpper === 'PENDING';
                 const rowS = "background: transparent; border: 1px solid var(--border); padding: 14px 18px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; gap: 15px; margin-bottom: 8px;";
                 const lblS = "color: var(--text-secondary); font-size: 0.8rem; font-weight: 700; text-transform: uppercase; flex-shrink: 0;";
                 
-                const shortAddr = item.address.length > 16 ? (item.address.substring(0, 8) + '...' + item.address.slice(-6)) : item.address;
-
                 return `
-                    <div class="user-card" style="margin-bottom: 25px; padding: 18px; border: 1px solid var(--border); background: var(--bg-elevated); border-radius: 20px;" 
-                         onclick='openWithdrawModal(${JSON.stringify(item)})'>
+                    <div class="user-card" style="margin-bottom: 25px; padding: 18px; border: 1px solid var(--border); background: var(--bg-elevated); border-radius: 20px; cursor: default;">
                         <div style="display: flex; flex-direction: column;">
                             <div style="${rowS}">
                                 <span style="${lblS}">STATUS</span>
                                 <span style="color: ${statusColor}; font-weight: 800; font-size: 0.85rem; text-transform: uppercase;">${statusUpper}</span>
                             </div>
                             <div style="${rowS}">
-                                <span style="${lblS}">AMOUNT</span>
-                                <span style="color: #10b981; font-weight: 800; font-size: 1.1rem; text-align: right;">$${parseFloat(item.amount).toFixed(2)}</span>
+                                <span style="${lblS}">DETAILS</span>
+                                <span style="color: #10b981; font-weight: 800; font-size: 1.1rem; text-align: right;">$${parseFloat(item.amount).toFixed(2)} - ${item.method}</span>
                             </div>
                             <div style="${rowS}">
                                 <span style="${lblS}">ID</span>
                                 <span style="color: #8b5cf6; font-weight: 600; font-size: 0.9rem; text-align: right;">${item.transaction_id || item.id}</span>
                             </div>
                             <div style="${rowS}">
+                                <span style="${lblS}">USER ID</span>
+                                <span style="color: #ff9f0a; font-weight: 800; font-size: 0.95rem; text-align: right;">${item.user_id}</span>
+                            </div>
+                            <div style="${rowS}">
                                 <span style="${lblS}">ADDRESS</span>
-                                <span style="color: #3b82f6; font-weight: 600; font-size: 0.85rem; text-align: right; direction: ltr;">${shortAddr}</span>
+                                <span style="color: #3b82f6; font-weight: 600; font-size: 0.85rem; text-align: right; direction: ltr; word-break: break-all;">${item.address}</span>
                             </div>
                             <div style="${rowS}; margin-bottom: 0;">
                                 <span style="${lblS}">DATE</span>
                                 <span style="color: #fdd835; font-weight: 600; font-size: 0.85rem; text-align: right;">${item.date}</span>
                             </div>
+
+                            ${isPending ? `
+                            <div style="display: flex; gap: 10px; margin-top: 15px;">
+                                <button class="primary-btn" style="flex: 1; height: 46px; background: var(--success); color: #ffffff !important; font-size: 0.9rem; font-weight: 800; border-radius: 12px;" 
+                                    onclick="confirmWithdrawAction(${item.id}, 'approve')">
+                                    Approve
+                                </button>
+                                <button class="primary-btn" style="flex: 1; height: 46px; background: var(--error); color: #ffffff !important; font-size: 0.9rem; font-weight: 800; border-radius: 12px;"
+                                    onclick="confirmWithdrawAction(${item.id}, 'reject')">
+                                    Reject
+                                </button>
+                            </div>
+                            ` : ''}
                         </div>
                     </div>
                 `;
             }).join('');
-        }
-
-        function openWithdrawModal(item) {
-            document.getElementById('wd-user-id').innerText = item.user_id;
-            document.getElementById('wd-method').innerText = item.method;
-            document.getElementById('wd-address').innerText = item.address;
-            
-            const actions = document.getElementById('wd-actions');
-            if (item.status.toUpperCase() === 'PENDING') {
-                actions.style.display = 'flex';
-                document.getElementById('wd-approve-btn').onclick = () => confirmWithdrawAction(item.id, 'approve');
-                document.getElementById('wd-reject-btn').onclick = () => confirmWithdrawAction(item.id, 'reject');
-            } else {
-                actions.style.display = 'none';
-            }
-
-            const modal = document.getElementById('withdrawal-manage-modal');
-            modal.style.display = 'flex';
-            setTimeout(() => modal.classList.add('active'), 10);
-        }
-
-        function closeWithdrawModal() {
-            const modal = document.getElementById('withdrawal-manage-modal');
-            modal.classList.remove('active');
-            setTimeout(() => modal.style.display = 'none', 400);
         }
 
         async function approveWithdrawal(id) {
@@ -2031,7 +2021,6 @@
                 const data = await res.json();
                 if (data.ok) {
                     showToast(currentLang === 'ar' ? 'تم القبول بنجاح!' : 'Withdrawal Approved!');
-                    closeWithdrawModal();
                     fetchAdminWithdrawals(); // Refresh
                 } else {
                     alert(data.error || 'Failed to approve');
@@ -2051,7 +2040,6 @@
                 const data = await res.json();
                 if (data.ok) {
                     showToast(currentLang === 'ar' ? 'تم الرفض بنجاح!' : 'Withdrawal Rejected!');
-                    closeWithdrawModal();
                     fetchAdminWithdrawals(); // Refresh
                 } else {
                     alert(data.error || 'Failed to reject');
@@ -2929,31 +2917,6 @@
         if (menuBtn) switchNav(savedView, menuBtn, true);
         else switchNav(savedView, null, true);
     </script>
-    <div id="withdrawal-manage-modal" class="manage-overlay" onclick="closeWithdrawModal()">
-        <div class="manage-card" onclick="event.stopPropagation()" style="gap: 10px; display: flex; flex-direction: column;">
-            <!-- User ID Box -->
-            <div class="manage-data-box">
-                <div id="wd-user-id" style="color: #ff9f0a; font-weight: 800; font-size: 0.95rem;">0000</div>
-            </div>
-
-            <!-- Method Box -->
-            <div class="manage-data-box">
-                <div id="wd-method" style="color: #bf5af2; font-weight: 700; font-size: 0.95rem;">TRX - TRC20</div>
-            </div>
-
-            <!-- Address Box -->
-            <div style="background: var(--card-glass); border: 1px solid var(--border); border-radius: 18px; padding: 18px 15px; text-align: center; width: 100%; box-sizing: border-box; backdrop-filter: blur(10px);">
-                <div id="wd-address" style="color: #3b82f6; font-weight: 600; font-size: 0.85rem; word-break: break-all; font-family: monospace; line-height: 1.4;">0x...</div>
-            </div>
-
-            <div id="wd-actions" class="manage-actions" style="display: none; flex-direction: column; gap: 10px;">
-                <button class="manage-btn" style="background: var(--success); color: #fff;" id="wd-approve-btn">Approve</button>
-                <button class="manage-btn danger" id="wd-reject-btn">Reject</button>
-            </div>
-            
-            <button class="manage-btn secondary" onclick="closeWithdrawModal()" data-i18n="nav_close">Close</button>
-        </div>
-    </div>
     <div id="user-manage-modal" class="manage-overlay" onclick="closeManageModal()">
         <div class="manage-card" onclick="event.stopPropagation()">
 
