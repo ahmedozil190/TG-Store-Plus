@@ -443,6 +443,9 @@
             transform: translateY(-2px);
         }
 
+        .confirm-yes.approve { background: var(--success) !important; }
+        .confirm-yes.reject { background: var(--error) !important; }
+
         .confirm-no:hover {
             background: rgba(255, 255, 255, 0.1);
         }
@@ -2067,7 +2070,16 @@
                 ? (currentLang === 'ar' ? 'هل تود بالفعل الموافقة على تحويل المبلغ لهذا المستخدم؟' : 'Are you sure you want to approve this payment request?')
                 : (currentLang === 'ar' ? 'هل تود حقاً رفض هذا الطلب؟ لن يتمكن المستخدم من المطالبة به مرة أخرى.' : 'Are you sure you want to reject this request? This action is final.');
 
-            const confirmed = await showConfirm(title, msg);
+            const btnText = type === 'approve'
+                ? (currentLang === 'ar' ? 'قبول' : 'Approve')
+                : (currentLang === 'ar' ? 'رفض' : 'Reject');
+
+            const icon = type === 'approve' ? 'fas fa-check-circle' : 'fas fa-times-circle';
+            const iconBg = type === 'approve' ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)';
+            const iconColor = type === 'approve' ? '#10b981' : '#ef4444';
+            const btnClass = type === 'approve' ? 'approve' : 'reject';
+
+            const confirmed = await showConfirm(title, msg, btnText, icon, iconBg, iconColor, btnClass);
             if (confirmed) {
                 if (type === 'approve') await approveWithdrawal(id);
                 else await rejectWithdrawal(id);
@@ -2800,12 +2812,18 @@
 
         // Confirm Modal Logic
         let confirmResolve = null;
-        function showConfirm(title, msg, btnText) {
+        function showConfirm(title, msg, btnText, icon = 'fas fa-question-circle', iconBg = 'rgba(59, 130, 246, 0.1)', iconColor = '#3b82f6', btnClass = '') {
             if (title) document.getElementById('confirm-title').innerText = title;
             if (msg) document.getElementById('confirm-msg').innerText = msg;
 
+            const iconWrap = document.querySelector('.confirm-icon');
+            iconWrap.innerHTML = `<i class="${icon}"></i>`;
+            iconWrap.style.background = iconBg;
+            iconWrap.style.color = iconColor;
+
             const yesBtn = document.querySelector('.confirm-yes');
             yesBtn.innerText = btnText || (currentLang === 'ar' ? 'تأكيد' : 'Confirm');
+            yesBtn.className = 'confirm-btn confirm-yes ' + btnClass;
 
             document.getElementById('confirm-overlay').classList.add('active');
             return new Promise((resolve) => {
