@@ -2017,7 +2017,7 @@
                 const res = await fetch(`/api/admin/withdrawals/action`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ id, action: 'approve' })
+                    body: JSON.stringify({ request_id: parseInt(id), action: 'approve' })
                 });
                 const data = await res.json();
                 if (data.ok) {
@@ -2036,7 +2036,7 @@
                 const res = await fetch(`/api/admin/withdrawals/action`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ id, action: 'reject' })
+                    body: JSON.stringify({ request_id: parseInt(id), action: 'reject' })
                 });
                 const data = await res.json();
                 if (data.ok) {
@@ -2054,12 +2054,12 @@
 
         async function confirmWithdrawAction(id, type) {
             const title = type === 'approve' 
-                ? (currentLang === 'ar' ? 'تأكيد القبول' : 'Approve Withdrawal') 
-                : (currentLang === 'ar' ? 'تأكيد الرفض' : 'Reject Withdrawal');
+                ? (currentLang === 'ar' ? 'تأكيد قبول السحب' : 'Confirm Approval') 
+                : (currentLang === 'ar' ? 'تأكيد رفض السحب' : 'Confirm Rejection');
             
             const msg = type === 'approve'
-                ? (currentLang === 'ar' ? 'هل أنت متأكد من قبول هذا السحب؟ لا يمكن التراجع عن هذا الإجراء.' : 'Are you sure you want to approve this withdrawal request? This action cannot be undone.')
-                : (currentLang === 'ar' ? 'هل أنت متأكد من رفض هذا السحب؟ سيتم التعامل مع الرصيد وفقاً للقواعد.' : 'Are you sure you want to reject this withdrawal request?');
+                ? (currentLang === 'ar' ? 'هل تود بالفعل الموافقة على تحويل المبلغ لهذا المستخدم؟' : 'Are you sure you want to approve this payment request?')
+                : (currentLang === 'ar' ? 'هل تود حقاً رفض هذا الطلب؟ لن يتمكن المستخدم من المطالبة به مرة أخرى.' : 'Are you sure you want to reject this request? This action is final.');
 
             const confirmed = await showConfirm(title, msg);
             if (confirmed) {
