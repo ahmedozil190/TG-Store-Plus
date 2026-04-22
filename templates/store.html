@@ -487,41 +487,36 @@
                 const res = await fetch(`/api/store/data?user_id=${userId}`);
                 const data = await res.json();
                 
-                // Set balance
                 if (data.user) {
                     updateBalanceUI(data.user.balance || 0);
                     document.getElementById('side-user-id').innerText = userId;
                 }
 
-                // Initial for avatar
                 const uname = tg.initDataUnsafe?.user?.first_name || "U";
                 document.getElementById('userInitial').innerText = uname.charAt(0).toUpperCase();
                 
-                // Sidebar & Footer Bot Handle
                 if (data.bot_name) {
                     const cleanName = data.bot_name.replace(/\s+/g, '');
                     document.getElementById('side-bot-handle').innerText = '@' + cleanName + 'bot';
                     document.getElementById('main-footer').innerText = '@' + cleanName + 'bot';
                 }
+
+                countries = data.countries || [];
                 if (document.getElementById('section-store').classList.contains('active')) {
                     renderCountries(countries);
                 }
-                
-                // Note: currentLang is still fetched from user data if needed, 
-                // but let's default to 'ar' like before or fetch it.
-                const userRes = await fetch(`/api/admin/user/sync`, {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({user_id: userId, bot_type: 'store'})
-                });
-                // This is just to ensure language exists in some cases, 
-                // but for now we'll stick to the current initialization.
-            } catch(e) { console.error(e); }
-            
-            updateTranslations();
-            setTimeout(() => {
-                document.getElementById('splash').style.display = 'none';
-            }, 800);
+            } catch(e) { 
+                console.error("Init Error:", e);
+            } finally {
+                updateTranslations();
+                setTimeout(() => {
+                    const splash = document.getElementById('splash');
+                    if(splash) {
+                        splash.style.opacity = '0';
+                        setTimeout(() => splash.style.display = 'none', 400);
+                    }
+                }, 500);
+            }
         }
 
         function updateBalanceUI(val) {

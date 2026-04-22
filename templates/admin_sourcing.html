@@ -1593,12 +1593,11 @@
                 </div>
 
                 <div class="card" style="padding: 22px;">
-                    <div class="section-header" style="margin-top: 0; margin-bottom: 25px;">
+                    <div class="section-header" style="margin-top: 0; margin-bottom: 25px; display: flex; align-items: center; justify-content: space-between;">
                         <h2 data-i18n="nav_withdrawals" style="margin: 0; font-size: 1rem;">Withdrawal Requests</h2>
                         <select id="withdraw-filter" class="input-field"
-                            style="width: auto; height: 38px; padding: 0 15px; font-size: 0.85rem;"
+                            style="width: auto; height: 38px; padding: 0 15px; font-size: 0.85rem; margin-left: auto; background: var(--bg); border: 1px solid var(--border); border-radius: 10px; color: var(--text-p); cursor: pointer;"
                             onchange="fetchAdminWithdrawals(1, this.value)">
-                            <option value="all">All Status</option>
                             <option value="pending" selected>Pending</option>
                             <option value="approved">Approved</option>
                             <option value="rejected">Rejected</option>
@@ -1959,26 +1958,28 @@
                 <div class="user-card" style="margin-bottom: 15px;">
                     <div style="display: flex; flex-direction: column; gap: 10px;">
                         <div style="${rowS}">
-                            <span style="${lblS}">${currentLang === 'ar' ? 'المستخدم' : 'User'}</span>
-                            <div style="text-align: right;">
-                                <div style="font-weight: 800; color: var(--text-p);">${item.user_name}</div>
-                                <div style="font-size: 0.8rem; color: var(--accent);">${item.user_handle} (${item.user_id})</div>
-                            </div>
+                            <span style="${lblS}">${currentLang === 'ar' ? 'الحالة' : 'Status'}</span>
+                            <span style="${valS}; color: ${statusColor}; text-transform: uppercase;">${item.status}</span>
                         </div>
                         <div style="${rowS}">
-                            <span style="${lblS}">${currentLang === 'ar' ? 'التفاصيل' : 'Details'}</span>
-                            <div style="text-align: right; color: var(--text-p);">
-                                <div style="font-weight: 800; color: var(--success); font-size: 1.1rem;">$${item.amount.toFixed(2)}</div>
-                                <div style="font-size: 0.85rem; opacity: 0.8;">${item.method}</div>
-                            </div>
+                            <span style="${lblS}">${currentLang === 'ar' ? 'معرف المستخدم' : 'User ID'}</span>
+                            <span style="${valS}; color: var(--accent);">${item.user_id}</span>
+                        </div>
+                        <div style="${rowS}">
+                            <span style="${lblS}">${currentLang === 'ar' ? 'معرف العملية' : 'ID'}</span>
+                            <span style="${valS}; color: var(--accent-purple);">${item.transaction_id || item.id}</span>
+                        </div>
+                        <div style="${rowS}">
+                            <span style="${lblS}">${currentLang === 'ar' ? 'المبلغ' : 'Amount'}</span>
+                            <span style="${valS}; color: var(--success); font-weight: 800;">$${item.amount.toFixed(2)}</span>
+                        </div>
+                        <div style="${rowS}">
+                            <span style="${lblS}">${currentLang === 'ar' ? 'الطريقة' : 'Method'}</span>
+                            <span style="${valS}; color: var(--text-p); opacity: 0.8;">${item.method}</span>
                         </div>
                         <div style="${rowS}">
                             <span style="${lblS}">${currentLang === 'ar' ? 'العنوان' : 'Address'}</span>
-                            <span style="${valS}; color: var(--accent-purple);">${item.address}</span>
-                        </div>
-                        <div style="${rowS}">
-                            <span style="${lblS}">${currentLang === 'ar' ? 'الحالة' : 'Status'}</span>
-                            <span style="${valS}; color: ${statusColor}; text-transform: uppercase;">${item.status}</span>
+                            <span style="${valS}; color: var(--text-p); font-size: 0.85rem; word-break: break-all;">${item.address}</span>
                         </div>
                         ${isPending ? `
                         <div style="display: flex; gap: 10px; margin-top: 5px;">
