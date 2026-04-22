@@ -437,6 +437,7 @@ async def get_sourcing_data():
             withdraw_pending = (await session.execute(select(func.count(WithdrawalRequest.id)).where(WithdrawalRequest.status == WithdrawalStatus.PENDING))).scalar() or 0
             withdraw_approved = (await session.execute(select(func.count(WithdrawalRequest.id)).where(WithdrawalRequest.status == WithdrawalStatus.APPROVED))).scalar() or 0
             withdraw_rejected = (await session.execute(select(func.count(WithdrawalRequest.id)).where(WithdrawalRequest.status == WithdrawalStatus.REJECTED))).scalar() or 0
+            total_paid_amount = (await session.execute(select(func.sum(WithdrawalRequest.amount)).where(WithdrawalRequest.status == WithdrawalStatus.APPROVED))).scalar() or 0
             
             recent_result = await session.execute(
                 select(Account).order_by(Account.id.desc()).limit(50)
@@ -552,7 +553,8 @@ async def get_sourcing_data():
                     "user_count": user_count,
                     "withdraw_pending": withdraw_pending,
                     "withdraw_approved": withdraw_approved,
-                    "withdraw_rejected": withdraw_rejected
+                    "withdraw_rejected": withdraw_rejected,
+                    "total_paid_amount": float(total_paid_amount)
                 },
                 "recent": recent,
                 "prices": prices,
