@@ -1954,7 +1954,7 @@
 
         let currentSourcingPage = 1;
         let totalSourcingPages = 1;
-        const SOURCING_LIMIT = 1; // User requested 1 for testing
+        const SOURCING_LIMIT = 10;
 
         async function moveSourcingPage(delta) {
             const target = currentSourcingPage + delta;
@@ -1987,7 +1987,7 @@
                 empty.style.display = 'none';
                 data.accounts.forEach(acc => {
                     const item = document.createElement('div');
-                    item.className = 'history-item';
+                    item.className = 'user-card';
                     item.style.marginBottom = "15px";
 
                     let statusColor = '#f59e0b'; // PENDING
