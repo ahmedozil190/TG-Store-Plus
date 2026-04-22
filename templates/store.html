@@ -35,13 +35,23 @@
             --border: rgba(255, 255, 255, 0.06);
             --text-p: #fafafa;
             --text-s: #a1a1aa;
-            --text-primary: var(--text-p);
-            --text-secondary: var(--text-s);
             --sidebar-bg: var(--bg-elevated);
             --modal-bg: #111113;
             --input-bg: #111113;
             --shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
-            --tab-bg: rgba(255, 255, 255, 0.05);
+        }
+
+        .light-mode {
+            --bg: #f1f3f5;
+            --bg-elevated: #ffffff;
+            --card-glass: rgba(0, 0, 0, 0.02);
+            --border: rgba(0, 0, 0, 0.06);
+            --text-p: #0f172a;
+            --text-s: #64748b;
+            --sidebar-bg: var(--bg-elevated);
+            --modal-bg: #ffffff;
+            --input-bg: #f1f2f6;
+            --shadow: 0 10px 40px rgba(0, 0, 0, 0.06);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -60,7 +70,7 @@
 
         .top-bar {
             height: 70px;
-            background: #111113 !important;
+            background: var(--bg-elevated);
             border-bottom: 1px solid var(--border);
             display: flex;
             align-items: center;
@@ -301,8 +311,16 @@
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
-        tg.setHeaderColor('#111113');
-        tg.setBackgroundColor('#111113');
+
+        function applyTheme() {
+            const isDark = tg.colorScheme === 'dark';
+            document.body.className = isDark ? 'dark-mode' : 'light-mode';
+            const color = isDark ? '#111113' : '#ffffff';
+            tg.setHeaderColor(color);
+            tg.setBackgroundColor(color);
+        }
+        tg.onEvent('themeChanged', applyTheme);
+        applyTheme();
 
         let currentLang = 'en';
         let countries = [];
