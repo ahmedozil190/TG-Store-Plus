@@ -1997,7 +1997,7 @@
         }
 
         function openWithdrawModal(item) {
-            document.getElementById('wd-user-id').innerText = '#' + item.user_id;
+            document.getElementById('wd-user-id').innerText = item.user_id;
             document.getElementById('wd-method').innerText = item.method;
             document.getElementById('wd-address').innerText = item.address;
             
@@ -2021,14 +2021,57 @@
             setTimeout(() => modal.style.display = 'none', 400);
         }
 
+        async function approveWithdrawal(id) {
+            try {
+                const res = await fetch(`/api/admin/withdrawals/action`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id, action: 'approve' })
+                });
+                const data = await res.json();
+                if (data.ok) {
+                    showToast(currentLang === 'ar' ? 'تم القبول بنجاح!' : 'Withdrawal Approved!');
+                    closeWithdrawModal();
+                    fetchAdminWithdrawals(); // Refresh
+                } else {
+                    alert(data.error || 'Failed to approve');
+                }
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        async function rejectWithdrawal(id) {
+            try {
+                const res = await fetch(`/api/admin/withdrawals/action`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id, action: 'reject' })
+                });
+                const data = await res.json();
+                if (data.ok) {
+                    showToast(currentLang === 'ar' ? 'تم الرفض بنجاح!' : 'Withdrawal Rejected!');
+                    closeWithdrawModal();
+                    fetchAdminWithdrawals(); // Refresh
+                } else {
+                    alert(data.error || 'Failed to reject');
+                }
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
         let withdrawConfirmationData = null;
 
         function confirmWithdrawAction(id, type) {
             withdrawConfirmationData = { id, type };
-            const title = type === 'approve' ? 'Approve Withdrawal' : 'Reject Withdrawal';
+            const title = type === 'approve' 
+                ? (currentLang === 'ar' ? 'تأكيد القبول' : 'Approve Withdrawal') 
+                : (currentLang === 'ar' ? 'تأكيد الرفض' : 'Reject Withdrawal');
+            
             const msg = type === 'approve'
-                ? 'Are you sure you want to approve this withdrawal request? This action cannot be undone.'
-                : 'Are you sure you want to reject this withdrawal request? The balance will be returned/kept based on system rules.';
+                ? (currentLang === 'ar' ? 'هل أنت متأكد من قبول هذا السحب؟ لا يمكن التراجع عن هذا الإجراء.' : 'Are you sure you want to approve this withdrawal request? This action cannot be undone.')
+                : (currentLang === 'ar' ? 'هل أنت متأكد من رفض هذا السحب؟ سيتم التعامل مع الرصيد وفقاً للقواعد.' : 'Are you sure you want to reject this withdrawal request?');
 
             showConfirm(title, msg, (confirmed) => {
                 if (confirmed && withdrawConfirmationData) {
@@ -2887,10 +2930,10 @@
         else switchNav(savedView, null, true);
     </script>
     <div id="withdrawal-manage-modal" class="manage-overlay" onclick="closeWithdrawModal()">
-        <div class="manage-card" onclick="event.stopPropagation()">
+        <div class="manage-card" onclick="event.stopPropagation()" style="gap: 10px; display: flex; flex-direction: column;">
             <!-- User ID Box -->
             <div class="manage-data-box">
-                <div id="wd-user-id" style="color: #ff9f0a; font-weight: 800; font-size: 0.95rem;">#0000</div>
+                <div id="wd-user-id" style="color: #ff9f0a; font-weight: 800; font-size: 0.95rem;">0000</div>
             </div>
 
             <!-- Method Box -->
@@ -2903,12 +2946,12 @@
                 <div id="wd-address" style="color: #3b82f6; font-weight: 600; font-size: 0.85rem; word-break: break-all; font-family: monospace; line-height: 1.4;">0x...</div>
             </div>
 
-            <div id="wd-actions" class="manage-actions" style="margin-top: 10px; padding-top: 15px; border-top: 1px solid var(--border); display: none;">
+            <div id="wd-actions" class="manage-actions" style="display: none; flex-direction: column; gap: 10px;">
                 <button class="manage-btn" style="background: var(--success); color: #fff;" id="wd-approve-btn">Approve</button>
                 <button class="manage-btn danger" id="wd-reject-btn">Reject</button>
             </div>
             
-            <button class="manage-btn secondary" onclick="closeWithdrawModal()" data-i18n="nav_close" style="margin-top: 5px;">Close</button>
+            <button class="manage-btn secondary" onclick="closeWithdrawModal()" data-i18n="nav_close">Close</button>
         </div>
     </div>
     <div id="user-manage-modal" class="manage-overlay" onclick="closeManageModal()">
