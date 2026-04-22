@@ -1806,7 +1806,7 @@
             document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
 
             const scroller = document.getElementById('app-content-scroller');
-            if (scroller) scroller.scrollTop = 0;
+            if (scroller) scroller.scrollTo({ top: 0, behavior: 'smooth' });
 
             document.getElementById('section-' + id).classList.add('active');
             document.querySelectorAll('.nav-item').forEach(m => m.classList.remove('active'));
