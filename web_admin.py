@@ -365,10 +365,14 @@ async def get_store_data(user_id: int = None):
                 if user:
                     balance = user.balance_store
 
-        return {
-            "countries": countries,
-            "user": {"balance": balance}
-        }
+            return {
+                "countries": countries,
+                "user": {
+                    "balance": balance,
+                    "full_name": user.full_name if user else "Unknown",
+                    "username": user.username if user else ""
+                }
+            }
     except Exception as e:
         logger.error(f"Store Data Error: {e}")
         raise HTTPException(status_code=500, detail=str(e))

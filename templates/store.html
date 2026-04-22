@@ -32,7 +32,7 @@
         }
 
         .dark-mode {
-            --bg: #1a1a1c;
+            --bg: #0c0d10;
             --bg-elevated: #111113;
             --card-glass: rgba(255, 255, 255, 0.02);
             --border: rgba(255, 255, 255, 0.06);
@@ -41,8 +41,8 @@
             --text-primary: var(--text-p);
             --text-secondary: var(--text-s);
             --sidebar-bg: var(--bg-elevated);
-            --modal-bg: #09090b;
-            --input-bg: #09090b;
+            --modal-bg: #0c0d10;
+            --input-bg: #0c0d10;
             --shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
             --tab-bg: rgba(255, 255, 255, 0.05);
         }
@@ -88,7 +88,7 @@
         /* ─── Top Bar ─── */
         .top-bar {
             height: 70px;
-            background: #111113 !important;
+            background: #0c0d10 !important;
             border-bottom: 1px solid var(--border);
             display: flex;
             align-items: center;
@@ -393,12 +393,11 @@
         </div>
     </div>
 
-    <footer class="bottom-bar" id="main-footer">
-    </footer>
-
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
+        tg.setHeaderColor('#0c0d10');
+        tg.setBackgroundColor('#0c0d10');
 
         let currentLang = 'en';
         let countries = [];
@@ -489,15 +488,13 @@
                     document.getElementById('side-user-id').innerText = userId;
                 }
 
-                const displayName = data.user?.full_name || tg.initDataUnsafe?.user?.first_name || "U";
+                const displayName = (data.user?.full_name && data.user.full_name !== 'Unknown') ? data.user.full_name : (tg.initDataUnsafe?.user?.first_name || "User");
                 document.getElementById('userInitial').innerText = displayName.charAt(0).toUpperCase();
                 
                 if (data.bot_name) {
                     const cleanName = data.bot_name.replace(/\s+/g, '');
                     const sideHandle = document.getElementById('side-bot-handle');
-                    const mainFoot = document.getElementById('main-footer');
                     if (sideHandle) sideHandle.innerText = '@' + cleanName + 'bot';
-                    if (mainFoot) mainFoot.innerText = ''; 
                 }
 
                 countries = data.countries || [];
