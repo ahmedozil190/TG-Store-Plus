@@ -1161,9 +1161,14 @@ async def admin_get_all_withdrawals(page: int = 1, status: str = "all"):
     offset = (page - 1) * page_size
     async with async_session() as session:
         # Build query
-        stmt = select(WithdrawalRequest).order_by(WithdrawalRequest.created_at.desc())
+        order_col = WithdrawalRequest.created_at.desc()
+        if status == "approved":
+            order_col = WithdrawalRequest.updated_at.desc()
+
+        stmt = select(WithdrawalRequest).order_by(order_col)
         if status != "all":
             try:
+                # Use string comparison if enum mapping is tricky, but here status should match
                 stmt = stmt.where(WithdrawalRequest.status == WithdrawalStatus(status.lower()))
             except: pass
         
