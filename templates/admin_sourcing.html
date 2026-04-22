@@ -1933,9 +1933,9 @@
                 renderAdminWithdrawals(allWithdrawals);
                 totalAdminWithdrawPages = data.total_pages;
                 updateWithdrawPagination();
-                // Scroll to top of withdrawals card
-                const el = document.getElementById('withdrawals-history-card');
-                if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                // Scroll to top of the main content area
+                const scroller = document.getElementById('app-content-scroller');
+                if (scroller) scroller.scrollTo({ top: 0, behavior: 'smooth' });
             } catch (e) { console.error(e); }
         }
 
