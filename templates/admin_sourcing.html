@@ -1747,21 +1747,21 @@
                 <input type="hidden" id="up-id" value="">
                 
                 <div class="form-group">
-                    <label>User ID</label>
+                    <label data-i18n="lbl_user_id">User ID</label>
                     <input type="number" id="up-user-id" class="input-field" placeholder="Enter User ID">
                 </div>
                 
                 <div class="form-group">
-                    <label>Country Code (e.g. 1)</label>
+                    <label data-i18n="lbl_code">Country Code (e.g. 1)</label>
                     <input type="text" id="up-country-code" class="input-field" placeholder="Enter Country Code">
                 </div>
                 
                 <div class="form-group">
-                    <label>Custom Buy Price</label>
+                    <label data-i18n="lbl_custom_price">Custom Buy Price</label>
                     <input type="number" id="up-buy-price" class="input-field" step="0.01" placeholder="Enter custom buy price">
                 </div>
                 
-                <button class="btn-primary" onclick="saveUserPrice()" style="width:100%; margin-top:10px;">Save Custom Price</button>
+                <button class="btn-primary" onclick="saveUserPrice()" style="width:100%; margin-top:10px;" data-i18n="btn_save_custom">Save Custom Price</button>
             </div>
         </div>
     </div>
@@ -1817,6 +1817,11 @@
                 nav_user_prices: "Custom Users",
                 nav_withdrawals: "Withdrawals",
                 nav_close: "Close",
+                modal_add_custom: "Add Custom Price",
+                modal_edit_custom: "Edit Custom Price",
+                lbl_user_id: "User ID",
+                lbl_custom_price: "Custom Buy Price",
+                btn_save_custom: "Save Custom Price",
                 stat_section: "Inventory",
                 stat_total: "TOTAL ACCOUNTS",
                 stat_pending: "PENDING APPROVAL",
@@ -1885,6 +1890,11 @@
                 nav_user_prices: "مستخدمين مخصصين",
                 nav_withdrawals: "طلبات السحب",
                 nav_close: "إغلاق",
+                modal_add_custom: "إضافة سعر مخصص",
+                modal_edit_custom: "تعديل السعر المخصص",
+                lbl_user_id: "معرّف المستخدم",
+                lbl_custom_price: "سعر الشراء المخصص",
+                btn_save_custom: "حفظ السعر",
                 stat_section: "المخزون",
                 stat_total: "إجمالي الحسابات",
                 stat_pending: "بانتظار الموافقة",
@@ -2038,25 +2048,26 @@
         }
 
         function openUserPriceModal(up = null) {
-            document.getElementById('user-price-modal').classList.add('show');
+            document.getElementById('user-price-modal').classList.add('active');
             if (up) {
-                document.getElementById('user-price-modal-title').innerText = 'Edit Custom Price';
+                document.getElementById('user-price-modal-title').innerText = translations[currentLang].modal_edit_custom;
                 document.getElementById('up-id').value = up.id;
                 document.getElementById('up-user-id').value = up.user_id;
                 document.getElementById('up-country-code').value = up.country_code;
                 document.getElementById('up-buy-price').value = up.buy_price;
             } else {
-                document.getElementById('user-price-modal-title').innerText = 'Add Custom Price';
+                document.getElementById('user-price-modal-title').innerText = translations[currentLang].modal_add_custom;
                 document.getElementById('up-id').value = '';
                 document.getElementById('up-user-id').value = '';
                 document.getElementById('up-country-code').value = '';
                 document.getElementById('up-buy-price').value = '';
             }
+            updateUI();
         }
 
         function closeUserPriceModal(e) {
             if (e && e.target !== document.getElementById('user-price-modal')) return;
-            document.getElementById('user-price-modal').classList.remove('show');
+            document.getElementById('user-price-modal').classList.remove('active');
         }
 
         function editUserPrice(id) {
@@ -2070,7 +2081,7 @@
             const price = parseFloat(document.getElementById('up-buy-price').value);
 
             if (!userId || !cc || isNaN(price)) {
-                alert('Please fill all fields properly.');
+                alert(currentLang === 'ar' ? 'يرجى ملء جميع الخانات بشكل صحيح.' : 'Please fill all fields properly.');
                 return;
             }
 
@@ -2085,17 +2096,26 @@
                     fetchUserPrices();
                 } else {
                     const err = await res.json();
-                    alert(err.detail || 'Error saving custom price');
+                    alert(err.detail || (currentLang === 'ar' ? 'خطأ في حفظ السعر المخصص' : 'Error saving custom price'));
                 }
             } catch (e) { alert('Error: ' + e); }
         }
 
         async function deleteUserPrice(id) {
-            if (!confirm('Are you sure you want to delete this custom price?')) return;
+            const confirmed = await showConfirm(
+                currentLang === 'ar' ? 'هل أنت متأكد؟' : 'Are you sure?',
+                currentLang === 'ar' ? 'هل تريد حقاً حذف هذا السعر المخصص؟' : 'Do you really want to delete this custom price?',
+                currentLang === 'ar' ? 'حذف' : 'Delete',
+                'fas fa-trash', 'rgba(239, 68, 68, 0.1)', '#ef4444', 'danger'
+            );
+            if (!confirmed) return;
+            
             try {
                 const res = await fetch('/api/admin/sourcing/user-prices/' + id, { method: 'DELETE' });
                 if (res.ok) fetchUserPrices();
-                else alert('Error deleting custom price');
+                else {
+                    alert(currentLang === 'ar' ? 'خطأ في الحذف' : 'Error deleting custom price');
+                }
             } catch (e) { alert('Error: ' + e); }
         }
         let filteredPrices = null;
