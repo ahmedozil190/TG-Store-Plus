@@ -1962,7 +1962,11 @@
         function renderAdminWithdrawals(data) {
             const list = document.getElementById('withdrawals-list');
             if (!data || !data.length) {
-                list.innerHTML = '<p style="text-align:center; padding: 40px; opacity: 0.5;">No withdrawal requests found</p>';
+                list.innerHTML = `
+                <div style="text-align: center; padding: 40px 20px; background: var(--card-glass); border-radius: 16px; border: 1px dashed var(--border); margin-top: 0; backdrop-filter: blur(10px);">
+                    <i class="fas fa-hand-holding-usd" style="font-size: 2.5rem; color: var(--text-secondary); opacity: 0.15; margin-bottom: 12px;"></i>
+                    <p style="color: var(--text-secondary); font-weight: 600; font-size: 0.95rem;">No withdrawal requests found.</p>
+                </div>`;
                 return;
             }
 
@@ -2234,24 +2238,58 @@
             } catch (e) { }
         }
 
-        function searchWithdrawals() {
+        async function searchWithdrawals() {
             const q = document.getElementById('withdraw-search').value.trim().toLowerCase();
             const resetBtn = document.getElementById('reset-withdraw-search-container');
 
             if (!q) return;
 
-            resetBtn.style.display = 'block';
-            const filtered = allWithdrawals.filter(w =>
+            // Search in current tab first
+            let filtered = allWithdrawals.filter(w =>
                 String(w.user_id).includes(q) ||
                 (w.transaction_id && w.transaction_id.toLowerCase().includes(q))
             );
-            renderAdminWithdrawals(filtered);
+
+            if (filtered.length > 0) {
+                resetBtn.style.display = 'block';
+                renderAdminWithdrawals(filtered);
+                return;
+            }
+
+            // Not found in current tab, try the other tab
+            const otherStatus = currentAdminWithdrawStatus === 'pending' ? 'approved' : 'pending';
+            try {
+                const res = await fetch(`/api/admin/withdrawals/all?page=1&status=${otherStatus}`);
+                const data = await res.json();
+                const otherList = data.history || [];
+                filtered = otherList.filter(w =>
+                    String(w.user_id).includes(q) ||
+                    (w.transaction_id && w.transaction_id.toLowerCase().includes(q))
+                );
+
+                if (filtered.length > 0) {
+                    // Switch to the other tab visually
+                    currentAdminWithdrawStatus = otherStatus;
+                    allWithdrawals = otherList;
+                    document.querySelectorAll('#section-withdrawals .tab-btn').forEach(b => b.classList.remove('active'));
+                    document.getElementById(`withdraw-tab-${otherStatus}`).classList.add('active');
+                    resetBtn.style.display = 'block';
+                    renderAdminWithdrawals(filtered);
+                } else {
+                    resetBtn.style.display = 'block';
+                    renderAdminWithdrawals([]);
+                }
+            } catch (e) {
+                console.error(e);
+                resetBtn.style.display = 'block';
+                renderAdminWithdrawals([]);
+            }
         }
 
         function resetWithdrawSearch() {
             document.getElementById('withdraw-search').value = '';
             document.getElementById('reset-withdraw-search-container').style.display = 'none';
-            renderAdminWithdrawals(allWithdrawals);
+            fetchAdminWithdrawals(1, currentAdminWithdrawStatus);
         }
 
         function switchTab(tab, btn) {
