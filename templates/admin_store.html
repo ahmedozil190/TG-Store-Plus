@@ -509,10 +509,12 @@
         @keyframes fadeIn {
             from {
                 opacity: 0;
+                transform: translateY(25px);
             }
 
             to {
                 opacity: 1;
+                transform: translateY(0);
             }
         }
 
@@ -1800,13 +1802,24 @@
             document.getElementById('navOverlay').classList.remove('show');
         }
 
+        function smoothScrollTo(elementId) {
+            const scroller = document.getElementById('app-content-scroller');
+            const el = document.getElementById(elementId);
+            if (scroller && el) {
+                const scrollerRect = scroller.getBoundingClientRect();
+                const elRect = el.getBoundingClientRect();
+                const targetTop = elRect.top - scrollerRect.top + scroller.scrollTop - 20;
+                scroller.scrollTo({ top: targetTop, behavior: 'smooth' });
+            }
+        }
+
         function switchNav(id, btn, skipToggle = false) {
             if (!skipToggle) closeNav();
             // Hide all first to avoid visual jump during scroll reset
             document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
 
             const scroller = document.getElementById('app-content-scroller');
-            if (scroller) scroller.scrollTo({ top: 0, behavior: 'smooth' });
+            if (scroller) scroller.scrollTop = 0;
 
             document.getElementById('section-' + id).classList.add('active');
             document.querySelectorAll('.nav-item').forEach(m => m.classList.remove('active'));
@@ -2013,8 +2026,7 @@
             if (currentPage > 1) {
                 currentPage--;
                 renderUsers(filteredUsers || allUsers);
-                const scroller = document.getElementById('app-content-scroller');
-                if (scroller) scroller.scrollTo({ top: 0, behavior: 'smooth' });
+                smoothScrollTo('user-mgmt-section');
             }
         }
         function nextPage() {
@@ -2024,8 +2036,7 @@
             if (currentPage < totalPages) {
                 currentPage++;
                 renderUsers(list);
-                const scroller = document.getElementById('app-content-scroller');
-                if (scroller) scroller.scrollTo({ top: 0, behavior: 'smooth' });
+                smoothScrollTo('user-mgmt-section');
             }
         }
 
@@ -2172,8 +2183,7 @@
             if (currentPricePage > 1) {
                 currentPricePage--;
                 renderPrices(filteredPrices || allPrices);
-                const scroller = document.getElementById('app-content-scroller');
-                if (scroller) scroller.scrollTo({ top: 0, behavior: 'smooth' });
+                smoothScrollTo('price-mgmt-section');
             }
         }
 
@@ -2183,8 +2193,7 @@
             if (currentPricePage < totalPages) {
                 currentPricePage++;
                 renderPrices(list);
-                const scroller = document.getElementById('app-content-scroller');
-                if (scroller) scroller.scrollTo({ top: 0, behavior: 'smooth' });
+                smoothScrollTo('price-mgmt-section');
             }
         }
 
