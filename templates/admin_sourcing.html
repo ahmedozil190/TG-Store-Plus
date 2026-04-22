@@ -620,15 +620,7 @@
             font-size: 1.1rem;
             flex-shrink: 0;
         }
-
-        #withdrawals-history-card, 
-        #user-mgmt-section, 
-        #price-mgmt-section, 
-        #history-section-card,
-        #section-settings {
-            scroll-margin-top: 25px;
-        }
-
+        
         /* ========== Pagination ========== */
         .pagination-ctrls {
             display: flex;
@@ -2181,19 +2173,6 @@
             titleEl.innerText = translations[currentLang][titleMap[id]] || "Withdrawals";
 
             if (id === 'withdrawals') fetchAdminWithdrawals(1, 'pending');
-            
-            // Scroll to the section if it's not the home section (already at top)
-            if (id !== 'home') {
-                const targetId = {
-                    users: 'user-mgmt-section',
-                    prices: 'price-mgmt-section',
-                    history: 'history-section-card',
-                    withdrawals: 'withdrawals-history-card',
-                    settings: 'section-settings'
-                }[id];
-                const el = document.getElementById(targetId);
-                if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }
         }
 
         async function init() {
@@ -2311,7 +2290,7 @@
         function resetWithdrawSearch() {
             document.getElementById('withdraw-search').value = '';
             document.getElementById('reset-withdraw-search-container').style.display = 'none';
-            fetchAdminWithdrawals(1, currentAdminWithdrawStatus, true);
+            fetchAdminWithdrawals(1, currentAdminWithdrawStatus);
         }
 
         function switchTab(tab, btn) {
@@ -2337,7 +2316,6 @@
             currentPage = 1;
             document.getElementById('reset-search-container').style.display = 'none';
             renderUsers(allUsers);
-            document.getElementById('user-mgmt-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
 
         function renderUsers(list) {
@@ -2574,7 +2552,7 @@
         let totalAdminHistoryPages = 1;
         const ADMIN_HISTORY_LIMIT = 10;
 
-        async function fetchAdminHistory(page, doScroll = false) {
+        async function fetchAdminHistory(page) {
             try {
                 const res = await fetch(`/api/admin/sourcing/history?page=${page}&limit=${ADMIN_HISTORY_LIMIT}`);
                 const data = await res.json();
@@ -2584,10 +2562,6 @@
 
                 renderHistory(data.history);
                 updateAdminHistoryPagination();
-                if (doScroll) {
-                    const el = document.getElementById('history-section-card');
-                    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                }
             } catch (e) { console.error("Admin History error:", e); }
         }
 
@@ -2602,7 +2576,8 @@
         async function moveAdminHistoryPage(delta) {
             const nextP = currentAdminHistoryPage + delta;
             if (nextP >= 1 && nextP <= totalAdminHistoryPages) {
-                await fetchAdminHistory(nextP, true);
+                await fetchAdminHistory(nextP);
+                document.getElementById('history-section-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
             }
         }
 
@@ -2642,7 +2617,6 @@
             currentPricePage = 1;
             document.getElementById('reset-price-search-container').style.display = 'none';
             renderPrices(allPrices);
-            document.getElementById('price-mgmt-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
 
         function prevPricePage() {
