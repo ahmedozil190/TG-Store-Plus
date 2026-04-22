@@ -1940,7 +1940,7 @@
                 totalAdminWithdrawPages = data.total_pages;
                 updateWithdrawPagination();
                 // Scroll to top of withdrawals section
-                const el = document.getElementById('withdrawals-list');
+                const el = document.getElementById('section-withdrawals');
                 if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
             } catch (e) { console.error(e); }
         }
