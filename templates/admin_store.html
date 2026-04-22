@@ -1802,12 +1802,13 @@
 
         function switchNav(id, btn, skipToggle = false) {
             if (!skipToggle) closeNav();
-            // Switch section then smooth scroll to top
+            // Hide all first to avoid visual jump during scroll reset
             document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
-            document.getElementById('section-' + id).classList.add('active');
 
             const scroller = document.getElementById('app-content-scroller');
             if (scroller) scroller.scrollTo({ top: 0, behavior: 'smooth' });
+
+            document.getElementById('section-' + id).classList.add('active');
             document.querySelectorAll('.nav-item').forEach(m => m.classList.remove('active'));
             if (btn) btn.classList.add('active');
 
