@@ -1611,7 +1611,7 @@
                     </div>
                 </div>
 
-                <div class="card" style="padding: 22px;">
+                <div id="withdrawals-history-card" class="card" style="padding: 22px;">
                     <div class="section-header" style="margin-top: 0; margin-bottom: 20px;">
                         <h2 data-i18n="nav_withdrawals" style="margin: 0; font-size: 1rem;">Withdrawal Requests</h2>
                     </div>
@@ -1939,8 +1939,8 @@
                 renderAdminWithdrawals(allWithdrawals);
                 totalAdminWithdrawPages = data.total_pages;
                 updateWithdrawPagination();
-                // Scroll to top of withdrawals section
-                const el = document.getElementById('section-withdrawals');
+                // Scroll to top of withdrawals card
+                const el = document.getElementById('withdrawals-history-card');
                 if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
             } catch (e) { console.error(e); }
         }
