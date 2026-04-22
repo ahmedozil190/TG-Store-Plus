@@ -98,6 +98,21 @@
             flex-shrink: 0;
         }
 
+        .bottom-bar {
+            height: 60px;
+            background: var(--bg-elevated);
+            border-top: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 20px;
+            z-index: 1000;
+            flex-shrink: 0;
+            font-size: 0.85rem;
+            color: var(--text-s);
+            font-weight: 600;
+        }
+
         .nav-trigger {
             width: 44px; height: 44px; border-radius: 12px;
             background: var(--card-glass); border: 1px solid var(--border);
@@ -105,14 +120,19 @@
             font-size: 1.2rem; cursor: pointer; color: var(--text-p);
         }
 
-        .page-title { font-size: 1rem; font-weight: 800; letter-spacing: 0.5px; opacity: 0.9; }
-
-        .user-balance {
-            padding: 8px 16px; border-radius: 12px;
-            background: var(--card-glass); border: 1px solid var(--border);
-            display: flex; align-items: center; gap: 8px; cursor: pointer;
+        .page-title {
+            font-size: 1rem;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            opacity: 0.9;
         }
-        .balance-val { font-weight: 800; color: var(--success); }
+
+        .user-avatar {
+            width: 44px; height: 44px; border-radius: 12px;
+            background: var(--accent); color: white;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 800; border: 1px solid var(--border);
+        }
 
         /* ─── Sidebar ─── */
         .sidebar {
@@ -262,10 +282,7 @@
             <i class="fas fa-bars"></i>
         </div>
         <div class="page-title" id="view-title" data-i18n="nav_home">Dashboard</div>
-        <div class="user-balance" onclick="switchNav('history', document.getElementById('m-history'))">
-            <i class="fas fa-wallet" style="color: var(--text-s);"></i>
-            <span class="balance-val" id="top-balance">$0.00</span>
-        </div>
+        <div class="user-avatar" id="userInitial">U</div>
     </header>
 
     <main class="main-content">
@@ -380,7 +397,9 @@
         </div>
     </div>
 
-    <script>
+    <footer class="bottom-bar" id="main-footer">
+        @BotName
+    </footer>
         const tg = window.Telegram.WebApp;
         tg.expand();
 
@@ -468,16 +487,21 @@
                 const res = await fetch(`/api/store/data?user_id=${userId}`);
                 const data = await res.json();
                 
-                // Set balance from nested structure
+                // Set balance
                 if (data.user) {
                     updateBalanceUI(data.user.balance || 0);
                     document.getElementById('side-user-id').innerText = userId;
                 }
+
+                // Initial for avatar
+                const uname = tg.initDataUnsafe?.user?.first_name || "U";
+                document.getElementById('userInitial').innerText = uname.charAt(0).toUpperCase();
                 
-                // Load countries automatically if in store view
-                countries = data.countries || [];
+                // Sidebar & Footer Bot Handle
                 if (data.bot_name) {
-                    document.getElementById('side-bot-handle').innerText = '@' + data.bot_name.replace(/\s+/g, '') + 'Bot';
+                    const cleanName = data.bot_name.replace(/\s+/g, '');
+                    document.getElementById('side-bot-handle').innerText = '@' + cleanName + 'bot';
+                    document.getElementById('main-footer').innerText = '@' + cleanName + 'bot';
                 }
                 if (document.getElementById('section-store').classList.contains('active')) {
                     renderCountries(countries);
@@ -502,7 +526,6 @@
 
         function updateBalanceUI(val) {
             const formatted = `$${parseFloat(val).toFixed(2)}`;
-            document.getElementById('top-balance').innerText = formatted;
             document.getElementById('dash-balance').innerText = formatted;
         }
 

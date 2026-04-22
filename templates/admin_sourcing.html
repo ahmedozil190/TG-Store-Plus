@@ -1916,7 +1916,7 @@
                 const data = await res.json();
                 currentAdminWithdrawPage = data.current_page;
                 totalAdminWithdrawPages = data.total_pages;
-                renderWithdrawals(data.history);
+                renderAdminWithdrawals(data.history);
                 updateWithdrawPagination();
             } catch (e) { console.error("Withdrawals fetch error:", e); }
         }
@@ -1932,15 +1932,16 @@
             if (next) next.disabled = (currentAdminWithdrawPage >= totalAdminWithdrawPages);
         }
 
-        function renderWithdrawals(list) {
+        function renderAdminWithdrawals(list) {
             const container = document.getElementById('withdrawals-list');
             if (!container) return;
             if (!list || !list.length) {
                 container.innerHTML = `
-                <div style="text-align: center; padding: 40px 20px; background: var(--card-glass); border-radius: 16px; border: 1px dashed var(--border);">
-                    <i class="fas fa-money-bill-transfer" style="font-size: 2.5rem; color: var(--text-secondary); opacity: 0.15; margin-bottom: 12px;"></i>
-                    <p style="color: var(--text-secondary); font-weight: 600;">No withdrawal requests found</p>
+                <div style="text-align: center; padding: 60px 20px; background: var(--card-glass); border-radius: 20px; border: 1px dashed var(--border); margin-top: 10px;">
+                    <i class="fas fa-money-check-dollar" style="font-size: 3rem; color: var(--text-secondary); opacity: 0.2; margin-bottom: 20px; display: block;"></i>
+                    <p style="color: var(--text-secondary); font-weight: 700; font-size: 1rem;">No withdrawal requests found</p>
                 </div>`;
+                document.getElementById('withdraw-pagination').style.display = 'none';
                 return;
             }
 
