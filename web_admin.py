@@ -1157,7 +1157,7 @@ async def get_withdrawals(user_id: int, page: int = 1, status: str = "all"):
 
 @app.get("/api/admin/withdrawals/all")
 async def admin_get_all_withdrawals(page: int = 1, status: str = "all"):
-    page_size = 20
+    page_size = 10
     offset = (page - 1) * page_size
     async with async_session() as session:
         # Build base filter
