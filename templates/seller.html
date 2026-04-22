@@ -204,6 +204,27 @@
             flex: 1;
         }
 
+        /* ========== Card Scale Effects ========== */
+        .user-card {
+            background: var(--bg-elevated);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 18px;
+            margin-top: 0;
+            position: relative;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .user-card:hover {
+            transform: scale(1.02);
+            border-color: var(--accent);
+        }
+
+        .user-card:active {
+            transform: scale(0.98);
+        }
+
         .nav-item {
             padding: 16px 20px;
             border-radius: 16px;
@@ -1736,7 +1757,7 @@
 
                 data.history.forEach(h => {
                     const item = document.createElement('div');
-                    item.className = 'history-item';
+                    item.className = 'user-card';
                     item.style.marginBottom = "15px";
 
                     let statusColor = '#f59e0b'; // PENDING (Orange)
@@ -1750,14 +1771,11 @@
                         statusText = 'REJECTED';
                     }
 
-                    const rowS = "background: var(--bg-elevated); border: 1px solid var(--border); padding: 14px 18px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; gap: 15px;";
+                    const rowS = "background: transparent; border: 1px solid var(--border); padding: 14px 18px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; gap: 15px; margin-bottom: 8px;";
                     const lblS = "color: var(--text-secondary); font-size: 0.8rem; font-weight: 700; text-transform: uppercase;";
 
-                    // Format address to show start...end
-                    const shortAddr = h.address.length > 15 ? (h.address.substring(0, 8) + '...' + h.address.slice(-6)) : h.address;
-
                     item.innerHTML = `
-                        <div style="display: flex; flex-direction: column; gap: 10px; width: 100%;">
+                        <div style="display: flex; flex-direction: column;">
                             <div style="${rowS}">
                                 <span style="${lblS}">STATUS</span>
                                 <span style="color: ${statusColor}; font-weight: 800; font-size: 0.85rem; text-transform: uppercase;">
@@ -1774,9 +1792,9 @@
                             </div>
                             <div style="${rowS}">
                                 <span style="${lblS}">ADDRESS</span>
-                                <span style="color: #3b82f6; font-weight: 600; font-size: 0.85rem; text-align: right; direction: ltr;">${shortAddr}</span>
+                                <span style="color: #3b82f6; font-weight: 600; font-size: 0.85rem; text-align: right; direction: ltr;">${h.address}</span>
                             </div>
-                            <div style="${rowS}">
+                            <div style="${rowS}; margin-bottom: 0;">
                                 <span style="${lblS}">DATE</span>
                                 <span style="color: #fdd835; font-weight: 600; font-size: 0.85rem; text-align: right;">${h.date}</span>
                             </div>

@@ -1952,37 +1952,30 @@
             }
 
             list.innerHTML = data.map(item => {
+                const statusUpper = item.status.toUpperCase();
                 let statusColor = 'var(--warning)';
-                if (item.status === 'APPROVED') statusColor = 'var(--success)';
-                if (item.status === 'REJECTED') statusColor = 'var(--error)';
+                if (statusUpper === 'APPROVED') statusColor = 'var(--success)';
+                if (statusUpper === 'REJECTED') statusColor = 'var(--error)';
 
-                const isPending = item.status === 'PENDING';
+                const isPending = statusUpper === 'PENDING';
                 const rowS = "background: transparent; border: 1px solid var(--border); padding: 14px 18px; border-radius: 12px; display: flex; justify-content: space-between; align-items: flex-start; gap: 15px; margin-bottom: 8px;";
                 const lblS = "color: var(--text-secondary); font-size: 0.8rem; font-weight: 700; text-transform: uppercase; flex-shrink: 0;";
                 const valS = "font-weight: 700; font-size: 0.95rem; text-align: right; word-break: break-all;";
                 
                 return `
-                    <div class="card no-shadow" style="margin-bottom: 25px; padding: 18px; border: 1px solid var(--border); background: var(--bg-elevated); border-radius: 20px;">
+                    <div class="user-card" style="margin-bottom: 25px; padding: 18px; border: 1px solid var(--border); background: var(--bg-elevated); border-radius: 20px;">
                         <div style="display: flex; flex-direction: column;">
                             <div style="${rowS}">
                                 <span style="${lblS}">Status</span>
-                                <span style="${valS}; color: ${statusColor}; text-transform: uppercase;">${item.status}</span>
-                            </div>
-                            <div style="${rowS}">
-                                <span style="${lblS}">User ID</span>
-                                <span style="${valS}; color: var(--accent); cursor: pointer;" onclick="searchUserById(${item.user_id})">#${item.user_id}</span>
-                            </div>
-                            <div style="${rowS}">
-                                <span style="${lblS}">ID</span>
-                                <span style="${valS}; color: var(--accent-purple);">${item.transaction_id}</span>
+                                <span style="${valS}; color: ${statusColor}; text-transform: uppercase;">${statusUpper}</span>
                             </div>
                             <div style="${rowS}">
                                 <span style="${lblS}">Amount</span>
-                                <span style="${valS}; color: var(--success); font-weight: 800;">$${item.amount.toFixed(2)}</span>
+                                <span style="${valS}; color: var(--success); font-weight: 800;">$${parseFloat(item.amount).toFixed(2)}</span>
                             </div>
                             <div style="${rowS}">
-                                <span style="${lblS}">Method</span>
-                                <span style="${valS}; color: var(--text-p);">${item.method}</span>
+                                <span style="${lblS}">ID</span>
+                                <span style="${valS}; color: var(--accent-purple);">${item.transaction_id || item.id}</span>
                             </div>
                             <div style="${rowS}">
                                 <span style="${lblS}">Address</span>
