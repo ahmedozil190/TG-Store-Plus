@@ -1606,12 +1606,11 @@
                 </div>
 
                 <div class="card" style="padding: 22px;">
-                    <div class="section-header"
-                        style="margin-top: 0; margin-bottom: 25px; display: flex; align-items: center; justify-content: space-between;">
+                    <div class="section-header" style="margin-top: 0; margin-bottom: 25px; display: flex; align-items: center; justify-content: space-between;">
                         <h2 data-i18n="nav_withdrawals" style="margin: 0; font-size: 1rem;">Withdrawal Requests</h2>
-                        <div class="tabs-container" style="display: flex; gap: 8px; background: var(--bg); padding: 4px; border-radius: 12px; border: 1px solid var(--border); width: 220px; margin-left: auto;">
-                            <button class="tab-btn active" id="withdraw-tab-pending" onclick="switchWithdrawTab('pending', this)" style="padding: 8px; font-size: 0.75rem;">PENDING</button>
-                            <button class="tab-btn" id="withdraw-tab-approved" onclick="switchWithdrawTab('approved', this)" style="padding: 8px; font-size: 0.75rem;">APPROVED</button>
+                        <div class="tabs-row" style="width: 250px; margin-left: auto; margin-bottom: 0;">
+                            <button class="tab-btn active" id="withdraw-tab-pending" onclick="switchWithdrawTab('pending', this)">PENDING</button>
+                            <button class="tab-btn" id="withdraw-tab-approved" onclick="switchWithdrawTab('approved', this)">APPROVED</button>
                         </div>
                     </div>
                     <div class="list-container" id="withdrawals-list"></div>
