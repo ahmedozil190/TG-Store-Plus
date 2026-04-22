@@ -1359,29 +1359,6 @@
             background-clip: padding-box;
         }
 
-        /* ========== Toast ========== */
-        .toast {
-            position: fixed;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%) translateY(100px);
-            background: var(--bg-elevated);
-            color: var(--text-p);
-            padding: 14px 24px;
-            border-radius: 50px;
-            border: 1px solid var(--border);
-            z-index: 10000;
-            transition: transform 0.4s var(--ease);
-            font-weight: 600;
-            white-space: nowrap;
-            pointer-events: none;
-            box-shadow: var(--shadow);
-            font-size: 0.85rem;
-        }
-
-        .toast.show {
-            transform: translateX(-50%) translateY(0);
-        }
     </style>
 </head>
 
@@ -2050,7 +2027,6 @@
                 });
                 const data = await res.json();
                 if (data.ok) {
-                    showToast(currentLang === 'ar' ? 'تم القبول بنجاح!' : 'Withdrawal Approved!');
                     refreshDashboardStats();
                     fetchAdminWithdrawals(); // Refresh list
                 } else {
@@ -2070,7 +2046,6 @@
                 });
                 const data = await res.json();
                 if (data.ok) {
-                    showToast(currentLang === 'ar' ? 'تم الرفض بنجاح!' : 'Withdrawal Rejected!');
                     refreshDashboardStats();
                     fetchAdminWithdrawals(); // Refresh list
                 } else {
@@ -2909,13 +2884,6 @@
             }
         }
 
-        function showToast(msg) {
-            const t = document.getElementById('toast');
-            document.getElementById('toast-msg').innerText = msg;
-            t.classList.add('show');
-            setTimeout(() => t.classList.remove('show'), 3000);
-        }
-
         function saveSettings() {
             alert(currentLang === 'ar' ? 'تم حفظ الإعدادات بنجاح!' : 'Settings saved successfully!');
         }
@@ -3013,7 +2981,6 @@
             </div>
         </div>
     </div>
-    <div id="toast" class="toast"><i class="fas fa-check-circle"></i> <span id="toast-msg">Success</span></div>
 </body>
 
 </html>

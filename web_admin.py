@@ -1163,7 +1163,14 @@ async def admin_get_all_withdrawals(page: int = 1, status: str = "all"):
         # Build base filter
         filters = []
         if status != "all":
-            filters.append(WithdrawalRequest.status == status.lower())
+            # Map string to Enum member safely
+            s_map = {
+                "pending": WithdrawalStatus.PENDING, 
+                "approved": WithdrawalStatus.APPROVED, 
+                "rejected": WithdrawalStatus.REJECTED
+            }
+            if status.lower() in s_map:
+                filters.append(WithdrawalRequest.status == s_map[status.lower()])
             
         # Count total
         count_stmt = select(func.count(WithdrawalRequest.id)).where(*filters)
