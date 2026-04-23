@@ -1438,11 +1438,11 @@
                     </div>
                     <div class="info-card">
                         <div class="info-card-l">
-                            <span class="info-card-lbl" data-i18n="total_balance">TOTAL BALANCE</span>
-                            <div class="info-card-val"><span id="stat-total-balance">$0.00</span></div>
+                            <span class="info-card-lbl" data-i18n="stat_total_paid">TOTAL PAID</span>
+                            <div class="info-card-val"><span id="home-stat-total-paid">$0.00</span></div>
                         </div>
                         <div class="info-card-icon" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">
-                            <i class="fas fa-wallet"></i>
+                            <i class="fas fa-file-invoice-dollar"></i>
                         </div>
                     </div>
                 </div>
@@ -1886,7 +1886,7 @@
                 stat_section: "Inventory",
                 stat_total: "TOTAL ACCOUNTS",
                 stat_pending: "PENDING APPROVAL",
-                total_balance: "TOTAL BALANCE",
+                stat_total_paid: "TOTAL PAID",
                 recent_ops: "Recent Operations",
                 buying_prices: "Buying Prices",
                 btn_add: "Add",
@@ -1960,7 +1960,7 @@
                 stat_section: "المخزون",
                 stat_total: "إجمالي الحسابات",
                 stat_pending: "بانتظار الموافقة",
-                total_balance: "إجمالي الأرصدة",
+                stat_total_paid: "إجمالي المدفوعات",
                 recent_ops: "أحدث العمليات",
                 buying_prices: "أسعار الشراء",
                 btn_add: "إضافة",
@@ -2611,7 +2611,8 @@
                 const uIEl = document.getElementById('userInitial');
                 if (uIEl) uIEl.textContent = uname.charAt(0).toUpperCase();
                 document.getElementById('stat-pending').innerText = data.stats.pending_count;
-                document.getElementById('stat-total-balance').innerText = `$${Number(data.stats.total_balance).toFixed(2)}`;
+                const htpEl = document.getElementById('home-stat-total-paid');
+                if (htpEl) htpEl.innerText = `$${parseFloat(data.stats.total_paid_amount || 0).toFixed(2)}`;
 
                 // History Stats
                 document.getElementById('stat-history-pending').innerText = data.stats.pending_count;
