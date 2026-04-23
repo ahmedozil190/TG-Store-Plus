@@ -1417,28 +1417,69 @@
                     <i class="fas fa-database"></i>
                     <h2 data-i18n="stat_section">Inventory</h2>
                 </div>
-                <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 30px;">
-                    <div class="card stat-row">
-                        <span class="label" data-i18n="stat_total">TOTAL ACCOUNTS</span>
-                        <span class="value" id="stat-total-sourced" style="color: var(--success);">0</span>
+                <div style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 30px;">
+                    <div class="info-card">
+                        <div class="info-card-l">
+                            <span class="info-card-lbl" data-i18n="stat_total">TOTAL ACCOUNTS</span>
+                            <div class="info-card-val"><span id="stat-total-sourced">0</span> <span style="font-size: 0.9rem; margin-left: 5px; opacity: 0.8;">ACCOUNTS</span></div>
+                        </div>
+                        <div class="info-card-icon" style="background: rgba(34, 197, 94, 0.1); color: var(--success);">
+                            <i class="fas fa-box-archive"></i>
+                        </div>
                     </div>
-                    <div class="card stat-row">
-                        <span class="label" data-i18n="stat_pending">PENDING APPROVAL</span>
-                        <span class="value" id="stat-pending" style="color: var(--warning);">0</span>
+                    <div class="info-card">
+                        <div class="info-card-l">
+                            <span class="info-card-lbl" data-i18n="stat_pending">PENDING APPROVAL</span>
+                            <div class="info-card-val"><span id="stat-pending">0</span> <span style="font-size: 0.9rem; margin-left: 5px; opacity: 0.8;">PENDING</span></div>
+                        </div>
+                        <div class="info-card-icon" style="background: rgba(245, 158, 11, 0.1); color: var(--warning);">
+                            <i class="fas fa-clock-rotate-left"></i>
+                        </div>
                     </div>
-                    <div class="card stat-row">
-                        <span class="label" data-i18n="total_balance">TOTAL BALANCE</span>
-                        <span class="value" id="stat-total-balance" style="color: #30d158;">$0.00</span>
+                    <div class="info-card">
+                        <div class="info-card-l">
+                            <span class="info-card-lbl" data-i18n="total_balance">TOTAL BALANCE</span>
+                            <div class="info-card-val"><span id="stat-total-balance">$0.00</span></div>
+                        </div>
+                        <div class="info-card-icon" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">
+                            <i class="fas fa-wallet"></i>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Recent Operations -->
+                <!-- Customers Section -->
                 <div class="section-header">
-                    <i class="fas fa-clock-rotate-left"></i>
-                    <h2 data-i18n="recent_ops">Recent Operations</h2>
+                    <i class="fas fa-users"></i>
+                    <h2 data-i18n="nav_users">Customers</h2>
                 </div>
-                <div class="card" style="padding: 22px;">
-                    <div class="list-container" id="recent-sourced"></div>
+                <div style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 30px;">
+                    <div class="info-card">
+                        <div class="info-card-l">
+                            <span class="info-card-lbl" data-i18n="stat_total_users">TOTAL USERS</span>
+                            <div class="info-card-val"><span id="home-total-users">0</span> <span data-i18n="unit_users">USERS</span></div>
+                        </div>
+                        <div class="info-card-icon" style="background: rgba(88, 101, 242, 0.1); color: var(--accent);">
+                            <i class="fas fa-users"></i>
+                        </div>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-card-l">
+                            <span class="info-card-lbl" data-i18n="stat_active_users">ACTIVE USERS</span>
+                            <div class="info-card-val"><span id="home-active-users">0</span> <span data-i18n="unit_users">USERS</span></div>
+                        </div>
+                        <div class="info-card-icon" style="background: rgba(16, 185, 129, 0.1); color: var(--success);">
+                            <i class="fas fa-user-check"></i>
+                        </div>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-card-l">
+                            <span class="info-card-lbl" data-i18n="stat_banned">BANNED USERS</span>
+                            <div class="info-card-val"><span id="home-banned-users">0</span> <span data-i18n="unit_users">USERS</span></div>
+                        </div>
+                        <div class="info-card-icon" style="background: rgba(239, 68, 68, 0.1); color: var(--error);">
+                            <i class="fas fa-user-slash"></i>
+                        </div>
+                    </div>
                 </div>
             </section>
 
@@ -1860,6 +1901,7 @@
                 no_countries: "No countries found",
                 buy_lbl: "Buying Price",
                 stat_total_users: "TOTAL USERS",
+                stat_active_users: "ACTIVE USERS",
                 stat_banned: "BANNED USERS",
                 unit_users: "USERS",
                 btn_find: "Find",
@@ -1937,6 +1979,7 @@
                 no_countries: "لم يتم العثور على دول",
                 buy_lbl: "سعر الشراء",
                 stat_total_users: "إجمالي المستخدمين",
+                stat_active_users: "المستخدمين النشطين",
                 stat_banned: "المحظورين",
                 unit_users: "مستخدم",
                 btn_find: "بحث",
@@ -2574,6 +2617,14 @@
                 document.getElementById('stat-history-pending').innerText = data.stats.pending_count;
                 document.getElementById('stat-history-accepted').innerText = data.stats.accepted_sourced;
                 document.getElementById('stat-history-rejected').innerText = data.stats.rejected_sourced;
+
+                // Home User Stats
+                const huTotal = document.getElementById('home-total-users');
+                const huActive = document.getElementById('home-active-users');
+                const huBanned = document.getElementById('home-banned-users');
+                if (huTotal) huTotal.innerText = data.stats.total_users || 0;
+                if (huActive) huActive.innerText = data.stats.active_users || 0;
+                if (huBanned) huBanned.innerText = data.stats.banned_users || 0;
 
                 // Withdrawal Stats
                 const ws = data.stats;

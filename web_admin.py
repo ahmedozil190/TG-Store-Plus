@@ -459,6 +459,11 @@ async def get_sourcing_data():
             withdraw_rejected = (await session.execute(select(func.count(WithdrawalRequest.id)).where(WithdrawalRequest.status == WithdrawalStatus.REJECTED))).scalar() or 0
             total_paid_amount = (await session.execute(select(func.sum(WithdrawalRequest.amount)).where(WithdrawalRequest.status == WithdrawalStatus.APPROVED))).scalar() or 0
             
+            # User stats
+            total_users = (await session.execute(select(func.count(User.id)))).scalar() or 0
+            banned_users = (await session.execute(select(func.count(User.id)).where(User.is_banned_sourcing == True))).scalar() or 0
+            active_users = total_users - banned_users
+            
             recent_result = await session.execute(
                 select(Account).order_by(Account.id.desc()).limit(50)
             )
@@ -574,7 +579,10 @@ async def get_sourcing_data():
                     "withdraw_pending": withdraw_pending,
                     "withdraw_approved": withdraw_approved,
                     "withdraw_rejected": withdraw_rejected,
-                    "total_paid_amount": float(total_paid_amount)
+                    "total_paid_amount": float(total_paid_amount),
+                    "total_users": total_users,
+                    "active_users": active_users,
+                    "banned_users": banned_users
                 },
                 "recent": recent,
                 "prices": prices,
