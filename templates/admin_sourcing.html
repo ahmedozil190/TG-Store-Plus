@@ -1391,6 +1391,9 @@
             <div class="nav-item" id="menu-users" onclick="switchNav('users', this)">
                 <i class="fas fa-users-cog"></i> <span data-i18n="nav_users">Customers</span>
             </div>
+            <div class="nav-item" id="menu-withdrawals" onclick="switchNav('withdrawals', this)">
+                <i class="fas fa-hand-holding-dollar"></i> <span data-i18n="nav_withdrawals">Withdrawals</span>
+            </div>
             <div class="nav-item" id="menu-prices" onclick="switchNav('prices', this)">
                 <i class="fas fa-tags"></i> <span data-i18n="nav_prices">Buying Prices</span>
             </div>
@@ -1399,9 +1402,6 @@
             </div>
             <div class="nav-item" id="menu-history" onclick="switchNav('history', this)">
                 <i class="fas fa-clock-rotate-left"></i> <span data-i18n="nav_history">Accounts History</span>
-            </div>
-            <div class="nav-item" id="menu-withdrawals" onclick="switchNav('withdrawals', this)">
-                <i class="fas fa-hand-holding-dollar"></i> <span data-i18n="nav_withdrawals">Withdrawals</span>
             </div>
         </div>
     </div>
@@ -1443,6 +1443,41 @@
                         </div>
                         <div class="info-card-icon" style="background: rgba(239, 68, 68, 0.1); color: var(--error);">
                             <i class="fas fa-circle-xmark"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Customers Section -->
+                <div class="section-header">
+                    <i class="fas fa-users"></i>
+                    <h2 data-i18n="nav_users">Customers</h2>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 30px;">
+                    <div class="info-card">
+                        <div class="info-card-l">
+                            <span class="info-card-lbl" data-i18n="stat_total_users">TOTAL USERS</span>
+                            <div class="info-card-val"><span id="home-total-users">0</span> <span data-i18n="unit_users">USERS</span></div>
+                        </div>
+                        <div class="info-card-icon" style="background: rgba(88, 101, 242, 0.1); color: var(--accent);">
+                            <i class="fas fa-users"></i>
+                        </div>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-card-l">
+                            <span class="info-card-lbl" data-i18n="stat_active_users">ACTIVE USERS</span>
+                            <div class="info-card-val"><span id="home-active-users">0</span> <span data-i18n="unit_users">USERS</span></div>
+                        </div>
+                        <div class="info-card-icon" style="background: rgba(16, 185, 129, 0.1); color: var(--success);">
+                            <i class="fas fa-user-check"></i>
+                        </div>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-card-l">
+                            <span class="info-card-lbl" data-i18n="stat_banned">BANNED USERS</span>
+                            <div class="info-card-val"><span id="home-banned-users">0</span> <span data-i18n="unit_users">USERS</span></div>
+                        </div>
+                        <div class="info-card-icon" style="background: rgba(239, 68, 68, 0.1); color: var(--error);">
+                            <i class="fas fa-user-slash"></i>
                         </div>
                     </div>
                 </div>
@@ -1512,41 +1547,6 @@
                         </div>
                         <div class="info-card-icon" style="background: rgba(139, 92, 246, 0.1); color: #8b5cf6;">
                             <i class="fas fa-user-tag"></i>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Customers Section -->
-                <div class="section-header">
-                    <i class="fas fa-users"></i>
-                    <h2 data-i18n="nav_users">Customers</h2>
-                </div>
-                <div style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 30px;">
-                    <div class="info-card">
-                        <div class="info-card-l">
-                            <span class="info-card-lbl" data-i18n="stat_total_users">TOTAL USERS</span>
-                            <div class="info-card-val"><span id="home-total-users">0</span> <span data-i18n="unit_users">USERS</span></div>
-                        </div>
-                        <div class="info-card-icon" style="background: rgba(88, 101, 242, 0.1); color: var(--accent);">
-                            <i class="fas fa-users"></i>
-                        </div>
-                    </div>
-                    <div class="info-card">
-                        <div class="info-card-l">
-                            <span class="info-card-lbl" data-i18n="stat_active_users">ACTIVE USERS</span>
-                            <div class="info-card-val"><span id="home-active-users">0</span> <span data-i18n="unit_users">USERS</span></div>
-                        </div>
-                        <div class="info-card-icon" style="background: rgba(16, 185, 129, 0.1); color: var(--success);">
-                            <i class="fas fa-user-check"></i>
-                        </div>
-                    </div>
-                    <div class="info-card">
-                        <div class="info-card-l">
-                            <span class="info-card-lbl" data-i18n="stat_banned">BANNED USERS</span>
-                            <div class="info-card-val"><span id="home-banned-users">0</span> <span data-i18n="unit_users">USERS</span></div>
-                        </div>
-                        <div class="info-card-icon" style="background: rgba(239, 68, 68, 0.1); color: var(--error);">
-                            <i class="fas fa-user-slash"></i>
                         </div>
                     </div>
                 </div>
