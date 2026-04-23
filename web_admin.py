@@ -378,16 +378,31 @@ async def get_store_data(user_id: int = None):
                     "count": count
                 })
             
-            # User balance
+            # User balance & Stats
             balance = 0.0
+            total_orders = 0
             if user_id:
                 user = await session.get(User, user_id)
                 if user:
                     balance = user.balance_store
+                    total_orders = (await session.execute(select(func.count(Account.id)).where(Account.buyer_id == user_id))).scalar() or 0
+
+            # Calculate Stats
+            total_numbers = sum(c['count'] for c in countries)
+            countries_count = len(set(c['name'] for c in countries))
+            lowest_price = min((c['buy_price'] for c in countries), default=0.0)
 
         return {
             "countries": countries,
-            "user": {"balance": balance}
+            "user": {
+                "balance": balance,
+                "total_orders": total_orders
+            },
+            "stats": {
+                "total_numbers": total_numbers,
+                "countries_count": countries_count,
+                "lowest_price": lowest_price
+            }
         }
     except Exception as e:
         logger.error(f"Store Data Error: {e}")
