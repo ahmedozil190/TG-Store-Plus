@@ -1035,10 +1035,11 @@ async def get_seller_data(user_id: int):
             # Get custom user prices
             from database.models import UserCountryPrice
             custom_prices_result = await session.execute(select(UserCountryPrice).where(UserCountryPrice.user_id == user_id))
-            custom_prices = {cp.country_code: cp.buy_price for cp in custom_prices_result.scalars().all()}
+            # Map by (code, iso) -> price
+            custom_prices = {(cp.country_code, cp.iso_code): cp.buy_price for cp in custom_prices_result.scalars().all()}
             
             formatted_prices = []
-            seen_codes = set()
+            seen_global_keys = set() # Store (code, iso)
             
             # First, add global prices, applying custom overrides if they exist
             for p in prices:
@@ -1048,7 +1049,10 @@ async def get_seller_data(user_id: int):
                     default_name = resolve_country_info(p.country_code)[0]
                     name = p.country_name if p.country_name and p.country_name != "Unknown" else default_name
                     
-                    price_val = custom_prices.get(p.country_code, p.buy_price)
+                    # Check for specific ISO override, fallback to 'XX' override, fallback to global
+                    price_val = custom_prices.get((p.country_code, iso), 
+                                               custom_prices.get((p.country_code, 'XX'), p.buy_price))
+                    
                     if price_val > 0:
                         formatted_prices.append({
                             "name": name,
@@ -1056,15 +1060,26 @@ async def get_seller_data(user_id: int):
                             "code": p.country_code,
                             "price": price_val
                         })
-                        seen_codes.add(p.country_code)
+                        seen_global_keys.add((p.country_code, iso))
                 except Exception as inner_e:
                     logger.error(f"Error processing price for code {p.country_code}: {inner_e}")
                     
-            # Next, add any custom prices that are NOT in the global active list
-            for cc, cp_buy_price in custom_prices.items():
-                if cc not in seen_codes and cp_buy_price > 0:
+            # Next, add any custom prices that are NOT in the global active list (Private Countries)
+            for (cc, iso), cp_buy_price in custom_prices.items():
+                if (cc, iso) not in seen_global_keys and cp_buy_price > 0:
                     try:
                         n, f, _ = resolve_country_info(cc)
+                        # If we have a specific ISO, try to get its flag and name
+                        if iso and iso != 'XX':
+                            import pycountry
+                            from web_admin import get_flag_emoji
+                            f = get_flag_emoji(iso)
+                            country = pycountry.countries.get(alpha_2=iso)
+                            if country:
+                                import re
+                                n = country.name
+                                n = re.sub(r'\s*\(?[A-Z]{2,3}\)?\s*$', '', n).strip()
+                        
                         name = n if n != "Unknown" else f"Code {cc}"
                         formatted_prices.append({
                             "name": name,
