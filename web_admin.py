@@ -1113,41 +1113,47 @@ async def seller_request_otp(data: SellerOTPRequest):
             if existing:
                 raise HTTPException(status_code=400, detail="This account already exists in the system.")
 
-        # Pre-check 2: Country availability & Pricing
+        # 2. Country & Pricing Check
         try:
-            parsed = phonenumbers.parse(phone)
+            # Clean phone and parse
+            phone_p = phone if phone.startswith("+") else "+" + phone
+            parsed = phonenumbers.parse(phone_p)
             cc = str(parsed.country_code)
             target_iso = phonenumbers.region_code_for_number(parsed) or 'XX'
             
             async with async_session() as session:
                 from sqlalchemy import or_
-                # 1. Try to find a global CountryPrice (Specific ISO or fallback XX, with or without + in code)
-                cc_clean = cc.lstrip('+')
-                cc_with_plus = "+" + cc_clean
+                # Fetch all possible price candidates for this country code
+                # This covers both specific ISO and global 'XX' entries
                 
-                cp_stmt = select(CountryPrice).where(
-                    or_(CountryPrice.country_code == cc_clean, CountryPrice.country_code == cc_with_plus),
-                    or_(CountryPrice.iso_code == target_iso, CountryPrice.iso_code == 'XX')
-                ).order_by(CountryPrice.iso_code.asc()) # Prefer specific ISO
-                cp = (await session.execute(cp_stmt)).scalars().first()
-                
-                # 2. Check for custom user price override
+                # Check User Specific Prices first
                 ucp_stmt = select(UserCountryPrice).where(
-                    UserCountryPrice.user_id == data.user_id, 
-                    or_(UserCountryPrice.country_code == cc_clean, UserCountryPrice.country_code == cc_with_plus),
-                    or_(UserCountryPrice.iso_code == target_iso, UserCountryPrice.iso_code == 'XX')
-                ).order_by(UserCountryPrice.iso_code.asc())
-                ucp = (await session.execute(ucp_stmt)).scalars().first()
+                    UserCountryPrice.user_id == data.user_id,
+                    UserCountryPrice.country_code == cc
+                )
+                ucp_list = (await session.execute(ucp_stmt)).scalars().all()
                 
-                # 3. Determine final buy price
+                # Filter for best ISO match (Specific > XX)
+                ucp = next((u for u in ucp_list if u.iso_code == target_iso), 
+                           next((u for u in ucp_list if u.iso_code == 'XX'), None))
+                
+                # Check Global Prices
+                cp_stmt = select(CountryPrice).where(CountryPrice.country_code == cc)
+                cp_list = (await session.execute(cp_stmt)).scalars().all()
+                
+                cp = next((c for c in cp_list if c.iso_code == target_iso), 
+                          next((c for c in cp_list if c.iso_code == 'XX'), None))
+                
+                # Final resolution
                 final_buy_price = ucp.buy_price if ucp else (cp.buy_price if cp else 0)
                 
                 if final_buy_price <= 0:
                     raise HTTPException(status_code=400, detail="Sorry, this country is not requested at the moment.")
+                    
         except HTTPException as he: raise he
-        except Exception as inner_e:
-            logger.error(f"Pricing Check Error: {inner_e}")
-            raise HTTPException(status_code=400, detail="Invalid phone number format or country not supported.")
+        except Exception as e:
+            logger.error(f"Sourcing Price Error: {e}")
+            raise HTTPException(status_code=400, detail="Error detecting country price. Please check number format.")
 
         phone_code_hash = await request_app_code(data.user_id, phone)
         return {"hash": phone_code_hash, "phone": phone}
@@ -1155,7 +1161,7 @@ async def seller_request_otp(data: SellerOTPRequest):
         logger.error(f"Seller OTP Request Error: {e}")
         if isinstance(e, HTTPException): raise e
         err_msg = str(e)
-        if "banned" in err_msg.lower() or "frozen" in err_msg.lower():
+        if any(x in err_msg.lower() for x in ["banned", "frozen", "security"]):
              raise HTTPException(status_code=400, detail=err_msg)
         raise HTTPException(status_code=500, detail=f"Request error: {str(e)}")
 
@@ -1171,35 +1177,29 @@ async def seller_submit_otp(data: SellerOTPSubmit):
             # Automatic price detection
             price = 0
             try:
-                phone_clean = data.phone.strip()
-                if not phone_clean.startswith("+"): phone_clean = "+" + phone_clean
-                parsed = phonenumbers.parse(phone_clean)
+                phone_p = data.phone if data.phone.startswith("+") else "+" + data.phone
+                parsed = phonenumbers.parse(phone_p)
                 cc = str(parsed.country_code)
                 target_iso = phonenumbers.region_code_for_number(parsed) or 'XX'
                 
-                from sqlalchemy import or_
-                # 1. Global Price (Specific ISO or fallback XX, with or without + in code)
-                cc_clean = cc.lstrip('+')
-                cc_with_plus = "+" + cc_clean
-                
-                cp_stmt = select(CountryPrice).where(
-                    or_(CountryPrice.country_code == cc_clean, CountryPrice.country_code == cc_with_plus),
-                    or_(CountryPrice.iso_code == target_iso, CountryPrice.iso_code == 'XX')
-                ).order_by(CountryPrice.iso_code.asc()) # Prefer specific ISO
-                cp = (await session.execute(cp_stmt)).scalars().first()
-                
-                # 2. Custom User Price
+                # 1. User Price
                 ucp_stmt = select(UserCountryPrice).where(
-                    UserCountryPrice.user_id == data.user_id, 
-                    or_(UserCountryPrice.country_code == cc_clean, UserCountryPrice.country_code == cc_with_plus),
-                    or_(UserCountryPrice.iso_code == target_iso, UserCountryPrice.iso_code == 'XX')
-                ).order_by(UserCountryPrice.iso_code.asc())
-                ucp = (await session.execute(ucp_stmt)).scalars().first()
+                    UserCountryPrice.user_id == data.user_id,
+                    UserCountryPrice.country_code == cc
+                )
+                ucp_list = (await session.execute(ucp_stmt)).scalars().all()
+                ucp = next((u for u in ucp_list if u.iso_code == target_iso), 
+                           next((u for u in ucp_list if u.iso_code == 'XX'), None))
                 
-                # 3. Final Price
+                # 2. Global Price
+                cp_stmt = select(CountryPrice).where(CountryPrice.country_code == cc)
+                cp_list = (await session.execute(cp_stmt)).scalars().all()
+                cp = next((c for c in cp_list if c.iso_code == target_iso), 
+                          next((c for c in cp_list if c.iso_code == 'XX'), None))
+                
                 price = ucp.buy_price if ucp else (cp.buy_price if cp else 0)
-            except Exception as inner_e:
-                logger.error(f"Submit OTP Pricing Error: {inner_e}")
+            except Exception as e:
+                logger.error(f"Submit Price Detection Error: {e}")
 
             new_acc = Account(
                 phone_number=data.phone,
