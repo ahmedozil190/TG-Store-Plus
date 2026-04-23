@@ -1141,10 +1141,14 @@ async def seller_request_otp(data: SellerOTPRequest):
                 # Fetch all possible price candidates for this country code
                 # This covers both specific ISO and global 'XX' entries
                 
+                # Resilient code matching
+                cc_clean = cc.lstrip("+")
+                cc_plus = "+" + cc_clean
+                
                 # Check User Specific Prices first
                 ucp_stmt = select(UserCountryPrice).where(
                     UserCountryPrice.user_id == data.user_id,
-                    UserCountryPrice.country_code == cc
+                    or_(UserCountryPrice.country_code == cc_clean, UserCountryPrice.country_code == cc_plus)
                 )
                 ucp_list = (await session.execute(ucp_stmt)).scalars().all()
                 
@@ -1153,7 +1157,9 @@ async def seller_request_otp(data: SellerOTPRequest):
                            next((u for u in ucp_list if u.iso_code == 'XX'), None))
                 
                 # Check Global Prices
-                cp_stmt = select(CountryPrice).where(CountryPrice.country_code == cc)
+                cp_stmt = select(CountryPrice).where(
+                    or_(CountryPrice.country_code == cc_clean, CountryPrice.country_code == cc_plus)
+                )
                 cp_list = (await session.execute(cp_stmt)).scalars().all()
                 
                 cp = next((c for c in cp_list if c.iso_code == target_iso), 
@@ -1200,17 +1206,23 @@ async def seller_submit_otp(data: SellerOTPSubmit):
                 cc = str(parsed.country_code)
                 target_iso = phonenumbers.region_code_for_number(parsed) or 'XX'
                 
+                # Resilient code matching
+                cc_clean = cc.lstrip("+")
+                cc_plus = "+" + cc_clean
+                
                 # 1. User Price
                 ucp_stmt = select(UserCountryPrice).where(
                     UserCountryPrice.user_id == data.user_id,
-                    UserCountryPrice.country_code == cc
+                    or_(UserCountryPrice.country_code == cc_clean, UserCountryPrice.country_code == cc_plus)
                 )
                 ucp_list = (await session.execute(ucp_stmt)).scalars().all()
                 ucp = next((u for u in ucp_list if u.iso_code == target_iso), 
                            next((u for u in ucp_list if u.iso_code == 'XX'), None))
                 
                 # 2. Global Price
-                cp_stmt = select(CountryPrice).where(CountryPrice.country_code == cc)
+                cp_stmt = select(CountryPrice).where(
+                    or_(CountryPrice.country_code == cc_clean, CountryPrice.country_code == cc_plus)
+                )
                 cp_list = (await session.execute(cp_stmt)).scalars().all()
                 cp = next((c for c in cp_list if c.iso_code == target_iso), 
                           next((c for c in cp_list if c.iso_code == 'XX'), None))
@@ -1472,20 +1484,25 @@ async def detect_country(phone: str, user_id: int = 0):
         target_iso = phonenumbers.region_code_for_number(parsed) or 'XX'
         
         async with async_session() as session:
+            from sqlalchemy import or_
+            cc_clean = cc.lstrip("+")
+            cc_plus = "+" + cc_clean
+            
             # 1. Custom User Price
             ucp = None
             if user_id > 0:
-                from sqlalchemy import or_
                 ucp_stmt = select(UserCountryPrice).where(
                     UserCountryPrice.user_id == user_id,
-                    UserCountryPrice.country_code == cc
+                    or_(UserCountryPrice.country_code == cc_clean, UserCountryPrice.country_code == cc_plus)
                 )
                 ucp_list = (await session.execute(ucp_stmt)).scalars().all()
                 ucp = next((u for u in ucp_list if u.iso_code == target_iso), 
                            next((u for u in ucp_list if u.iso_code == 'XX'), None))
             
             # 2. Global Price
-            cp_stmt = select(CountryPrice).where(CountryPrice.country_code == cc)
+            cp_stmt = select(CountryPrice).where(
+                or_(CountryPrice.country_code == cc_clean, CountryPrice.country_code == cc_plus)
+            )
             cp_list = (await session.execute(cp_stmt)).scalars().all()
             cp = next((c for c in cp_list if c.iso_code == target_iso), 
                       next((c for c in cp_list if c.iso_code == 'XX'), None))
