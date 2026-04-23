@@ -1740,8 +1740,7 @@
     <div id="user-price-modal" class="modal-overlay" onclick="closeUserPriceModal(event)">
         <div class="modal-card" onclick="event.stopPropagation()">
             <div class="modal-header">
-                <h3 id="user-price-modal-title">Add Custom User Price</h3>
-                <i class="fas fa-times close-icon" onclick="closeUserPriceModal()"></i>
+                <h3 id="user-price-modal-title" style="margin-bottom: 0;">Add Custom User Price</h3>
             </div>
             <div class="modal-body">
                 <input type="hidden" id="up-id" value="">
@@ -1761,7 +1760,10 @@
                     <input type="number" id="up-buy-price" class="input-field" step="0.01" placeholder="Enter custom buy price">
                 </div>
                 
-                <button class="btn-primary" onclick="saveUserPrice()" style="width:100%; margin-top:10px;" data-i18n="btn_save_custom">Save Custom Price</button>
+                <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 10px;">
+                    <button class="btn-add" onclick="saveUserPrice()" style="width:100%; justify-content: center; padding: 14px; font-size: 1rem;" data-i18n="btn_save_custom">Save Custom Price</button>
+                    <button class="cancel-btn" onclick="closeUserPriceModal()" style="width:100%; background: transparent; border: 1px solid var(--border); color: var(--text-s); padding: 12px; border-radius: 14px; font-weight: 600;" data-i18n="btn_cancel">Cancel</button>
+                </div>
             </div>
         </div>
     </div>
