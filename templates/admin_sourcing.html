@@ -1412,7 +1412,7 @@
 
             <!-- ===== Dashboard Section ===== -->
             <section id="section-home" class="view-section active">
-                <!-- Stats -->
+                <!-- Inventory Section -->
                 <div class="section-header">
                     <i class="fas fa-database"></i>
                     <h2 data-i18n="stat_section">Inventory</h2>
@@ -1420,20 +1420,55 @@
                 <div style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 30px;">
                     <div class="info-card">
                         <div class="info-card-l">
-                            <span class="info-card-lbl" data-i18n="stat_total">TOTAL ACCOUNTS</span>
-                            <div class="info-card-val"><span id="stat-total-sourced">0</span> <span style="font-size: 0.9rem; margin-left: 5px; opacity: 0.8;">ACCOUNTS</span></div>
+                            <span class="info-card-lbl" data-i18n="stat_pending_ops">PENDING ACCOUNTS</span>
+                            <div class="info-card-val"><span id="home-stat-pending">0</span> <span style="font-size: 0.9rem; margin-left: 5px; opacity: 0.8;">PENDING</span></div>
                         </div>
-                        <div class="info-card-icon" style="background: rgba(34, 197, 94, 0.1); color: var(--success);">
-                            <i class="fas fa-box-archive"></i>
+                        <div class="info-card-icon" style="background: rgba(245, 158, 11, 0.1); color: var(--warning);">
+                            <i class="fas fa-clock-rotate-left"></i>
                         </div>
                     </div>
                     <div class="info-card">
                         <div class="info-card-l">
-                            <span class="info-card-lbl" data-i18n="stat_pending">PENDING APPROVAL</span>
-                            <div class="info-card-val"><span id="stat-pending">0</span> <span style="font-size: 0.9rem; margin-left: 5px; opacity: 0.8;">PENDING</span></div>
+                            <span class="info-card-lbl" data-i18n="stat_accepted_ops">ACCEPTED ACCOUNTS</span>
+                            <div class="info-card-val"><span id="home-stat-accepted">0</span> <span style="font-size: 0.9rem; margin-left: 5px; opacity: 0.8;">ACCEPTED</span></div>
+                        </div>
+                        <div class="info-card-icon" style="background: rgba(34, 197, 94, 0.1); color: var(--success);">
+                            <i class="fas fa-circle-check"></i>
+                        </div>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-card-l">
+                            <span class="info-card-lbl" data-i18n="stat_rejected_ops">REJECTED ACCOUNTS</span>
+                            <div class="info-card-val"><span id="home-stat-rejected">0</span> <span style="font-size: 0.9rem; margin-left: 5px; opacity: 0.8;">REJECTED</span></div>
+                        </div>
+                        <div class="info-card-icon" style="background: rgba(239, 68, 68, 0.1); color: var(--error);">
+                            <i class="fas fa-circle-xmark"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Withdrawals Section -->
+                <div class="section-header">
+                    <i class="fas fa-wallet"></i>
+                    <h2 data-i18n="nav_withdrawals">Withdrawals</h2>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 30px;">
+                    <div class="info-card">
+                        <div class="info-card-l">
+                            <span class="info-card-lbl" data-i18n="lbl_pending_requests">PENDING REQUESTS</span>
+                            <div class="info-card-val"><span id="home-stat-withdraw-pending">0</span></div>
                         </div>
                         <div class="info-card-icon" style="background: rgba(245, 158, 11, 0.1); color: var(--warning);">
-                            <i class="fas fa-clock-rotate-left"></i>
+                            <i class="fas fa-hourglass-half"></i>
+                        </div>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-card-l">
+                            <span class="info-card-lbl" data-i18n="lbl_approved_requests">APPROVED REQUESTS</span>
+                            <div class="info-card-val"><span id="home-stat-withdraw-approved">0</span></div>
+                        </div>
+                        <div class="info-card-icon" style="background: rgba(34, 197, 94, 0.1); color: var(--success);">
+                            <i class="fas fa-check-double"></i>
                         </div>
                     </div>
                     <div class="info-card">
@@ -1443,6 +1478,40 @@
                         </div>
                         <div class="info-card-icon" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">
                             <i class="fas fa-file-invoice-dollar"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Buying Prices Section -->
+                <div class="section-header">
+                    <i class="fas fa-tags"></i>
+                    <h2 data-i18n="nav_prices">Buying Prices</h2>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 30px;">
+                    <div class="info-card">
+                        <div class="info-card-l">
+                            <span class="info-card-lbl" data-i18n="stat_total_countries">ACTIVE COUNTRIES</span>
+                            <div class="info-card-val"><span id="home-stat-active-countries">0</span></div>
+                        </div>
+                        <div class="info-card-icon" style="background: rgba(59, 130, 246, 0.1); color: #3b82f6;">
+                            <i class="fas fa-globe"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Custom Users Section -->
+                <div class="section-header">
+                    <i class="fas fa-user-gear"></i>
+                    <h2 data-i18n="nav_user_prices">Custom Users</h2>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 30px;">
+                    <div class="info-card">
+                        <div class="info-card-l">
+                            <span class="info-card-lbl" data-i18n="nav_user_prices">CUSTOM USERS</span>
+                            <div class="info-card-val"><span id="home-stat-total-custom-prices">0</span></div>
+                        </div>
+                        <div class="info-card-icon" style="background: rgba(139, 92, 246, 0.1); color: #8b5cf6;">
+                            <i class="fas fa-user-tag"></i>
                         </div>
                     </div>
                 </div>
@@ -1888,6 +1957,8 @@
                 stat_pending: "PENDING APPROVAL",
                 stat_total_paid: "TOTAL PAID",
                 recent_ops: "Recent Operations",
+                lbl_pending_requests: "PENDING REQUESTS",
+                lbl_approved_requests: "APPROVED REQUESTS",
                 buying_prices: "Buying Prices",
                 btn_add: "Add",
                 btn_save: "Add Country",
@@ -1914,6 +1985,7 @@
                 stat_pending_ops: "PENDING ACCOUNTS",
                 stat_total_ops: "TOTAL ACCOUNTS",
                 stat_accepted_ops: "ACCEPTED ACCOUNTS",
+                stat_rejected_ops: "REJECTED ACCOUNTS",
                 unit_ops: "ACCOUNTS",
                 unit_accs: "ACCOUNTS",
                 lbl_status: "Status",
@@ -1962,6 +2034,8 @@
                 stat_pending: "بانتظار الموافقة",
                 stat_total_paid: "إجمالي المدفوعات",
                 recent_ops: "أحدث العمليات",
+                lbl_pending_requests: "طلبات قيد الانتظار",
+                lbl_approved_requests: "طلبات تمت الموافقة",
                 buying_prices: "أسعار الشراء",
                 btn_add: "إضافة",
                 btn_save: "إضافة دولة",
@@ -2605,18 +2679,37 @@
             try {
                 const res = await fetch('/api/admin/sourcing/data');
                 const data = await res.json();
-                const totalSourcedEl = document.getElementById('stat-total-sourced');
-                if (totalSourcedEl) totalSourcedEl.innerText = data.stats.total_sourced;
+                
+                // Inventory (Home)
+                const hsp = document.getElementById('home-stat-pending');
+                const hsa = document.getElementById('home-stat-accepted');
+                const hsr = document.getElementById('home-stat-rejected');
+                if (hsp) hsp.innerText = data.stats.pending_count;
+                if (hsa) hsa.innerText = data.stats.accepted_sourced;
+                if (hsr) hsr.innerText = data.stats.rejected_sourced;
+
+                // Withdrawals (Home)
+                const hwp = document.getElementById('home-stat-withdraw-pending');
+                const hwa = document.getElementById('home-stat-withdraw-approved');
+                const htp = document.getElementById('home-stat-total-paid');
+                if (hwp) hwp.innerText = data.stats.withdraw_pending || 0;
+                if (hwa) hwa.innerText = data.stats.withdraw_approved || 0;
+                if (htp) htp.innerText = `$${parseFloat(data.stats.total_paid_amount || 0).toFixed(2)}`;
+
+                // Buying Prices (Home)
+                const hacEl = document.getElementById('home-stat-active-countries');
+                if (hacEl) hacEl.innerText = data.prices.length;
+
+                // Custom Users (Home)
+                const htcpEl = document.getElementById('home-stat-total-custom-prices');
+                if (htcpEl) htcpEl.innerText = data.stats.total_custom_prices || 0;
+
                 if (data.bot_name) document.getElementById('sideBrandName').textContent = data.bot_name;
                 const uname = tg.initDataUnsafe?.user?.first_name || "AD";
                 const uIEl = document.getElementById('userInitial');
                 if (uIEl) uIEl.textContent = uname.charAt(0).toUpperCase();
-                const pendingEl = document.getElementById('stat-pending');
-                if (pendingEl) pendingEl.innerText = data.stats.pending_count;
-                const htpEl = document.getElementById('home-stat-total-paid');
-                if (htpEl) htpEl.innerText = `$${parseFloat(data.stats.total_paid_amount || 0).toFixed(2)}`;
 
-                // History Stats
+                // History Section Stats
                 const hpEl = document.getElementById('stat-history-pending');
                 const haEl = document.getElementById('stat-history-accepted');
                 const hrEl = document.getElementById('stat-history-rejected');
@@ -2624,7 +2717,7 @@
                 if (haEl) haEl.innerText = data.stats.accepted_sourced;
                 if (hrEl) hrEl.innerText = data.stats.rejected_sourced;
 
-                // Home User Stats
+                // Customers Section (Home)
                 const huTotal = document.getElementById('home-total-users');
                 const huActive = document.getElementById('home-active-users');
                 const huBanned = document.getElementById('home-banned-users');
@@ -2632,7 +2725,7 @@
                 if (huActive) huActive.innerText = data.stats.active_users || 0;
                 if (huBanned) huBanned.innerText = data.stats.banned_users || 0;
 
-                // Withdrawal Stats
+                // Withdrawal Tab Stats
                 const ws = data.stats;
                 const wp = document.getElementById('stat-withdraw-pending');
                 const wa = document.getElementById('stat-withdraw-approved');
@@ -2645,17 +2738,22 @@
                 fetchAdminHistory(currentAdminHistoryPage);
                 allPrices = data.prices || [];
 
-                // Update counts
-                document.getElementById('stat-active-countries').innerText = allPrices.length;
+                const sacEl = document.getElementById('stat-active-countries');
+                if (sacEl) sacEl.innerText = allPrices.length;
 
                 renderPrices(allPrices);
 
                 allUsers = (data.users || []).reverse();
-                document.getElementById('user-count').innerText = data.stats.user_count || allUsers.length;
-                document.getElementById('banned-count').innerText = allUsers.filter(u => u.banned).length;
+                const ucEl = document.getElementById('user-count');
+                if (ucEl) ucEl.innerText = data.stats.user_count || allUsers.length;
+                const bcEl = document.getElementById('banned-count');
+                if (bcEl) bcEl.innerText = allUsers.filter(u => u.banned).length;
                 renderUsers(filteredUsers || allUsers);
-            } catch (e) { console.error(e); }
-            finally { document.getElementById('loader').style.display = 'none'; }
+            } catch (e) { console.error('Init Error:', e); }
+            finally { 
+                const loader = document.getElementById('loader');
+                if (loader) loader.style.display = 'none'; 
+            }
         }
 
         async function refreshDashboardStats() {
