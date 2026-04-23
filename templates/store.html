@@ -216,6 +216,64 @@
         @keyframes slideUp { from { transform: translateY(100%); } }
         .phone-display { background: var(--bg); border: 1px solid var(--border); border-radius: 16px; padding: 20px; text-align: center; margin: 20px 0; font-size: 1.6rem; font-weight: 800; position: relative; }
         .copy-trigger { position: absolute; top: 10px; right: 10px; color: var(--text-s); font-size: 1rem; cursor: pointer; }
+        /* Toast Notification */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            pointer-events: none;
+        }
+
+        .toast {
+            background: #111113;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 18px;
+            padding: 16px 20px;
+            width: 340px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
+            transform: translateX(120%);
+            transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            pointer-events: auto;
+        }
+
+        .toast.show { transform: translateX(0); }
+
+        .toast-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-size: 1.1rem;
+        }
+
+        .toast-error .toast-icon { 
+            background: rgba(239, 68, 68, 0.12); 
+            color: #ef4444; 
+            border: 1px solid rgba(239, 68, 68, 0.1);
+        }
+        
+        .toast-content { flex: 1; }
+        .toast-title { font-weight: 800; font-size: 1rem; color: #ffffff; margin-bottom: 2px; }
+        .toast-desc { font-size: 0.85rem; color: #a1a1aa; font-weight: 500; }
+        
+        .toast-close {
+            color: #3f3f46;
+            cursor: pointer;
+            transition: 0.2s;
+            font-size: 0.9rem;
+            padding: 5px;
+        }
+        .toast-close:hover { color: #ffffff; }
     </style>
 </head>
 
@@ -223,6 +281,7 @@
     <div id="loader">
         <div class="spinner"></div>
     </div>
+    <div class="toast-container" id="toast-container"></div>
 
     <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeNav()"></div>
 
@@ -573,7 +632,14 @@
                     document.getElementById('btn-get-code').innerHTML = '<i class="fas fa-key"></i> <span>Get Login Code</span>';
                     document.getElementById('success-modal').style.display = 'flex';
                     init();
-                } else { alert(data.detail || data.message || 'Error'); }
+                } else { 
+                    const msg = data.detail || data.message || 'Error';
+                    if (msg.includes('رصيدك') || msg.toLowerCase().includes('balance')) {
+                        showToast(lang === 'ar' ? 'فشل الشراء' : 'Purchase Failed', lang === 'ar' ? 'رصيدك غير كافٍ لإتمام العملية' : 'Insufficient buy balance', 'error');
+                    } else {
+                        alert(msg);
+                    }
+                }
             } catch (e) { alert(e); }
             btn.disabled = false; btn.innerText = translations[currentLang].btn_confirm_pay;
         }
@@ -660,6 +726,34 @@
         function copyPhone() {
             const txt = document.getElementById('success-phone').innerText;
             navigator.clipboard.writeText(txt).then(() => { tg.HapticFeedback.notificationOccurred('success'); });
+        }
+
+        function showToast(title, desc, type = 'error') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            toast.innerHTML = `
+                <div class="toast-icon">
+                    <i class="fas ${type === 'error' ? 'fa-xmark' : 'fa-check'}"></i>
+                </div>
+                <div class="toast-content">
+                    <div class="toast-title">${title}</div>
+                    <div class="toast-desc">${desc}</div>
+                </div>
+                <div class="toast-close" onclick="this.parentElement.remove()">
+                    <i class="fas fa-xmark"></i>
+                </div>
+            `;
+            container.appendChild(toast);
+            setTimeout(() => toast.classList.add('show'), 10);
+            
+            // Auto remove
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 600);
+            }, 4000);
+            
+            if (type === 'error') tg.HapticFeedback.notificationOccurred('error');
         }
 
         async function fetchOTP() {
