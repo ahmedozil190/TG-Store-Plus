@@ -239,7 +239,7 @@
                 <i class="fas fa-shopping-cart"></i> <span data-i18n="nav_store">Buy Number</span>
             </div>
             <div class="nav-item" id="m-history" onclick="switchNav('history', this)">
-                <i class="fas fa-clock-rotate-left"></i> <span data-i18n="nav_history">My Orders</span>
+                <i class="fas fa-clock-rotate-left"></i> <span data-i18n="nav_history">Orders History</span>
             </div>
             <div class="nav-item" id="m-support" onclick="switchNav('support', this)">
                 <i class="fas fa-headset"></i> <span data-i18n="nav_support">Support</span>
@@ -431,7 +431,7 @@
 
         const translations = {
             en: {
-                loading: "Optimizing Store...", nav_home: "Dashboard", nav_store: "Buy Number", nav_history: "Orders", nav_support: "Support",
+                loading: "Optimizing Store...", nav_home: "Dashboard", nav_store: "Buy Number", nav_history: "Orders History", nav_support: "Support",
                 balance: "YOUR BALANCE", total_orders: "SUCCESS ORDERS", quick_buy: "Quick Access", btn_start_shopping: "Browse Numbers",
                 confirm_title: "Confirmation", lbl_country: "Country", lbl_price: "Price", btn_confirm_pay: "Buy Now",
                 success_title: "Payment Success!", success_desc: "Wait for the code in your bot chat.", btn_close: "Dismiss",
@@ -439,7 +439,7 @@
                 total_numbers: "Total Numbers", countries: "Total Countries", lowest_price: "Lowest Price"
             },
             ar: {
-                loading: "جاري تجهيز المتجر...", nav_home: "الرئيسية", nav_store: "شراء رقم", nav_history: "طلباتي", nav_support: "الدعم",
+                loading: "جاري تجهيز المتجر...", nav_home: "الرئيسية", nav_store: "شراء رقم", nav_history: "سجل الطلبات", nav_support: "الدعم",
                 balance: "رصيدك الحالي", total_orders: "إجمالي المشتريات", quick_buy: "وصول سريع", btn_start_shopping: "تصفح الأرقام",
                 confirm_title: "تأكيد الشراء", lbl_country: "الدولة", lbl_price: "السعر", btn_confirm_pay: "إتمام الشراء",
                 success_title: "تم بنجاح!", success_desc: "انتظر وصول الكود في البوت.", btn_close: "إغلاق",
@@ -591,7 +591,16 @@
         function renderHistory(data) {
             const list = document.getElementById('history-list');
             document.getElementById('hist-total-orders').innerText = data ? data.length : 0;
-            if (!data || !data.length) { list.innerHTML = '<p style="text-align:center; padding: 40px; opacity: 0.5;">No history found</p>'; return; }
+            
+            if (!data || !data.length) { 
+                list.innerHTML = `
+                    <div class="empty-state" style="display: flex; padding: 60px 20px;">
+                        <div class="empty-icon"><i class="fas fa-clock-rotate-left"></i></div>
+                        <div class="empty-text" style="font-size: 0.95rem; color: var(--text-s); font-weight: 600;">No orders history found.</div>
+                    </div>
+                `; 
+                return; 
+            }
             list.innerHTML = data.map(h => `
                 <div class="history-item" style="flex-direction: column; align-items: stretch; gap: 12px; padding: 18px;">
                     <div style="display: flex; justify-content: space-between; align-items: center;">
