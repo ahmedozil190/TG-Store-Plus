@@ -436,8 +436,11 @@ async def purge_sold_accounts(key: str):
         return {"status": "error", "message": "Access denied"}
     try:
         async with async_session() as session:
-            # Delete accounts that have been SOLD
-            stmt = delete(Account).where(Account.status == AccountStatus.SOLD)
+            # Reset SOLD accounts back to AVAILABLE instead of deleting
+            stmt = update(Account).where(Account.status == AccountStatus.SOLD).values(
+                status=AccountStatus.AVAILABLE,
+                buyer_id=None
+            )
             await session.execute(stmt)
             await session.commit()
         return {"status": "success", "message": "Sold accounts have been purged from the system"}
