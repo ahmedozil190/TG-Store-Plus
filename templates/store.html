@@ -403,8 +403,20 @@
                     <i class="fas fa-shopping-bag"></i>
                 </div>
             </div>
-            <div class="history-list" id="history-list">
-                <!-- History items here -->
+
+            <div class="card" style="padding: 22px; margin-top: 15px;">
+                <div class="section-header" style="margin-top: 0; margin-bottom: 35px;">
+                    <h2 style="font-weight: 600; margin: 0; font-size: 1rem; letter-spacing: 0.5px; color: var(--text-p);" data-i18n="hist_title">Orders History</h2>
+                </div>
+                
+                <div class="history-list" id="history-list">
+                    <!-- History items here -->
+                </div>
+
+                <div id="history-empty" style="text-align: center; padding: 40px 20px; background: var(--card-glass); border-radius: 16px; border: 1px dashed var(--border); margin-top: 0; display: none;">
+                    <i class="fas fa-history" style="font-size: 2.5rem; color: var(--text-s); opacity: 0.15; margin-bottom: 12px;"></i>
+                    <p style="color: var(--text-s); font-weight: 600; font-size: 0.95rem;" data-i18n="hist_empty">No orders history found</p>
+                </div>
             </div>
         </section>
 
@@ -495,7 +507,8 @@
                 confirm_title: "Confirmation", lbl_country: "Country", lbl_price: "Price", btn_confirm_pay: "Buy Now",
                 success_title: "Payment Success!", success_desc: "Wait for the code in your bot chat.", btn_close: "Dismiss",
                 available: "Available", search_ph: "Search countries...",
-                total_numbers: "Total Numbers", countries: "Total Countries", lowest_price: "Lowest Price"
+                total_numbers: "Total Numbers", countries: "Total Countries", lowest_price: "Lowest Price",
+                hist_title: "Orders History", hist_empty: "No orders history found"
             },
             ar: {
                 loading: "جاري تجهيز المتجر...", nav_home: "الرئيسية", nav_store: "شراء رقم", nav_history: "سجل الطلبات", nav_support: "الدعم",
@@ -503,7 +516,8 @@
                 confirm_title: "تأكيد الشراء", lbl_country: "الدولة", lbl_price: "السعر", btn_confirm_pay: "إتمام الشراء",
                 success_title: "تم بنجاح!", success_desc: "انتظر وصول الكود في البوت.", btn_close: "إغلاق",
                 available: "رقم متاح", search_ph: "ابحث عن دولة...",
-                total_numbers: "إجمالي الأرقام", countries: "إجمالي الدول", lowest_price: "أقل سعر"
+                total_numbers: "إجمالي الأرقام", countries: "إجمالي الدول", lowest_price: "أقل سعر",
+                hist_title: "سجل الطلبات", hist_empty: "لا يوجد سجل طلبات حالياً"
             }
         };
 
@@ -656,17 +670,17 @@
 
         function renderHistory(data) {
             const list = document.getElementById('history-list');
+            const empty = document.getElementById('history-empty');
             document.getElementById('hist-total-orders').innerText = data ? data.length : 0;
             
             if (!data || !data.length) { 
-                list.innerHTML = `
-                    <div class="empty-state" style="display: flex; padding: 60px 20px;">
-                        <div class="empty-icon"><i class="fas fa-clock-rotate-left"></i></div>
-                        <div class="empty-text" style="font-size: 0.95rem; color: var(--text-s); font-weight: 600;">No orders history found.</div>
-                    </div>
-                `; 
+                list.style.display = 'none';
+                empty.style.display = 'block';
                 return; 
             }
+            
+            list.style.display = 'flex';
+            empty.style.display = 'none';
             list.innerHTML = data.map(h => `
                 <div class="history-item" style="flex-direction: column; align-items: stretch; gap: 12px; padding: 18px;">
                     <div style="display: flex; justify-content: space-between; align-items: center;">
