@@ -252,7 +252,7 @@
         <div class="nav-trigger" onclick="openNav()">
             <i class="fas fa-bars"></i>
         </div>
-        <div class="page-title" id="view-title" data-i18n="nav_home">Dashboard</div>
+        <div class="page-title" id="view-title">Dashboard</div>
         <div class="user-avatar" id="userInitial">U</div>
     </header>
 
@@ -283,7 +283,6 @@
         </section>
 
         <section id="section-store" class="view-panel">
-            <h2 style="font-weight: 800; margin-bottom: 20px;" data-i18n="nav_buy">Buy Number</h2>
             <div style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 10px;">
                 <div class="info-card" style="margin-bottom: 0; box-shadow: none;">
                     <div class="info-card-l">
@@ -454,6 +453,8 @@
 
         async function init() {
             try {
+                updateTranslations();
+
                 // Restore tab on refresh
                 const savedTab = sessionStorage.getItem('activeTab');
                 if (savedTab && savedTab !== 'home') {
@@ -490,8 +491,6 @@
                 if (document.getElementById('section-store').classList.contains('active')) renderCountries(countries);
             } catch(e) { console.error("Init Error:", e); }
             finally {
-                updateTranslations();
-                const loader = document.getElementById('loader');
                 if(loader) loader.classList.add('hide');
             }
         }
