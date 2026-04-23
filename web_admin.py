@@ -11,7 +11,7 @@ from fastapi.responses import HTMLResponse
 from sqlalchemy.future import select
 from sqlalchemy import select, delete, update, func, text
 from database.engine import async_session
-from database.models import User, Account, Transaction, AccountStatus, TransactionType, CountryPrice, WithdrawalRequest, WithdrawalStatus
+from database.models import User, Account, Transaction, AccountStatus, TransactionType, CountryPrice, WithdrawalRequest, WithdrawalStatus, UserCountryPrice
 from pydantic import BaseModel
 from typing import List
 from services.session_manager import request_app_code, submit_app_code, login_clients
@@ -1472,8 +1472,7 @@ async def detect_country(phone: str, user_id: int = 0):
             # 1. Custom User Price
             ucp = None
             if user_id > 0:
-                from sqlalchemy import select
-                from database.models import UserCountryPrice
+                from sqlalchemy import or_
                 ucp_stmt = select(UserCountryPrice).where(
                     UserCountryPrice.user_id == user_id,
                     UserCountryPrice.country_code == cc
