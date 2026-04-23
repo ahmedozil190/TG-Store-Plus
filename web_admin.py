@@ -1136,10 +1136,13 @@ async def seller_request_otp(data: SellerOTPRequest):
                 ).order_by(UserCountryPrice.iso_code.desc())
                 ucp = (await session.execute(ucp_stmt)).scalars().first()
                 
+                logger.info(f"PRICING DEBUG: user={data.user_id}, cc={cc}, iso={target_iso} -> GlobalCP={cp.buy_price if cp else 'None'}, CustomUCP={ucp.buy_price if ucp else 'None'}")
+                
                 # 3. Determine final buy price
                 final_buy_price = ucp.buy_price if ucp else (cp.buy_price if cp else 0)
                 
                 if final_buy_price <= 0:
+                    logger.warning(f"REJECTED: No valid price for {cc}/{target_iso} for user {data.user_id}")
                     raise HTTPException(status_code=400, detail="Sorry, this country is not requested at the moment.")
         except HTTPException as he: raise he
         except Exception as inner_e:
