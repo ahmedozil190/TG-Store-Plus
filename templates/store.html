@@ -377,12 +377,19 @@
                     <i class="fas fa-check"></i>
                 </div>
                 <h2 style="margin-top: 15px;" data-i18n="success_title">Success!</h2>
-                <p style="color: var(--text-s); font-size: 0.9rem; margin-top: 5px;" data-i18n="success_desc">Number purchased successfully.</p>
+                <p style="color: var(--text-s); font-size: 0.9rem; margin-top: 5px;">Number purchased. Copy the number and request code.</p>
             </div>
             <div class="phone-display">
                 <span id="success-phone">-----------</span>
                 <i class="fas fa-copy copy-trigger" onclick="copyPhone()"></i>
             </div>
+            <div id="otp-container" style="display:none; background: rgba(255,193,7,0.1); border: 1px dashed #ffc107; border-radius: 12px; padding: 15px; text-align: center; margin-bottom: 20px;">
+                <span style="color: #ffc107; font-size: 0.8rem; font-weight: 700; display: block; margin-bottom: 5px;">YOUR CODE</span>
+                <span id="otp-val" style="font-size: 1.8rem; font-weight: 800; color: var(--text-p); letter-spacing: 5px;">-----</span>
+            </div>
+            <button class="primary-btn" id="btn-get-code" onclick="fetchOTP()" style="margin-bottom: 12px; background: var(--accent-purple);">
+                <i class="fas fa-key"></i> <span>Get Login Code</span>
+            </button>
             <button class="primary-btn" style="background: var(--bg-elevated); box-shadow: none; border: 1px solid var(--border);" onclick="closeModal('success-modal')">
                 <span data-i18n="btn_close">Close</span>
             </button>
@@ -547,6 +554,9 @@
                 if (res.ok && data.status === 'success') {
                     closeModal('buy-modal');
                     document.getElementById('success-phone').innerText = data.phone;
+                    document.getElementById('otp-container').style.display = 'none';
+                    document.getElementById('btn-get-code').disabled = false;
+                    document.getElementById('btn-get-code').innerHTML = '<i class="fas fa-key"></i> <span>Get Login Code</span>';
                     document.getElementById('success-modal').style.display = 'flex';
                     init();
                 } else { alert(data.detail || data.message || 'Error'); }
@@ -581,6 +591,36 @@
         function copyPhone() {
             const txt = document.getElementById('success-phone').innerText;
             navigator.clipboard.writeText(txt).then(() => { tg.HapticFeedback.notificationOccurred('success'); });
+        }
+
+        async function fetchOTP() {
+            const btn = document.getElementById('btn-get-code');
+            const phone = document.getElementById('success-phone').innerText;
+            const otpContainer = document.getElementById('otp-container');
+            const otpVal = document.getElementById('otp-val');
+            
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Checking...';
+            
+            try {
+                const res = await fetch(`/api/store/get-code?user_id=${userId}&phone=${encodeURIComponent(phone)}`);
+                const data = await res.json();
+                
+                if (data.status === 'success') {
+                    otpContainer.style.display = 'block';
+                    otpVal.innerText = data.code;
+                    btn.innerHTML = '<i class="fas fa-check"></i> Code Received';
+                    tg.HapticFeedback.notificationOccurred('success');
+                } else {
+                    alert(data.message || 'Code not arrived yet. Make sure you entered the number in Telegram app first.');
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-key"></i> Retry Get Code';
+                }
+            } catch (e) {
+                alert('Connection error');
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-key"></i> Get Login Code';
+            }
         }
 
         init();

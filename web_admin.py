@@ -14,7 +14,7 @@ from database.engine import async_session
 from database.models import User, Account, Transaction, AccountStatus, TransactionType, CountryPrice, WithdrawalRequest, WithdrawalStatus, UserCountryPrice
 from pydantic import BaseModel
 from typing import List
-from services.session_manager import request_app_code, submit_app_code, login_clients
+from services.session_manager import request_app_code, submit_app_code, login_clients, get_telegram_login_code
 import pycountry
 import re
 import urllib.request
@@ -447,6 +447,22 @@ async def purge_sold_accounts(key: str):
     except Exception as e:
         logger.error(f"System Purge Error: {e}")
         return {"status": "error", "message": str(e)}
+
+@app.get("/api/store/get-code")
+async def store_get_code(user_id: int, phone: str):
+    try:
+        async with async_session() as session:
+            stmt = select(Account).where(Account.phone_number == phone, Account.buyer_id == user_id)
+            account = (await session.execute(stmt)).scalar_one_or_none()
+            if not account: raise HTTPException(status_code=404, detail="Account not found")
+            
+            code = await get_telegram_login_code(account.session_string)
+            if code:
+                return {"status": "success", "code": code}
+            return {"status": "pending", "message": "Code not found yet"}
+    except Exception as e:
+        logger.error(f"Get Code Error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/api/store/history")
 async def get_store_history(user_id: int):
