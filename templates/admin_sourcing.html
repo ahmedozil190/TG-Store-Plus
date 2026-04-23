@@ -2037,9 +2037,9 @@
                             <span style="color: var(--accent); font-weight: 900; font-size: 1.1rem;">$${Number(up.buy_price).toFixed(2)}</span>
                         </div>
                         <!-- User Name -->
-                        <div style="background: transparent; border: 1px solid var(--border); padding: 14px 18px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center;">
-                            <span style="color: var(--text-secondary); font-size: 0.8rem; font-weight: 700; text-transform: uppercase;">${currentLang === 'ar' ? 'المستخدم' : 'User'}</span>
-                            <span style="color: #10b981; font-weight: 800; font-size: 1.1rem;">${up.user_name}</span>
+                        <div style="background: transparent; border: 1px solid var(--border); padding: 14px 18px; border-radius: 12px; display: flex; justify-content: space-between; align-items: flex-start; gap: 20px;">
+                            <span style="color: var(--text-secondary); font-size: 0.8rem; font-weight: 700; text-transform: uppercase; flex-shrink: 0;">${currentLang === 'ar' ? 'المستخدم' : 'User'}</span>
+                            <span style="color: #10b981; font-weight: 800; font-size: 1.1rem; text-align: right; word-break: break-all; flex: 1; min-width: 0;">${up.user_name}</span>
                         </div>
                         <!-- User ID -->
                         <div style="background: transparent; border: 1px solid var(--border); padding: 14px 18px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center;">
@@ -2464,7 +2464,8 @@
                 users: 'nav_users',
                 history: 'nav_history',
                 settings: 'nav_settings',
-                withdrawals: 'nav_withdrawals'
+                withdrawals: 'nav_withdrawals',
+                'user-prices': 'nav_user_prices'
             };
             const titleEl = document.getElementById('page-title');
             titleEl.setAttribute('data-i18n', titleMap[id]);
