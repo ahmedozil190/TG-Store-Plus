@@ -302,6 +302,7 @@ class PriceUpdate(BaseModel):
     approve_delay: int
 
 class UserPriceCreate(BaseModel):
+    id: int = None
     user_id: int
     country_code: str
     iso_code: str = "XX"
@@ -859,16 +860,26 @@ async def add_user_price(data: UserPriceCreate):
         if not user:
             raise HTTPException(status_code=404, detail="User not found")
             
-        # Check if exists
-        stmt = select(UserCountryPrice).where(
-            UserCountryPrice.user_id == data.user_id,
-            UserCountryPrice.country_code == data.country_code,
-            UserCountryPrice.iso_code == data.iso_code
-        )
-        existing = (await session.execute(stmt)).scalar()
-        if existing:
-            existing.buy_price = data.buy_price
+        if data.id:
+            # Explicit Update
+            ucp = await session.get(UserCountryPrice, data.id)
+            if not ucp:
+                raise HTTPException(status_code=404, detail="Price record not found")
+            ucp.buy_price = data.buy_price
+            # If they changed the country/iso in the modal (though UI might prevent it)
+            ucp.country_code = data.country_code
+            ucp.iso_code = data.iso_code
         else:
+            # Check for Duplicate before adding new
+            stmt = select(UserCountryPrice).where(
+                UserCountryPrice.user_id == data.user_id,
+                UserCountryPrice.country_code == data.country_code,
+                UserCountryPrice.iso_code == data.iso_code
+            )
+            existing = (await session.execute(stmt)).scalar()
+            if existing:
+                raise HTTPException(status_code=400, detail="This country is already added for this user. Please edit the existing entry instead.")
+                
             new_ucp = UserCountryPrice(
                 user_id=data.user_id,
                 country_code=data.country_code,
@@ -876,6 +887,7 @@ async def add_user_price(data: UserPriceCreate):
                 buy_price=data.buy_price
             )
             session.add(new_ucp)
+            
         await session.commit()
         return {"status": "success"}
 
