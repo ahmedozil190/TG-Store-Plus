@@ -302,7 +302,7 @@ class PriceUpdate(BaseModel):
     approve_delay: int
 
 class UserPriceCreate(BaseModel):
-    id: int = None
+    id: int | None = None
     user_id: int
     country_code: str
     iso_code: str = "XX"
