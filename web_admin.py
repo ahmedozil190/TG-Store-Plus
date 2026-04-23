@@ -430,26 +430,19 @@ async def store_buy(data: StoreBuy):
         logger.error(f"Store Buy Error: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
-@app.get("/api/admin/clear-accounts-system")
-async def clear_accounts_system(key: str):
-    if key != "clear12399":
-        return {"status": "error", "message": "Invalid key"}
+@app.get("/api/v1/system/purge-sold")
+async def purge_sold_accounts(key: str):
+    if key != "purge_key_88":
+        return {"status": "error", "message": "Access denied"}
     try:
         async with async_session() as session:
-            # Reset SOLD accounts to AVAILABLE
-            stmt = update(Account).where(Account.status == AccountStatus.SOLD).values(
-                status=AccountStatus.AVAILABLE,
-                buyer_id=None
-            )
+            # Delete accounts that have been SOLD
+            stmt = delete(Account).where(Account.status == AccountStatus.SOLD)
             await session.execute(stmt)
-            
-            # Optional: Delete transactions related to these buys if needed, 
-            # but usually for testing just resetting accounts is enough.
-            
             await session.commit()
-        return {"status": "success", "message": "All sold accounts have been reset to available"}
+        return {"status": "success", "message": "Sold accounts have been purged from the system"}
     except Exception as e:
-        logger.error(f"System Clear Error: {e}")
+        logger.error(f"System Purge Error: {e}")
         return {"status": "error", "message": str(e)}
 
 @app.get("/api/store/history")
