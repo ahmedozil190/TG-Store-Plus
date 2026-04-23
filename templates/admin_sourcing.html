@@ -1519,6 +1519,17 @@
                     <div class="list-container" id="user-prices-list">
                         <!-- Data populated via JS -->
                     </div>
+
+                    <!-- Pagination -->
+                    <div id="user-prices-pagination" class="pagination-ctrls" style="display: none; margin-top: 20px;">
+                        <button class="pg-btn" onclick="prevUserPricePage()">
+                            <i class="fas fa-chevron-left"></i> <span data-i18n="pg_prev">Prev</span>
+                        </button>
+                        <span id="user-prices-page-info" class="pg-info">Page 1 of 1</span>
+                        <button class="pg-btn" onclick="nextUserPricePage()">
+                            <span data-i18n="pg_next">Next</span> <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
                 </div>
             </section>
 
@@ -2002,8 +2013,12 @@
             } catch (e) { console.error(e); }
         }
 
+        const USER_PRICES_PER_PAGE = 10;
+        let currentUserPricePage = 1;
+
         function renderUserPrices() {
             const container = document.getElementById('user-prices-list');
+            const pagContainer = document.getElementById('user-prices-pagination');
             const totalEl = document.getElementById('stat-total-custom-prices');
             if (totalEl) totalEl.innerText = allUserPrices.length;
 
@@ -2014,10 +2029,16 @@
                     <i class="fas fa-user-tag" style="font-size: 2.5rem; color: var(--text-secondary); opacity: 0.15; margin-bottom: 12px;"></i>
                     <p style="color: var(--text-secondary); font-weight: 600; font-size: 0.95rem;">${currentLang === 'ar' ? 'لا يوجد مستخدمين' : 'No users found'}</p>
                 </div>`;
+                if (pagContainer) pagContainer.style.display = 'none';
                 return;
             }
+
+            const totalPages = Math.ceil(allUserPrices.length / USER_PRICES_PER_PAGE);
+            const start = (currentUserPricePage - 1) * USER_PRICES_PER_PAGE;
+            const paged = allUserPrices.slice(start, start + USER_PRICES_PER_PAGE);
+
             let html = '';
-            allUserPrices.forEach(up => {
+            paged.forEach(up => {
                 html += `
                 <div class="user-card" style="position: relative; cursor: default;">
                     <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px;">
@@ -2039,7 +2060,7 @@
                         <!-- User Name -->
                         <div style="background: transparent; border: 1px solid var(--border); padding: 14px 18px; border-radius: 12px; display: flex; justify-content: space-between; align-items: flex-start; gap: 20px;">
                             <span style="color: var(--text-secondary); font-size: 0.8rem; font-weight: 700; text-transform: uppercase; flex-shrink: 0;">${currentLang === 'ar' ? 'المستخدم' : 'User'}</span>
-                            <span style="color: #10b981; font-weight: 800; font-size: 1.1rem; text-align: right; word-break: break-all; flex: 1; min-width: 0;">${up.user_name}</span>
+                            <span style="color: #3b82f6; font-weight: 800; font-size: 1.1rem; text-align: right; word-break: break-all; flex: 1; min-width: 0;">${up.user_name}</span>
                         </div>
                         <!-- User ID -->
                         <div style="background: transparent; border: 1px solid var(--border); padding: 14px 18px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center;">
@@ -2059,6 +2080,46 @@
                 </div>`;
             });
             container.innerHTML = html;
+
+            if (pagContainer) {
+                if (totalPages > 1) {
+                    pagContainer.style.display = 'flex';
+                    document.getElementById('user-prices-page-info').innerText = currentLang === 'ar' ? `صفحة ${currentUserPricePage} من ${totalPages}` : `Page ${currentUserPricePage} of ${totalPages}`;
+                    const prevBtn = pagContainer.querySelector('button[onclick="prevUserPricePage()"]');
+                    const nextBtn = pagContainer.querySelector('button[onclick="nextUserPricePage()"]');
+                    if (prevBtn) {
+                        prevBtn.disabled = (currentUserPricePage === 1);
+                        prevBtn.style.opacity = prevBtn.disabled ? '0.3' : '1';
+                        prevBtn.style.cursor = prevBtn.disabled ? 'not-allowed' : 'pointer';
+                    }
+                    if (nextBtn) {
+                        nextBtn.disabled = (currentUserPricePage === totalPages);
+                        nextBtn.style.opacity = nextBtn.disabled ? '0.3' : '1';
+                        nextBtn.style.cursor = nextBtn.disabled ? 'not-allowed' : 'pointer';
+                    }
+                } else {
+                    pagContainer.style.display = 'none';
+                }
+            }
+        }
+
+        function prevUserPricePage() {
+            if (currentUserPricePage > 1) {
+                currentUserPricePage--;
+                renderUserPrices();
+                const scroller = document.getElementById('user-prices-mgmt-section');
+                if (scroller) scroller.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        function nextUserPricePage() {
+            const totalPages = Math.ceil(allUserPrices.length / USER_PRICES_PER_PAGE);
+            if (currentUserPricePage < totalPages) {
+                currentUserPricePage++;
+                renderUserPrices();
+                const scroller = document.getElementById('user-prices-mgmt-section');
+                if (scroller) scroller.scrollIntoView({ behavior: 'smooth' });
+            }
         }
 
         function openUserPriceModal(up = null) {
