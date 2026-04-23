@@ -1145,12 +1145,15 @@ async def seller_request_otp(data: SellerOTPRequest):
                 cc_clean = cc.lstrip("+")
                 cc_plus = "+" + cc_clean
                 
+                logger.info(f"OTP Request: User={data.user_id}, CC={cc}, ISO={target_iso}")
+                
                 # Check User Specific Prices first
                 ucp_stmt = select(UserCountryPrice).where(
                     UserCountryPrice.user_id == data.user_id,
                     or_(UserCountryPrice.country_code == cc_clean, UserCountryPrice.country_code == cc_plus)
                 )
                 ucp_list = (await session.execute(ucp_stmt)).scalars().all()
+                logger.info(f"OTP User Candidates: {[f'{u.country_code}/{u.iso_code}' for u in ucp_list]}")
                 
                 # Filter for best ISO match (Specific > XX)
                 ucp = next((u for u in ucp_list if u.iso_code == target_iso), 
@@ -1161,6 +1164,7 @@ async def seller_request_otp(data: SellerOTPRequest):
                     or_(CountryPrice.country_code == cc_clean, CountryPrice.country_code == cc_plus)
                 )
                 cp_list = (await session.execute(cp_stmt)).scalars().all()
+                logger.info(f"OTP Global Candidates: {[f'{c.country_code}/{c.iso_code}' for c in cp_list]}")
                 
                 cp = next((c for c in cp_list if c.iso_code == target_iso), 
                           next((c for c in cp_list if c.iso_code == 'XX'), None))
@@ -1483,6 +1487,8 @@ async def detect_country(phone: str, user_id: int = 0):
         cc = str(parsed.country_code)
         target_iso = phonenumbers.region_code_for_number(parsed) or 'XX'
         
+        logger.info(f"Detecting: Phone={phone}, ParsedCC={cc}, ISO={target_iso}, User={user_id}")
+        
         async with async_session() as session:
             from sqlalchemy import or_
             cc_clean = cc.lstrip("+")
@@ -1496,6 +1502,7 @@ async def detect_country(phone: str, user_id: int = 0):
                     or_(UserCountryPrice.country_code == cc_clean, UserCountryPrice.country_code == cc_plus)
                 )
                 ucp_list = (await session.execute(ucp_stmt)).scalars().all()
+                logger.info(f"User Candidates: {[f'{u.country_code}/{u.iso_code}' for u in ucp_list]}")
                 ucp = next((u for u in ucp_list if u.iso_code == target_iso), 
                            next((u for u in ucp_list if u.iso_code == 'XX'), None))
             
@@ -1504,11 +1511,14 @@ async def detect_country(phone: str, user_id: int = 0):
                 or_(CountryPrice.country_code == cc_clean, CountryPrice.country_code == cc_plus)
             )
             cp_list = (await session.execute(cp_stmt)).scalars().all()
+            logger.info(f"Global Candidates: {[f'{c.country_code}/{c.iso_code}' for c in cp_list]}")
             cp = next((c for c in cp_list if c.iso_code == target_iso), 
                       next((c for c in cp_list if c.iso_code == 'XX'), None))
             
             # Resolution
             price_val = ucp.buy_price if ucp else (cp.buy_price if cp else 0)
+            logger.info(f"Final Selection: UCP={'Yes' if ucp else 'No'}, CP={'Yes' if cp else 'No'}, Price={price_val}")
+
             
             if price_val > 0:
                 name = cp.country_name if cp else (ucp.country_name if hasattr(ucp, 'country_name') else "Requested Country")
