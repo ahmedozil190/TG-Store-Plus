@@ -1528,11 +1528,6 @@
         let currentHash = null;
         let currentPhone = null;
         let allPrices = [];
-        let currentSourcingPage = 1;
-        let currentWithdrawPage = 1;
-        let totalSourcingPages = 1;
-        let totalWithdrawPages = 1;
-        const SOURCING_LIMIT = 10;
 
         // ─── Navigation Logic ───
         function openNav() {
@@ -1545,22 +1540,22 @@
         }
         function changeView(viewId) {
             closeNav();
-            // Reset pagination
+            
+            // Reset Pagination & Scroll
             currentSourcingPage = 1;
             currentWithdrawPage = 1;
+            const scroller = document.querySelector('.main-content');
+            if (scroller) scroller.scrollTop = 0;
 
             // Hide all first to prevent visual jump
             document.querySelectorAll('.view-panel').forEach(v => v.classList.remove('active'));
             document.querySelectorAll('.nav-item').forEach(v => v.classList.remove('active'));
 
-            const scroller = document.querySelector('.main-content');
-            if (scroller) scroller.scrollTop = 0;
-
             const targetView = document.getElementById(`view-${viewId}`);
             const targetBtn = document.getElementById(`btn-${viewId}`);
 
-            targetView.classList.add('active');
-            targetBtn.classList.add('active');
+            if (targetView) targetView.classList.add('active');
+            if (targetBtn) targetBtn.classList.add('active');
 
             // Update URL Hash for persistence
             window.location.hash = viewId;
@@ -1575,8 +1570,6 @@
             };
             document.getElementById('viewTitle').textContent = titles[viewId];
 
-            document.getElementById('viewTitle').textContent = titles[viewId];
-
             if (viewId === 'dashboard') fetchSellerData();
             if (viewId === 'pricing') fetchSellerData();
             if (viewId === 'withdraw') fetchWithdrawals();
@@ -1585,6 +1578,14 @@
                 fetchSourcingHistory();
             }
         }
+
+        window.onhashchange = () => {
+            const hash = window.location.hash.replace('#', '');
+            if (hash) {
+                const valid = ['dashboard', 'submit', 'withdraw', 'pricing', 'support'];
+                if (valid.includes(hash)) changeView(hash);
+            }
+        };
 
         // ─── Data Services ───
         async function fetchSellerData() {
@@ -1656,6 +1657,8 @@
         // ─── Withdrawal Logic ───
         let currentMethod = 'TRX - TRC20';
         let currentMin = 4.0;
+        let currentWithdrawPage = 1;
+        let totalWithdrawPages = 1;
 
         async function moveWithdrawPage(delta) {
             const target = currentWithdrawPage + delta;
@@ -1999,7 +2002,9 @@
             document.getElementById('node-3').className = 'step-node';
         }
 
-
+        let currentSourcingPage = 1;
+        let totalSourcingPages = 1;
+        const SOURCING_LIMIT = 10;
 
         async function moveSourcingPage(delta) {
             const target = currentSourcingPage + delta;
