@@ -14,9 +14,7 @@ async def cmd_start(message: Message, bot: Bot = None):
     # Force refresh commands and menu button if bot is provided
     if bot:
         user_commands = [
-            BotCommand(command="start", description="Start/Restart"),
-            BotCommand(command="profile", description="My Profile"),
-            BotCommand(command="support", description="Contact Support")
+            BotCommand(command="start", description="Start/Restart")
         ]
         try:
             await bot.set_my_commands(user_commands, scope=BotCommandScopeChat(chat_id=message.from_user.id))

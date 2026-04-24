@@ -30,11 +30,7 @@ async def seller_start_cmd(message: Message, bot: Bot = None):
     # Force refresh commands if bot is provided (during manual /start)
     if bot:
         user_commands = [
-            BotCommand(command="start", description="/start"),
-            BotCommand(command="coin", description="/coin"),
-            BotCommand(command="cancel", description="/cancel"),
-            BotCommand(command="language", description="/language"),
-            BotCommand(command="cap", description="/cap")
+            BotCommand(command="start", description="/start")
         ]
         try:
             await bot.set_my_commands(user_commands, scope=BotCommandScopeChat(chat_id=message.from_user.id))
@@ -78,12 +74,7 @@ async def seller_start_cmd(message: Message, bot: Bot = None):
         btn_support = "🆘 Support"
     
     markup = InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text=btn_panel, web_app=WebAppInfo(url=SELLER_URL))],
-        [
-            InlineKeyboardButton(text=btn_balance, callback_data="seller_coin_info"),
-            InlineKeyboardButton(text=btn_prices, callback_data="seller_price_list")
-        ],
-        [InlineKeyboardButton(text=btn_support, url="https://t.me/FE4EE")]
+        [InlineKeyboardButton(text=btn_panel, web_app=WebAppInfo(url=SELLER_URL))]
     ])
     
     await message.answer(welcome_text, reply_markup=markup)

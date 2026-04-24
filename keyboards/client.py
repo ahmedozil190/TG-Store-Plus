@@ -1,24 +1,10 @@
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, WebAppInfo
-from config import SELLER_URL
+from config import SELLER_URL, STORE_URL
 
 def main_keyboard():
     return InlineKeyboardMarkup(inline_keyboard=[
         [
-            InlineKeyboardButton(text="- Buy an account.", callback_data="buy_number"),
-            InlineKeyboardButton(text="- Selling an account.", web_app=WebAppInfo(url=SELLER_URL))
-        ],
-        [
-            InlineKeyboardButton(text="Automatic payment.", callback_data="deposit")
-        ],
-        [
-            InlineKeyboardButton(text="API KEY", callback_data="api_key")
-        ],
-        [
-            InlineKeyboardButton(text="Customer service.", callback_data="customer_service")
-        ],
-        [
-            InlineKeyboardButton(text="Bot activations.", url="https://t.me/MOOO8O"),
-            InlineKeyboardButton(text="- Call link.", callback_data="call_link")
+            InlineKeyboardButton(text="🛒 Open Store | فتح المتجر", web_app=WebAppInfo(url=STORE_URL))
         ]
     ])
 
