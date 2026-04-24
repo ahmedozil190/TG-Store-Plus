@@ -1802,24 +1802,36 @@
 
         function switchNav(id, btn, skipToggle = false) {
             if (!skipToggle) closeNav();
-            // Hide all first to avoid visual jump during scroll reset
-            document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
+            
+            // Standard Reset Logic
+            currentPage = 1;
+            currentPricePage = 1;
 
             const scroller = document.getElementById('app-content-scroller');
             if (scroller) scroller.scrollTo({ top: 0, behavior: 'smooth' });
 
+            // Update UI
+            document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
             document.getElementById('section-' + id).classList.add('active');
             document.querySelectorAll('.nav-item').forEach(m => m.classList.remove('active'));
             if (btn) btn.classList.add('active');
 
             sessionStorage.setItem('last_view_admin_store', id);
-            if (!skipToggle) closeNav();
+            location.hash = id;
 
             const titleMap = { home: 'nav_dashboard', users: 'nav_users', prices: 'nav_prices', sales: 'nav_sales', settings: 'nav_settings' };
             const titleEl = document.getElementById('page-title');
-            titleEl.setAttribute('data-i18n', titleMap[id]);
-            titleEl.innerText = translations[currentLang][titleMap[id]];
+            if (titleEl) {
+                titleEl.setAttribute('data-i18n', titleMap[id]);
+                titleEl.innerText = translations[currentLang][titleMap[id]] || id;
+            }
         }
+
+        window.onhashchange = function() {
+            const h = location.hash.replace('#', '') || 'home';
+            const btn = document.getElementById('menu-' + (h === 'home' ? 'dashboard' : h));
+            switchNav(h, btn, true);
+        };
 
         async function init() {
             try {

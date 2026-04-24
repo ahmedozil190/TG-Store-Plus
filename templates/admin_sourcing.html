@@ -2699,18 +2699,25 @@
 
         function switchNav(id, btn, skipToggle = false) {
             if (!skipToggle) closeNav();
-            // Hide all first
-            document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
+            
+            // Standard Reset Logic
+            currentPage = 1;
+            currentPricePage = 1;
+            currentUserPricePage = 1;
+            currentAdminWithdrawPage = 1;
+            currentAdminHistoryPage = 1;
 
             const scroller = document.getElementById('app-content-scroller');
             if (scroller) scroller.scrollTo({ top: 0, behavior: 'smooth' });
 
+            // Update UI
+            document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
             document.getElementById('section-' + id).classList.add('active');
             document.querySelectorAll('.nav-item').forEach(m => m.classList.remove('active'));
             if (btn) btn.classList.add('active');
 
             sessionStorage.setItem('last_view_admin_sourcing', id);
-            if (!skipToggle) closeNav();
+            location.hash = id;
 
             // Update page title
             const titleMap = {
@@ -2723,11 +2730,19 @@
                 'user-prices': 'nav_user_prices'
             };
             const titleEl = document.getElementById('page-title');
-            titleEl.setAttribute('data-i18n', titleMap[id]);
-            titleEl.innerText = translations[currentLang][titleMap[id]] || "Withdrawals";
+            if (titleEl) {
+                titleEl.setAttribute('data-i18n', titleMap[id]);
+                titleEl.innerText = translations[currentLang][titleMap[id]] || id;
+            }
 
             if (id === 'withdrawals') fetchAdminWithdrawals(1, 'pending');
         }
+
+        window.onhashchange = function() {
+            const h = location.hash.replace('#', '') || 'home';
+            const btn = document.getElementById('menu-' + (h === 'home' ? 'dashboard' : h));
+            switchNav(h, btn, true);
+        };
 
         async function init() {
             fetchUserPrices();
