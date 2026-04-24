@@ -803,18 +803,22 @@
                 </div>
                 <h3 style="margin-bottom: 10px;">Binance Pay Deposit</h3>
                 <p style="color: var(--text-s); font-size: 0.95rem; margin-bottom: 20px; line-height: 1.5;">
-                    Please transfer USDT via Binance Internal Transfer (Binance Pay) to the Pay ID below, then paste the Order ID or Transaction ID (TxID) to verify and add to your balance automatically.
+                    Please transfer USDT via Binance Internal Transfer (Binance Pay) to the Pay ID below, then paste the Order ID or Transaction ID to verify and add to your balance automatically.
                 </p>
                 <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 12px; width: 100%; word-break: break-all; font-family: monospace; font-size: 1.1rem; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 25px;" id="deposit-address-display">
                     Loading Address...
                 </div>
                 
                 <div style="width: 100%; text-align: left;">
-                    <label style="display: block; margin-bottom: 8px; color: var(--text-s); font-size: 0.9rem;">Transaction ID (TxID)</label>
-                    <input type="text" id="deposit-txid" class="search-input" placeholder="Paste TxID here..." style="width: 100%; margin-bottom: 20px; text-align: center; border: 1px solid rgba(255,255,255,0.2);">
+                    <label style="display: block; margin-bottom: 10px; color: var(--text-p); font-size: 0.9rem; font-weight: 700; opacity: 0.9;">Transaction ID</label>
+                    <div style="position: relative; margin-bottom: 20px;">
+                        <i class="fas fa-hashtag" style="position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: var(--text-s); font-size: 0.9rem;"></i>
+                        <input type="text" id="deposit-txid" class="search-input" placeholder="Paste Transaction ID here..." 
+                            style="width: 100%; margin-bottom: 0; text-align: left; padding-left: 44px; border: 1px solid var(--border); background: rgba(255,255,255,0.03); font-size: 0.95rem; height: 54px; border-radius: 14px; transition: 0.3s var(--ease);">
+                    </div>
                     
-                    <button class="btn btn-primary" style="width: 100%; font-weight: 700; font-size: 1.1rem;" onclick="verifyDeposit()" id="btn-verify-deposit">
-                        <i class="fas fa-check-circle" style="margin-right: 8px;"></i> Verify Deposit
+                    <button class="primary-btn" style="height: 54px; border-radius: 14px; background: linear-gradient(135deg, var(--accent), var(--accent-purple)); box-shadow: 0 8px 30px rgba(88, 101, 242, 0.4);" onclick="verifyDeposit()" id="btn-verify-deposit">
+                        <i class="fas fa-shield-check" style="margin-right: 4px;"></i> Verify Deposit
                     </button>
                 </div>
             </div>
