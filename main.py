@@ -166,11 +166,14 @@ async def main():
     tasks = [web_task]
     
     # 5. Delete Bot Commands (Side Menu)
+    from aiogram.types import BotCommandScopeAllPrivateChats
     try:
         await bot_buyer.delete_my_commands()
+        await bot_buyer.delete_my_commands(scope=BotCommandScopeAllPrivateChats())
         logger.info("Buyer Bot commands deleted globally.")
         if bot_seller:
             await bot_seller.delete_my_commands()
+            await bot_seller.delete_my_commands(scope=BotCommandScopeAllPrivateChats())
             logger.info("Seller Bot commands deleted globally.")
     except Exception as e:
         logger.error(f"Failed to delete commands: {e}")
