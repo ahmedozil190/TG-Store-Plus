@@ -584,6 +584,19 @@ async def get_store_history(user_id: int, page: int = 1, limit: int = 10):
         logger.error(f"Store History Error: {e}")
         return {"orders": [], "total_pages": 0, "current_page": 1, "total_count": 0}
 
+async def get_binance_price(coin: str):
+    """Fetch current price of a coin in USDT."""
+    if coin.upper() == "USDT":
+        return 1.0
+    try:
+        url = f"https://api.binance.com/api/v3/ticker/price?symbol={coin.upper()}USDT"
+        response = await asyncio.to_thread(requests.get, url, timeout=5)
+        if response.status_code == 200:
+            return float(response.json().get("price", 0))
+    except:
+        pass
+    return 0
+
 async def check_binance_deposit(txid: str, api_key: str, api_secret: str):
     if not api_key or not api_secret:
         return False, "Binance API keys not configured", 0
@@ -606,18 +619,28 @@ async def check_binance_deposit(txid: str, api_key: str, api_secret: str):
         response = await asyncio.to_thread(requests.get, url, headers=headers)
         data = response.json()
         if response.status_code == 200:
-            if isinstance(data, list):
+            if isinstance(data, list) and len(data) > 0:
                 for record in data:
                     if record.get("txId") == txid:
                         status = record.get("status")
+                        coin = record.get("coin", "USDT")
                         amount = float(record.get("amount", 0))
-                        if status == 1:
-                            return True, "Success", amount
+                        
+                        if status == 1: # Success
+                            # Conversion Logic
+                            if coin.upper() != "USDT":
+                                price = await get_binance_price(coin)
+                                if price <= 0:
+                                    return False, f"Could not determine price for {coin}. Please contact admin.", 0
+                                final_usd_amount = amount * price
+                                return True, f"Success: {amount} {coin} converted to ${final_usd_amount:.2f}", final_usd_amount
+                            else:
+                                return True, "Success", amount
                         else:
                             return False, f"Deposit pending (status: {status}). Please wait.", 0
                 return False, "Transaction ID not found in your Binance account.", 0
             else:
-                return False, "Unexpected response format from Binance.", 0
+                return False, "Transaction ID not found or unexpected response format.", 0
         else:
             return False, f"Binance error: {data.get('msg', 'Unknown')}", 0
     except Exception as e:
