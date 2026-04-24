@@ -136,12 +136,19 @@ async def submit_app_code(user_id: int, phone_number: str, phone_code_hash: str,
         login_clients.pop(user_id, None)
 
 async def get_telegram_login_code(session_string: str) -> str | None:
+    import time
     client = await create_client(session_string)
     code = None
+    now = time.time()
     
     try:
         await client.connect()
         async for message in client.get_chat_history(777000, limit=3):
+            # Only consider messages from the last 120 seconds (2 minutes)
+            msg_ts = message.date.timestamp() if message.date else 0
+            if (now - msg_ts) > 120:
+                continue
+
             text = message.text
             if not text:
                 continue
