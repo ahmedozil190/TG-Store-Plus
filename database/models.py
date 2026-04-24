@@ -99,3 +99,9 @@ class Deposit(Base):
     txid = Column(String, unique=True, nullable=False) # Binance TxID
     created_at = Column(DateTime, default=datetime.utcnow)
 
+class AppSetting(Base):
+    __tablename__ = 'app_settings'
+    key = Column(String, primary_key=True)
+    value = Column(String, nullable=True)
+
+

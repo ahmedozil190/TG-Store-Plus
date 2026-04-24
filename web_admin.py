@@ -11,7 +11,7 @@ from fastapi.responses import HTMLResponse
 from sqlalchemy.future import select
 from sqlalchemy import select, delete, update, func, text
 from database.engine import async_session
-from database.models import User, Account, Transaction, AccountStatus, TransactionType, CountryPrice, WithdrawalRequest, WithdrawalStatus, UserCountryPrice, Deposit
+from database.models import User, Account, Transaction, AccountStatus, TransactionType, CountryPrice, WithdrawalRequest, WithdrawalStatus, UserCountryPrice, Deposit, AppSetting
 import hmac
 import hashlib
 import time
@@ -56,6 +56,11 @@ class WithdrawAction(BaseModel):
 class DepositSubmit(BaseModel):
     user_id: int
     txid: str
+
+class StoreSettingsSubmit(BaseModel):
+    binance_api_key: str
+    binance_api_secret: str
+    deposit_address: str
 
 # Setup logging
 logging.basicConfig(level=logging.INFO)
@@ -449,7 +454,11 @@ async def get_store_data(user_id: int = None):
                 bot_name = await asyncio.to_thread(fetch_name)
             except: pass
 
-        from config import DEPOSIT_ADDRESS
+            # Fetch DEPOSIT_ADDRESS
+            from config import DEPOSIT_ADDRESS
+            dep_address_obj = (await session.execute(select(AppSetting).where(AppSetting.key == "DEPOSIT_ADDRESS"))).scalar_one_or_none()
+            final_deposit_address = dep_address_obj.value if dep_address_obj and dep_address_obj.value else DEPOSIT_ADDRESS
+
         return {
             "bot_name": bot_name,
             "countries": countries,
@@ -463,7 +472,7 @@ async def get_store_data(user_id: int = None):
                 "countries_count": countries_count,
                 "lowest_price": lowest_price
             },
-            "deposit_address": DEPOSIT_ADDRESS
+            "deposit_address": final_deposit_address
         }
     except Exception as e:
         logger.error(f"Store Data Error: {e}")
@@ -575,9 +584,8 @@ async def get_store_history(user_id: int, page: int = 1, limit: int = 10):
         logger.error(f"Store History Error: {e}")
         return {"orders": [], "total_pages": 0, "current_page": 1, "total_count": 0}
 
-def check_binance_deposit(txid: str):
-    from config import BINANCE_API_KEY, BINANCE_API_SECRET
-    if not BINANCE_API_KEY or not BINANCE_API_SECRET:
+async def check_binance_deposit(txid: str, api_key: str, api_secret: str):
+    if not api_key or not api_secret:
         return False, "Binance API keys not configured", 0
         
     base_url = "https://api.binance.com"
@@ -586,16 +594,16 @@ def check_binance_deposit(txid: str):
     
     query_string = f"txId={txid}&timestamp={timestamp}"
     signature = hmac.new(
-        BINANCE_API_SECRET.encode('utf-8'),
+        api_secret.encode('utf-8'),
         query_string.encode('utf-8'),
         hashlib.sha256
     ).hexdigest()
     
-    headers = {"X-MBX-APIKEY": BINANCE_API_KEY}
+    headers = {"X-MBX-APIKEY": api_key}
     url = f"{base_url}{endpoint}?{query_string}&signature={signature}"
     
     try:
-        response = requests.get(url, headers=headers)
+        response = await asyncio.to_thread(requests.get, url, headers=headers)
         data = response.json()
         if response.status_code == 200:
             if isinstance(data, list):
@@ -623,13 +631,22 @@ async def store_deposit_verify(req: DepositSubmit):
             return {"status": "error", "message": "TxID is empty"}
             
         async with async_session() as session:
+            # Fetch Binance credentials from DB
+            from config import BINANCE_API_KEY, BINANCE_API_SECRET
+            
+            key_obj = (await session.execute(select(AppSetting).where(AppSetting.key == "BINANCE_API_KEY"))).scalar_one_or_none()
+            sec_obj = (await session.execute(select(AppSetting).where(AppSetting.key == "BINANCE_API_SECRET"))).scalar_one_or_none()
+            
+            final_key = key_obj.value if key_obj and key_obj.value else BINANCE_API_KEY
+            final_sec = sec_obj.value if sec_obj and sec_obj.value else BINANCE_API_SECRET
+
             # Check if this txid was already processed
             existing = (await session.execute(select(Deposit).where(Deposit.txid == txid))).scalar_one_or_none()
             if existing:
                 return {"status": "error", "message": "This Transaction ID has already been used."}
                 
             # Verify with Binance
-            is_valid, msg, amount = check_binance_deposit(txid)
+            is_valid, msg, amount = await check_binance_deposit(txid, final_key, final_sec)
             if not is_valid:
                 return {"status": "error", "message": msg}
                 
@@ -950,6 +967,65 @@ async def get_admin_store_data():
         logger.error(f"Store Admin Data Error: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
+@app.get("/api/admin/store/settings")
+async def get_store_settings():
+    try:
+        from config import BINANCE_API_KEY, BINANCE_API_SECRET, DEPOSIT_ADDRESS
+        async with async_session() as session:
+            keys = ["BINANCE_API_KEY", "BINANCE_API_SECRET", "DEPOSIT_ADDRESS"]
+            settings = {}
+            for k in keys:
+                obj = (await session.execute(select(AppSetting).where(AppSetting.key == k))).scalar_one_or_none()
+                if obj:
+                    settings[k] = obj.value
+                else:
+                    settings[k] = ""
+            
+            # Fallbacks to config.py if empty in DB
+            api_key = settings.get("BINANCE_API_KEY") or BINANCE_API_KEY
+            api_secret = settings.get("BINANCE_API_SECRET") or BINANCE_API_SECRET
+            dep_address = settings.get("DEPOSIT_ADDRESS") or DEPOSIT_ADDRESS
+            
+            # Mask the secret for security
+            masked_secret = ""
+            if api_secret and len(api_secret) > 8:
+                masked_secret = api_secret[:4] + "*" * (len(api_secret) - 8) + api_secret[-4:]
+            elif api_secret:
+                masked_secret = "***"
+
+            return {
+                "binance_api_key": api_key,
+                "binance_api_secret_masked": masked_secret,
+                "deposit_address": dep_address
+            }
+    except Exception as e:
+        logger.error(f"Get Store Settings Error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/admin/store/settings")
+async def save_store_settings(req: StoreSettingsSubmit):
+    try:
+        async with async_session() as session:
+            updates = {
+                "BINANCE_API_KEY": req.binance_api_key.strip(),
+                "DEPOSIT_ADDRESS": req.deposit_address.strip()
+            }
+            if req.binance_api_secret and not req.binance_api_secret.startswith("*"):
+                updates["BINANCE_API_SECRET"] = req.binance_api_secret.strip()
+
+            for k, v in updates.items():
+                obj = (await session.execute(select(AppSetting).where(AppSetting.key == k))).scalar_one_or_none()
+                if obj:
+                    obj.value = v
+                else:
+                    new_setting = AppSetting(key=k, value=v)
+                    session.add(new_setting)
+            
+            await session.commit()
+            return {"status": "success", "message": "Settings saved successfully"}
+    except Exception as e:
+        logger.error(f"Save Store Settings Error: {e}")
+        return {"status": "error", "message": str(e)}
 @app.post("/api/admin/stock/start-login")
 async def start_login(data: StockLoginStart):
     phone = data.phone

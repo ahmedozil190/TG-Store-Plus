@@ -1404,6 +1404,9 @@
             <div class="nav-item" id="menu-sales" onclick="switchNav('sales', this)">
                 <i class="fas fa-receipt"></i> <span data-i18n="nav_sales">Sales History</span>
             </div>
+            <div class="nav-item" id="menu-settings" onclick="switchNav('settings', this)">
+                <i class="fas fa-cog"></i> <span data-i18n="nav_settings">Settings</span>
+            </div>
         </div>
     </div>
 
@@ -1593,12 +1596,28 @@
                     <h2 data-i18n="nav_settings">Settings</h2>
                 </div>
                 <div class="card" style="padding: 22px;">
-                    <div class="form-group">
-                        <label data-i18n="lbl_bot_name">Bot Name</label>
-                        <input type="text" id="setting-bot-name" class="input-field" placeholder="Store Bot">
+                    <div style="margin-bottom: 25px;">
+                        <h3 style="font-size: 1rem; margin-bottom: 15px; color: var(--accent);"><i class="fas fa-wallet" style="margin-right: 8px;"></i> Binance Integration</h3>
+                        
+                        <div class="form-group" style="margin-bottom: 15px;">
+                            <label style="font-size: 0.85rem; color: var(--text-s); margin-bottom: 8px; display: block;">Binance API Key</label>
+                            <input type="text" id="setting-binance-key" class="search-input" style="margin-bottom: 0;" placeholder="Enter API Key">
+                        </div>
+                        
+                        <div class="form-group" style="margin-bottom: 15px;">
+                            <label style="font-size: 0.85rem; color: var(--text-s); margin-bottom: 8px; display: block;">Binance API Secret</label>
+                            <input type="text" id="setting-binance-secret" class="search-input" style="margin-bottom: 0;" placeholder="Enter Secret Key (Hidden)">
+                        </div>
+                        
+                        <div class="form-group" style="margin-bottom: 15px;">
+                            <label style="font-size: 0.85rem; color: var(--text-s); margin-bottom: 8px; display: block;">Binance Pay ID / Deposit Address</label>
+                            <input type="text" id="setting-deposit-address" class="search-input" style="margin-bottom: 0;" placeholder="Enter Pay ID or TRC20 Address">
+                        </div>
                     </div>
-                    <button class="primary-btn" onclick="saveSettings()" data-i18n="btn_save_settings">Save
-                        Settings</button>
+
+                    <button class="btn-find" onclick="saveStoreSettings()">
+                        <i class="fas fa-save"></i> Save Settings
+                    </button>
                 </div>
             </section>
 
@@ -1827,6 +1846,7 @@
             if (id === 'prices') renderPrices(allPrices);
             if (id === 'sales') renderSalesList(allTransactions);
             if (id === 'home') renderSales(allTransactions);
+            if (id === 'settings') fetchStoreSettings();
 
             // 5. Reset scroll BEFORE showing the section
             const scroller = document.getElementById('app-content-scroller');
@@ -2449,9 +2469,57 @@
             }
         }
 
-        function saveSettings() {
-            alert(currentLang === 'ar' ? 'تم حفظ الإعدادات بنجاح!' : 'Settings saved successfully!');
+        async function fetchStoreSettings() {
+            try {
+                const res = await fetch('/api/admin/store/settings');
+                if (!res.ok) throw new Error("Failed to fetch settings");
+                const data = await res.json();
+                document.getElementById('setting-binance-key').value = data.binance_api_key || "";
+                document.getElementById('setting-binance-secret').value = data.binance_api_secret_masked || "";
+                document.getElementById('setting-deposit-address').value = data.deposit_address || "";
+            } catch (e) {
+                console.error("Fetch settings error:", e);
+                showToast("Error", "Could not fetch settings", "error");
+            }
         }
+
+        async function saveStoreSettings() {
+            const key = document.getElementById('setting-binance-key').value.trim();
+            const secret = document.getElementById('setting-binance-secret').value.trim();
+            const address = document.getElementById('setting-deposit-address').value.trim();
+
+            const btn = document.querySelector('#section-settings .btn-find');
+            btn.disabled = true;
+            const originalHtml = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+
+            try {
+                const res = await fetch('/api/admin/store/settings', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        binance_api_key: key,
+                        binance_api_secret: secret,
+                        deposit_address: address
+                    })
+                });
+                const data = await res.json();
+                if (data.status === 'success') {
+                    showToast("Success", "Settings saved successfully", "success");
+                    fetchStoreSettings(); // Refresh masked secret
+                } else {
+                    showToast("Error", data.message || "Failed to save", "error");
+                }
+            } catch (e) {
+                console.error("Save settings error:", e);
+                showToast("Error", "Connection error", "error");
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalHtml;
+            }
+        }
+
+        function saveSettings() { }
 
         applyTheme();
         updateUI();
