@@ -2722,9 +2722,9 @@
                 if (el) el.style.display = 'none';
             });
 
-            // 3. Reset Scroll Position
+            // 3. Reset Scroll Position (instant to avoid visible animation)
             const scroller = document.getElementById('app-content-scroller');
-            if (scroller) scroller.scrollTo({ top: 0, behavior: 'smooth' });
+            if (scroller) scroller.scrollTop = 0;
 
             // 4. Update UI Visibility
             document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
