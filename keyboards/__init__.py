@@ -1,1 +1,1 @@
-from .client import main_keyboard, profile_keyboard
+from .client import main_keyboard
