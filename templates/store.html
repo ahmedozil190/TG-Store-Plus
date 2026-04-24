@@ -338,6 +338,7 @@
             gap: 12px;
             height: 54px;
             transition: all 0.3s;
+            box-shadow: var(--shadow);
         }
 
         .search-input {
@@ -366,6 +367,7 @@
             justify-content: space-between;
             cursor: pointer;
             transition: all 0.2s;
+            box-shadow: var(--shadow);
         }
 
         .country-card:active {
@@ -605,7 +607,7 @@
         .tab-btn.active {
             background: var(--bg-elevated);
             border: 2px solid var(--accent);
-            box-shadow: 0 0 20px var(--accent-glow);
+            box-shadow: 0 0 12px var(--accent-glow);
         }
 
         /* ─── Pagination Controls ─── */
@@ -885,7 +887,7 @@
                 <div style="width: 100%; text-align: left;">
                     <label style="display: block; margin-bottom: 8px; color: var(--text-p); font-size: 0.85rem; font-weight: 700; opacity: 0.9;">Transaction ID</label>
                     <div style="position: relative; margin-bottom: 20px;">
-                        <input type="text" id="deposit-txid" class="search-input" placeholder="0"
+                        <input type="text" id="deposit-txid" class="search-input" placeholder="Enter Transaction ID..."
                             style="width: 100%; margin-bottom: 0; text-align: center; border: 1px solid var(--border); background: rgba(255,255,255,0.03); font-size: 0.95rem; height: 50px; border-radius: 12px;">
                     </div>
 
