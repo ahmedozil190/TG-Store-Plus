@@ -1426,8 +1426,6 @@
             </div>
         </div>
 
-        </div>
-
         <!-- View: Support -->
         <div class="view-panel" id="view-support">
             <div class="card"
@@ -2116,7 +2114,7 @@
         window.onload = () => {
             // Check hash for persistence
             const hash = window.location.hash.replace('#', '');
-            const validViews = ['dashboard', 'submit', 'withdraw', 'pricing'];
+            const validViews = ['dashboard', 'submit', 'withdraw', 'pricing', 'support'];
             if (hash && validViews.includes(hash)) {
                 changeView(hash);
             }
