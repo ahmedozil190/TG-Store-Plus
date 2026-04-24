@@ -812,9 +812,8 @@
                 <div style="width: 100%; text-align: left;">
                     <label style="display: block; margin-bottom: 10px; color: var(--text-p); font-size: 0.9rem; font-weight: 700; opacity: 0.9;">Transaction ID</label>
                     <div style="position: relative; margin-bottom: 20px;">
-                        <i class="fas fa-hashtag" style="position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: var(--text-s); font-size: 0.9rem;"></i>
                         <input type="text" id="deposit-txid" class="search-input" placeholder="Paste Transaction ID here..." 
-                            style="width: 100%; margin-bottom: 0; text-align: left; padding-left: 44px; border: 1px solid var(--border); background: rgba(255,255,255,0.03); font-size: 0.95rem; height: 54px; border-radius: 14px; transition: 0.3s var(--ease);">
+                            style="width: 100%; margin-bottom: 0; text-align: center; border: 1px solid var(--border); background: rgba(255,255,255,0.03); font-size: 0.95rem; height: 54px; border-radius: 14px; transition: 0.3s var(--ease);">
                     </div>
                     
                     <button class="primary-btn" style="height: 54px; border-radius: 14px; background: linear-gradient(135deg, var(--accent), var(--accent-purple)); box-shadow: 0 8px 30px rgba(88, 101, 242, 0.4);" onclick="verifyDeposit()" id="btn-verify-deposit">
@@ -1353,7 +1352,7 @@
             const btn = document.getElementById('btn-verify-deposit');
 
             if (!txid) {
-                showToast("Error", "Please enter a valid Transaction ID (TxID).", "error");
+                showToast("Error", "Please enter a valid Transaction ID.", "error");
                 return;
             }
 
