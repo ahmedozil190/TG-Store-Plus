@@ -1081,7 +1081,12 @@
             list.innerHTML = data.map(h => {
                 const phoneClean = h.phone.replace(/\D/g, '');
                 return `
-                <div class="card" style="display: flex; flex-direction: column; gap: 10px; padding: 20px;">
+                <div class="card" style="display: flex; flex-direction: column; gap: 10px; padding: 20px; box-shadow: none; transition: transform 0.2s; cursor: pointer;"
+                    onmouseover="this.style.transform='scale(1.02)'" 
+                    onmouseout="this.style.transform='scale(1)'"
+                    onmousedown="this.style.transform='scale(0.98)'"
+                    onmouseup="this.style.transform='scale(1.02)'">
+                    
                     <div style="${rowS}">
                         <span style="${lblS}">STATUS</span>
                         <span style="color: var(--success); font-weight: 800; font-size: 0.85rem; text-transform: uppercase;">PAID</span>
@@ -1089,6 +1094,12 @@
                     <div style="${rowS}">
                         <span style="${lblS}">NUMBER</span>
                         <span style="color: #8b5cf6; font-weight: 800; font-size: 1.1rem; text-align: right; direction: ltr;">${h.phone}</span>
+                    </div>
+                    <div style="${rowS}">
+                        <span style="${lblS}">CODE</span>
+                        <span id="otp-status-${phoneClean}" style="color: var(--warning); font-weight: 800; font-size: 0.85rem; display: flex; align-items: center; gap: 6px;">
+                            <i class="fas fa-clock"></i> WAITING
+                        </span>
                     </div>
                     <div style="${rowS}">
                         <span style="${lblS}">COUNTRY</span>
@@ -1130,6 +1141,11 @@
                 const data = await res.json();
 
                 if (data.status === 'success') {
+                    const statusEl = document.getElementById('otp-status-' + safeId);
+                    if (statusEl) {
+                        statusEl.innerHTML = '<i class="fas fa-check-circle"></i> RECEIVED';
+                        statusEl.style.color = 'var(--success)';
+                    }
                     otpBox.style.display = 'block';
                     otpVal.innerText = data.code;
                     btn.innerHTML = '<i class="fas fa-check"></i> Code Received';
