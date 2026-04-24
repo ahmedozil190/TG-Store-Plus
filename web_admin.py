@@ -410,7 +410,25 @@ async def get_store_data(user_id: int = None):
             countries_count = len(set(c['name'] for c in countries))
             lowest_price = min((c['buy_price'] for c in countries), default=0.0)
 
+            # Fetch bot name
+            bot_name = "Numbers Store"
+            try:
+                from config import BOT_TOKEN
+                import urllib.request
+                import json
+                def fetch_name():
+                    try:
+                        req = urllib.request.Request(f"https://api.telegram.org/bot{BOT_TOKEN}/getMe")
+                        with urllib.request.urlopen(req, timeout=2) as r:
+                            res_data = json.loads(r.read().decode())
+                            if res_data.get("ok"):
+                                return res_data["result"].get("first_name", "Numbers Store")
+                    except: return "Numbers Store"
+                bot_name = await asyncio.to_thread(fetch_name)
+            except: pass
+
         return {
+            "bot_name": bot_name,
             "countries": countries,
             "user": {
                 "balance": balance,
