@@ -351,6 +351,15 @@
             </div>
             <div class="info-card">
                 <div style="display: flex; flex-direction: column;">
+                    <span class="info-card-lbl" data-i18n="total_spent">TOTAL SPENT</span>
+                    <span class="info-card-val" id="dash-spent">$0.00</span>
+                </div>
+                <div style="width: 45px; height: 45px; background: rgba(239, 68, 68, 0.1); color: #ef4444; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-hand-holding-dollar"></i>
+                </div>
+            </div>
+            <div class="info-card">
+                <div style="display: flex; flex-direction: column;">
                     <span class="info-card-lbl" data-i18n="total_orders">TOTAL ORDERS</span>
                     <span class="info-card-val" id="dash-orders">0</span>
                 </div>
@@ -531,7 +540,7 @@
         const translations = {
             en: {
                 loading: "Optimizing Store...", nav_home: "Dashboard", nav_store: "Buy Number", nav_history: "Orders History", nav_support: "Support",
-                balance: "YOUR BALANCE", total_orders: "SUCCESS ORDERS", quick_buy: "Quick Access", btn_start_shopping: "Browse Numbers",
+                balance: "YOUR BALANCE", total_spent: "TOTAL SPENT", total_orders: "SUCCESS ORDERS", quick_buy: "Quick Access", btn_start_shopping: "Browse Numbers",
                 confirm_title: "Confirmation", lbl_country: "Country", lbl_price: "Price", btn_confirm_pay: "Buy Now",
                 success_title: "Payment Success!", success_desc: "Wait for the code in your bot chat.", btn_close: "Dismiss",
                 available: "Available", search_ph: "Search countries...",
@@ -541,7 +550,7 @@
             },
             ar: {
                 loading: "جاري تجهيز المتجر...", nav_home: "الرئيسية", nav_store: "شراء رقم", nav_history: "سجل الطلبات", nav_support: "الدعم",
-                balance: "رصيدك الحالي", total_orders: "إجمالي المشتريات", quick_buy: "وصول سريع", btn_start_shopping: "تصفح الأرقام",
+                balance: "رصيدك الحالي", total_spent: "إجمالي المدفوعات", total_orders: "إجمالي المشتريات", quick_buy: "وصول سريع", btn_start_shopping: "تصفح الأرقام",
                 confirm_title: "تأكيد الشراء", lbl_country: "الدولة", lbl_price: "السعر", btn_confirm_pay: "إتمام الشراء",
                 success_title: "تم بنجاح!", success_desc: "انتظر وصول الكود في البوت.", btn_close: "إغلاق",
                 available: "رقم متاح", search_ph: "ابحث عن دولة...",
@@ -607,6 +616,7 @@
                 if (data.user) {
                     updateBalanceUI(data.user.balance || 0);
                     document.getElementById('dash-orders').innerText = data.user.total_orders || 0;
+                    document.getElementById('dash-spent').innerText = `$${parseFloat(data.user.total_spent || 0).toFixed(2)}`;
                     const nameForUI = (data.user.full_name && data.user.full_name !== 'Unknown') ? data.user.full_name : (userData?.first_name || "User");
                     document.getElementById('userInitial').innerText = nameForUI.charAt(0).toUpperCase();
                 }

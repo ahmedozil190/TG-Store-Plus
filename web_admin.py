@@ -399,11 +399,20 @@ async def get_store_data(user_id: int = None):
             # User balance & Stats
             balance = 0.0
             total_orders = 0
+            total_spent = 0.0
             if user_id:
                 user = await session.get(User, user_id)
                 if user:
                     balance = user.balance_store
                     total_orders = (await session.execute(select(func.count(Account.id)).where(Account.buyer_id == user_id))).scalar() or 0
+                    
+                    spent_val = (await session.execute(
+                        select(func.sum(Transaction.amount)).where(
+                            Transaction.user_id == user_id,
+                            Transaction.type == TransactionType.BUY
+                        )
+                    )).scalar() or 0.0
+                    total_spent = abs(float(spent_val))
 
             # Calculate Stats
             total_numbers = sum(c['count'] for c in countries)
@@ -432,7 +441,8 @@ async def get_store_data(user_id: int = None):
             "countries": countries,
             "user": {
                 "balance": balance,
-                "total_orders": total_orders
+                "total_orders": total_orders,
+                "total_spent": total_spent
             },
             "stats": {
                 "total_numbers": total_numbers,
