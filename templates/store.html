@@ -587,72 +587,6 @@
             color: var(--text-p);
         }
 
-        /* ─── Deposit UI Styles ─── */
-        .deposit-tabs {
-            display: flex;
-            background: var(--bg-elevated);
-            padding: 5px;
-            border-radius: 14px;
-            border: 1px solid var(--border);
-            margin-bottom: 25px;
-            gap: 5px;
-        }
-        .deposit-tab {
-            flex: 1;
-            padding: 10px;
-            border-radius: 10px;
-            border: none;
-            background: transparent;
-            color: var(--text-s);
-            font-size: 0.8rem;
-            font-weight: 700;
-            cursor: pointer;
-            transition: 0.3s;
-            white-space: nowrap;
-        }
-        .deposit-tab.active {
-            background: var(--accent);
-            color: white;
-            box-shadow: 0 4px 15px var(--accent-glow);
-        }
-        .address-copy-container {
-            width: 100%;
-            background: var(--bg-elevated);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 5px;
-            display: flex;
-            align-items: center;
-            margin-bottom: 25px;
-            transition: 0.3s;
-        }
-        .address-text {
-            flex: 1;
-            padding: 15px;
-            font-family: 'monospace';
-            font-size: 0.95rem;
-            color: var(--text-p);
-            word-break: break-all;
-            text-align: left;
-            font-weight: 600;
-        }
-        .copy-btn {
-            background: var(--accent);
-            color: white;
-            border: none;
-            padding: 12px 18px;
-            border-radius: 12px;
-            font-size: 0.85rem;
-            font-weight: 800;
-            cursor: pointer;
-            transition: 0.2s;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            box-shadow: 0 4px 12px var(--accent-glow);
-        }
-        .copy-btn:active { transform: scale(0.95); }
-
         /* ─── Pagination Controls ─── */
         .pagination-ctrls {
             display: flex;
@@ -863,35 +797,61 @@
         </section>
 
         <section id="section-deposit" class="view-panel">
-            <div class="deposit-tabs">
-                <button class="deposit-tab active" onclick="switchDepositMethod('binance_pay', this)">Binance Pay</button>
-                <button class="deposit-tab" onclick="switchDepositMethod('trx_trc20', this)">TRX (TRC20)</button>
-                <button class="deposit-tab" onclick="switchDepositMethod('usdt_bep20', this)">USDT (BEP20)</button>
+            <div style="display: flex; flex-direction: column; gap: 15px; margin-bottom: 25px;">
+                <!-- Binance Pay Card -->
+                <div class="country-card" onclick="copyValue(depositMethods.binance_pay, 'Binance Pay ID')">
+                    <div style="display: flex; align-items: center; gap: 15px;">
+                        <div style="font-size: 2rem; color: #f3ba2f; background: rgba(243, 186, 47, 0.1); width: 50px; height: 50px; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-bolt"></i>
+                        </div>
+                        <div>
+                            <div class="c-name">Binance Pay</div>
+                            <div class="c-stock" id="addr-val-pay">Loading...</div>
+                        </div>
+                    </div>
+                    <div class="c-price" style="background: var(--accent); color: white; font-size: 0.75rem;">COPY</div>
+                </div>
+
+                <!-- TRX Card -->
+                <div class="country-card" onclick="copyValue(depositMethods.trx_trc20, 'TRX Address')">
+                    <div style="display: flex; align-items: center; gap: 15px;">
+                        <div style="font-size: 2rem; color: #ff0013; background: rgba(255, 0, 19, 0.1); width: 50px; height: 50px; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-coins"></i>
+                        </div>
+                        <div>
+                            <div class="c-name">TRX (TRC20)</div>
+                            <div class="c-stock" id="addr-val-trx">Loading...</div>
+                        </div>
+                    </div>
+                    <div class="c-price" style="background: var(--accent); color: white; font-size: 0.75rem;">COPY</div>
+                </div>
+
+                <!-- USDT Card -->
+                <div class="country-card" onclick="copyValue(depositMethods.usdt_bep20, 'USDT Address')">
+                    <div style="display: flex; align-items: center; gap: 15px;">
+                        <div style="font-size: 2rem; color: #32d74b; background: rgba(50, 215, 75, 0.1); width: 50px; height: 50px; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-shield-halved"></i>
+                        </div>
+                        <div>
+                            <div class="c-name">USDT (BEP20)</div>
+                            <div class="c-stock" id="addr-val-usdt">Loading...</div>
+                        </div>
+                    </div>
+                    <div class="c-price" style="background: var(--accent); color: white; font-size: 0.75rem;">COPY</div>
+                </div>
             </div>
 
-            <div class="info-card" style="box-shadow: none; margin-bottom: 25px; flex-direction: column; align-items: center; text-align: center; padding: 20px;">
-                <div id="deposit-method-icon" style="font-size: 2.5rem; color: #f3ba2f; margin-bottom: 12px;">
-                    <i class="fas fa-bolt"></i>
-                </div>
-                <h3 id="deposit-method-title" style="margin-bottom: 8px; font-size: 1.15rem; font-weight: 800;">Binance Pay</h3>
-                <p id="deposit-method-desc" style="color: var(--text-s); font-size: 0.88rem; margin-bottom: 25px; line-height: 1.5;">
-                    Please transfer USDT via Binance Internal Transfer (Binance Pay) to the Pay ID below.
-                </p>
-
-                <div class="address-copy-container">
-                    <div class="address-text" id="deposit-address-display">Loading...</div>
-                    <button class="copy-btn" onclick="copyDepositAddress()">
-                        <i class="fas fa-copy"></i> Copy
-                    </button>
-                </div>
-                
+            <div class="info-card" style="box-shadow: none; margin-top: 20px; padding: 25px;">
                 <div style="width: 100%; text-align: left;">
-                    <label style="display: block; margin-bottom: 10px; color: var(--text-p); font-size: 0.9rem; font-weight: 700;">Transaction ID</label>
+                    <label style="display: block; margin-bottom: 12px; color: var(--text-p); font-size: 0.95rem; font-weight: 800;">Verify Transaction</label>
+                    <p style="color: var(--text-s); font-size: 0.85rem; margin-bottom: 15px; line-height: 1.4;">
+                        After payment, paste the Transaction ID below to add balance.
+                    </p>
                     <input type="text" id="deposit-txid" class="search-input" placeholder="0" 
                         style="width: 100%; margin-bottom: 20px; text-align: center; border: 1px solid var(--border); background: var(--input-bg); font-size: 1rem; height: 54px; border-radius: 16px;">
                     
                     <button class="primary-btn" style="height: 54px; border-radius: 16px;" onclick="verifyDeposit()" id="btn-verify-deposit">
-                        <i class="fas fa-check-circle"></i> Verify Deposit
+                        <i class="fas fa-shield-check"></i> Verify Deposit
                     </button>
                 </div>
             </div>
@@ -1146,7 +1106,9 @@
 
                 if (data.deposit_methods) {
                     depositMethods = data.deposit_methods;
-                    switchDepositMethod('binance_pay', document.querySelector('#section-deposit .tab-btn.active'));
+                    document.getElementById('addr-val-pay').innerText = depositMethods.binance_pay || 'Not Set';
+                    document.getElementById('addr-val-trx').innerText = depositMethods.trx_trc20 || 'Not Set';
+                    document.getElementById('addr-val-usdt').innerText = depositMethods.usdt_bep20 || 'Not Set';
                 }
 
                 countries = data.countries || [];
@@ -1166,46 +1128,13 @@
         }
 
         let depositMethods = {};
-        let currentDepositMethod = 'binance_pay';
 
-        function switchDepositMethod(method, btn) {
-            currentDepositMethod = method;
-
-            // UI Update
-            document.querySelectorAll('.deposit-tab').forEach(b => b.classList.remove('active'));
-            if (btn) btn.classList.add('active');
-
-            const iconEl = document.getElementById('deposit-method-icon');
-            const titleEl = document.getElementById('deposit-method-title');
-            const descEl = document.getElementById('deposit-method-desc');
-            const addressEl = document.getElementById('deposit-address-display');
-
-            if (method === 'binance_pay') {
-                iconEl.innerHTML = '<i class="fas fa-bolt" style="color: #f3ba2f;"></i>';
-                titleEl.innerText = 'Binance Pay';
-                descEl.innerText = currentLang === 'ar' ? 'يرجى تحويل USDT عبر التحويل الداخلي لباينانس (Binance Pay) إلى الـ Pay ID أدناه.' : 'Please transfer USDT via Binance Internal Transfer (Binance Pay) to the Pay ID below.';
-                addressEl.innerText = depositMethods.binance_pay || 'Not Set';
-            } else if (method === 'trx_trc20') {
-                iconEl.innerHTML = '<i class="fas fa-coins" style="color: #ff0013;"></i>';
-                titleEl.innerText = 'TRX (TRC20)';
-                descEl.innerText = currentLang === 'ar' ? 'يرجى إرسال عملة TRX (شبكة TRC20) إلى العنوان أدناه.' : 'Please send TRX (TRC20 network) to the address below.';
-                addressEl.innerText = depositMethods.trx_trc20 || 'Not Set';
-            } else if (method === 'usdt_bep20') {
-                iconEl.innerHTML = '<i class="fas fa-shield-halved" style="color: #f3ba2f;"></i>';
-                titleEl.innerText = 'USDT (BEP20)';
-                descEl.innerText = currentLang === 'ar' ? 'يرجى إرسال USDT (شبكة BEP20 / BSC) إلى العنوان أدناه.' : 'Please send USDT (BEP20 / BSC network) to the address below.';
-                addressEl.innerText = depositMethods.usdt_bep20 || 'Not Set';
-            }
-        }
-
-        function copyDepositAddress() {
-            const addr = document.getElementById('deposit-address-display').innerText;
-            if (addr && addr !== 'Loading Address...' && addr !== 'Not Set') {
-                navigator.clipboard.writeText(addr).then(() => {
-                    showToast("Copied", "Address copied to clipboard", "success");
-                    tg.HapticFeedback.impactOccurred('light');
-                });
-            }
+        function copyValue(val, label) {
+            if (!val || val === 'Not Set') return;
+            navigator.clipboard.writeText(val).then(() => {
+                showToast("Copied", `${label} copied to clipboard`, "success");
+                tg.HapticFeedback.impactOccurred('light');
+            });
         }
 
         function updateBalanceUI(val) {
