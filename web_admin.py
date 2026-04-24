@@ -617,6 +617,12 @@ async def check_binance_deposit(txid: str, api_key: str, api_secret: str):
     api_key = api_key.strip()
     api_secret = api_secret.strip()
     
+    # CRITICAL CHECK: Ensure we aren't using a masked secret (e.g. abcd****)
+    if "*" in api_secret:
+        return False, "Error: Masked API Secret detected. Please re-enter your full Binance API Secret in settings.", 0
+    
+    logger.info(f"Binance DEBUG - Using Key: {api_key[:4]}... (Len: {len(api_key)})")
+    
     base_url = "https://api.binance.com"
     
     # NEW: Sync time with Binance Server to avoid "Signature for this request is not valid" (clock drift)
