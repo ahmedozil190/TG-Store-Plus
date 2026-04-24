@@ -321,11 +321,15 @@
 
         .search-area {
             position: sticky;
-            top: -20px;
+            top: -25px;
             background: var(--bg);
-            padding: 15px 0;
+            padding-top: 10px;
+            padding-bottom: 25px;
             z-index: 10;
-            margin-bottom: 5px;
+            overflow: hidden;
+            margin: 0 -5px;
+            padding-left: 5px;
+            padding-right: 5px;
         }
 
         .search-box {
@@ -338,6 +342,8 @@
             gap: 12px;
             height: 54px;
             transition: all 0.3s;
+            box-shadow: var(--shadow);
+            margin-bottom: 5px;
         }
 
         .search-input {
@@ -603,6 +609,7 @@
             gap: 8px;
             box-shadow: var(--shadow);
         }
+
         .tab-btn.active {
             background: var(--bg-elevated);
             border: 2px solid var(--accent);
@@ -821,14 +828,17 @@
         <section id="section-deposit" class="view-panel">
             <div class="tabs-row" style="margin-bottom: 25px; display: flex; flex-direction: column; gap: 12px;">
                 <!-- Binance Pay -->
-                <button class="tab-btn active" onclick="switchDepositMethod('binance_pay', this)" style="padding: 18px 20px; text-align: left; position: relative;">
+                <button class="tab-btn active" onclick="switchDepositMethod('binance_pay', this)"
+                    style="padding: 18px 20px; text-align: left; position: relative;">
                     <div style="display: flex; align-items: center; gap: 15px; width: 100%;">
-                        <div style="font-size: 1.5rem; color: #f3ba2f; background: rgba(243, 186, 47, 0.1); width: 45px; height: 45px; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                        <div
+                            style="font-size: 1.5rem; color: #f3ba2f; background: rgba(243, 186, 47, 0.1); width: 45px; height: 45px; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
                             <i class="fas fa-bolt"></i>
                         </div>
                         <div style="flex: 1;">
                             <div style="font-weight: 800; font-size: 1rem; color: var(--text-p);">Binance Pay</div>
-                            <div style="font-size: 0.75rem; color: var(--text-s); font-weight: 500;">USDT Internal Transfer</div>
+                            <div style="font-size: 0.75rem; color: var(--text-s); font-weight: 500;">USDT Internal
+                                Transfer</div>
                         </div>
                         <div class="active-check" style="display: block; color: var(--accent);">
                             <i class="fas fa-circle-check"></i>
@@ -837,14 +847,17 @@
                 </button>
 
                 <!-- TRX -->
-                <button class="tab-btn" onclick="switchDepositMethod('trx_trc20', this)" style="padding: 18px 20px; text-align: left; position: relative;">
+                <button class="tab-btn" onclick="switchDepositMethod('trx_trc20', this)"
+                    style="padding: 18px 20px; text-align: left; position: relative;">
                     <div style="display: flex; align-items: center; gap: 15px; width: 100%;">
-                        <div style="font-size: 1.5rem; color: #ff0013; background: rgba(255, 0, 19, 0.1); width: 45px; height: 45px; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                        <div
+                            style="font-size: 1.5rem; color: #ff0013; background: rgba(255, 0, 19, 0.1); width: 45px; height: 45px; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
                             <i class="fas fa-coins"></i>
                         </div>
                         <div style="flex: 1;">
                             <div style="font-weight: 800; font-size: 1rem; color: var(--text-p);">TRX (TRC20)</div>
-                            <div style="font-size: 0.75rem; color: var(--text-s); font-weight: 500;">TRON Network Transfer</div>
+                            <div style="font-size: 0.75rem; color: var(--text-s); font-weight: 500;">TRON Network
+                                Transfer</div>
                         </div>
                         <div class="active-check" style="display: none; color: var(--accent);">
                             <i class="fas fa-circle-check"></i>
@@ -853,14 +866,17 @@
                 </button>
 
                 <!-- USDT -->
-                <button class="tab-btn" onclick="switchDepositMethod('usdt_bep20', this)" style="padding: 18px 20px; text-align: left; position: relative;">
+                <button class="tab-btn" onclick="switchDepositMethod('usdt_bep20', this)"
+                    style="padding: 18px 20px; text-align: left; position: relative;">
                     <div style="display: flex; align-items: center; gap: 15px; width: 100%;">
-                        <div style="font-size: 1.5rem; color: #32d74b; background: rgba(50, 215, 75, 0.1); width: 45px; height: 45px; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                        <div
+                            style="font-size: 1.5rem; color: #32d74b; background: rgba(50, 215, 75, 0.1); width: 45px; height: 45px; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
                             <i class="fas fa-shield-halved"></i>
                         </div>
                         <div style="flex: 1;">
                             <div style="font-weight: 800; font-size: 1rem; color: var(--text-p);">USDT (BEP20)</div>
-                            <div style="font-size: 0.75rem; color: var(--text-s); font-weight: 500;">BSC Network Transfer</div>
+                            <div style="font-size: 0.75rem; color: var(--text-s); font-weight: 500;">BSC Network
+                                Transfer</div>
                         </div>
                         <div class="active-check" style="display: none; color: var(--accent);">
                             <i class="fas fa-circle-check"></i>
@@ -869,12 +885,14 @@
                 </button>
             </div>
 
-            <div class="info-card" style="margin-bottom: 25px; flex-direction: column; align-items: center; text-align: center; padding: 25px 20px;">
+            <div class="info-card"
+                style="margin-bottom: 25px; flex-direction: column; align-items: center; text-align: center; padding: 25px 20px;">
                 <div id="deposit-method-icon" style="font-size: 2.5rem; color: #f3ba2f; margin-bottom: 12px;">
                     <i class="fas fa-bolt"></i>
                 </div>
                 <h3 id="deposit-method-title" style="margin-bottom: 10px; font-size: 1.1rem;">Binance Pay</h3>
-                <p id="deposit-method-desc" style="color: var(--text-s); font-size: 0.85rem; margin-bottom: 20px; line-height: 1.5;">
+                <p id="deposit-method-desc"
+                    style="color: var(--text-s); font-size: 0.85rem; margin-bottom: 20px; line-height: 1.5;">
                     Please transfer USDT via Binance Internal Transfer (Binance Pay) to the Pay ID below.
                 </p>
 
@@ -884,7 +902,9 @@
                 </div>
 
                 <div style="width: 100%; text-align: left;">
-                    <label style="display: block; margin-bottom: 8px; color: var(--text-p); font-size: 0.85rem; font-weight: 700; opacity: 0.9;">Transaction ID</label>
+                    <label
+                        style="display: block; margin-bottom: 8px; color: var(--text-p); font-size: 0.85rem; font-weight: 700; opacity: 0.9;">Transaction
+                        ID</label>
                     <div style="position: relative; margin-bottom: 20px;">
                         <input type="text" id="deposit-txid" class="search-input" placeholder="Enter Transaction ID..."
                             style="width: 100%; margin-bottom: 0; text-align: center; border: 1px solid var(--border); background: rgba(255,255,255,0.03); font-size: 0.95rem; height: 50px; border-radius: 12px;">
