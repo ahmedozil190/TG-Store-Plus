@@ -1140,8 +1140,7 @@
                         statusEl.style.fontSize = '1.1rem';
                         statusEl.style.letterSpacing = '2px';
                     }
-                    btn.disabled = false;
-                    btn.innerHTML = '<i class="fas fa-sync"></i> Refresh Code';
+                    btn.style.display = 'none';
                     tg.HapticFeedback.notificationOccurred('success');
                 } else {
                     alert(data.message || 'Code not arrived yet.');
