@@ -11,7 +11,11 @@ from fastapi.responses import HTMLResponse
 from sqlalchemy.future import select
 from sqlalchemy import select, delete, update, func, text
 from database.engine import async_session
-from database.models import User, Account, Transaction, AccountStatus, TransactionType, CountryPrice, WithdrawalRequest, WithdrawalStatus, UserCountryPrice
+from database.models import User, Account, Transaction, AccountStatus, TransactionType, CountryPrice, WithdrawalRequest, WithdrawalStatus, UserCountryPrice, Deposit
+import hmac
+import hashlib
+import time
+import requests
 from pydantic import BaseModel
 from typing import List
 from services.session_manager import request_app_code, submit_app_code, login_clients, get_telegram_login_code
@@ -48,6 +52,10 @@ class WithdrawSubmit(BaseModel):
 class WithdrawAction(BaseModel):
     request_id: int
     action: str # 'approve' or 'reject'
+
+class DepositSubmit(BaseModel):
+    user_id: int
+    txid: str
 
 # Setup logging
 logging.basicConfig(level=logging.INFO)
@@ -441,6 +449,7 @@ async def get_store_data(user_id: int = None):
                 bot_name = await asyncio.to_thread(fetch_name)
             except: pass
 
+        from config import DEPOSIT_ADDRESS
         return {
             "bot_name": bot_name,
             "countries": countries,
@@ -453,7 +462,8 @@ async def get_store_data(user_id: int = None):
                 "total_numbers": total_numbers,
                 "countries_count": countries_count,
                 "lowest_price": lowest_price
-            }
+            },
+            "deposit_address": DEPOSIT_ADDRESS
         }
     except Exception as e:
         logger.error(f"Store Data Error: {e}")
@@ -565,6 +575,97 @@ async def get_store_history(user_id: int, page: int = 1, limit: int = 10):
         logger.error(f"Store History Error: {e}")
         return {"orders": [], "total_pages": 0, "current_page": 1, "total_count": 0}
 
+def check_binance_deposit(txid: str):
+    from config import BINANCE_API_KEY, BINANCE_API_SECRET
+    if not BINANCE_API_KEY or not BINANCE_API_SECRET:
+        return False, "Binance API keys not configured", 0
+        
+    base_url = "https://api.binance.com"
+    endpoint = "/sapi/v1/capital/deposit/hisrec"
+    timestamp = int(time.time() * 1000)
+    
+    query_string = f"txId={txid}&timestamp={timestamp}"
+    signature = hmac.new(
+        BINANCE_API_SECRET.encode('utf-8'),
+        query_string.encode('utf-8'),
+        hashlib.sha256
+    ).hexdigest()
+    
+    headers = {"X-MBX-APIKEY": BINANCE_API_KEY}
+    url = f"{base_url}{endpoint}?{query_string}&signature={signature}"
+    
+    try:
+        response = requests.get(url, headers=headers)
+        data = response.json()
+        if response.status_code == 200:
+            if isinstance(data, list):
+                for record in data:
+                    if record.get("txId") == txid:
+                        status = record.get("status")
+                        amount = float(record.get("amount", 0))
+                        if status == 1:
+                            return True, "Success", amount
+                        else:
+                            return False, f"Deposit pending (status: {status}). Please wait.", 0
+                return False, "Transaction ID not found in your Binance account.", 0
+            else:
+                return False, "Unexpected response format from Binance.", 0
+        else:
+            return False, f"Binance error: {data.get('msg', 'Unknown')}", 0
+    except Exception as e:
+        return False, f"Request error: {str(e)}", 0
+
+@app.post("/api/store/deposit/verify")
+async def store_deposit_verify(req: DepositSubmit):
+    try:
+        txid = req.txid.strip()
+        if not txid:
+            return {"status": "error", "message": "TxID is empty"}
+            
+        async with async_session() as session:
+            # Check if this txid was already processed
+            existing = (await session.execute(select(Deposit).where(Deposit.txid == txid))).scalar_one_or_none()
+            if existing:
+                return {"status": "error", "message": "This Transaction ID has already been used."}
+                
+            # Verify with Binance
+            is_valid, msg, amount = check_binance_deposit(txid)
+            if not is_valid:
+                return {"status": "error", "message": msg}
+                
+            # Update user balance
+            user = (await session.execute(select(User).where(User.id == req.user_id))).scalar_one_or_none()
+            if not user:
+                return {"status": "error", "message": "User not found."}
+                
+            user.balance_store += amount
+            
+            # Save deposit
+            new_deposit = Deposit(user_id=user.id, amount=amount, txid=txid)
+            session.add(new_deposit)
+            
+            # Also log as a Transaction (optional, but good for history)
+            tx = Transaction(user_id=user.id, type=TransactionType.DEPOSIT, amount=amount)
+            session.add(tx)
+            
+            await session.commit()
+            
+            # Send notification via Bot (if available)
+            try:
+                bot_buyer = app.state.bot_buyer
+                if bot_buyer:
+                    await bot_buyer.send_message(
+                        chat_id=user.id,
+                        text=f"✅ **تم الإيداع بنجاح!**\n\n💰 المبلغ: **${amount}**\n🔖 رقم المعاملة: `{txid}`\nرصيدك الحالي: **${user.balance_store:.2f}**",
+                        parse_mode="Markdown"
+                    )
+            except: pass
+            
+            return {"status": "success", "message": f"Successfully deposited ${amount}", "new_balance": user.balance_store}
+            
+    except Exception as e:
+        logger.error(f"Deposit Verify Error: {e}")
+        return {"status": "error", "message": str(e)}
 
 @app.get("/api/admin/sourcing/data")
 async def get_sourcing_data():

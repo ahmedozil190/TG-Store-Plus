@@ -652,6 +652,9 @@
             <div class="nav-item" id="m-store" onclick="switchNav('store', this)">
                 <i class="fas fa-shopping-cart"></i> <span data-i18n="nav_store">Buy Number</span>
             </div>
+            <div class="nav-item" id="m-deposit" onclick="switchNav('deposit', this)">
+                <i class="fas fa-wallet"></i> <span data-i18n="nav_deposit">Deposit</span>
+            </div>
             <div class="nav-item" id="m-history" onclick="switchNav('history', this)">
                 <i class="fas fa-clock-rotate-left"></i> <span data-i18n="nav_history">Orders History</span>
             </div>
@@ -791,6 +794,35 @@
                 </div>
             </div>
             <div class="grid-container" id="countries-grid"></div>
+        </section>
+
+        <section id="section-deposit" class="view-panel">
+            <div class="panel-header" style="margin-bottom: 20px;">
+                <h1 style="font-size: 1.8rem; font-weight: 800; letter-spacing: -0.5px;">Deposit Funds</h1>
+                <p style="color: var(--text-s); margin-top: 5px; font-size: 0.95rem;">Add balance via Binance</p>
+            </div>
+            
+            <div class="info-card" style="box-shadow: none; margin-bottom: 25px; flex-direction: column; align-items: center; text-align: center; padding: 30px 20px;">
+                <div style="font-size: 3rem; color: #f3ba2f; margin-bottom: 15px;">
+                    <i class="fas fa-coins"></i>
+                </div>
+                <h3 style="margin-bottom: 10px;">Binance Deposit</h3>
+                <p style="color: var(--text-s); font-size: 0.95rem; margin-bottom: 20px; line-height: 1.5;">
+                    Please transfer USDT to the address below, then paste the Transaction ID (TxID) to verify and add to your balance automatically.
+                </p>
+                <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 12px; width: 100%; word-break: break-all; font-family: monospace; font-size: 1.1rem; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 25px;" id="deposit-address-display">
+                    Loading Address...
+                </div>
+                
+                <div style="width: 100%; text-align: left;">
+                    <label style="display: block; margin-bottom: 8px; color: var(--text-s); font-size: 0.9rem;">Transaction ID (TxID)</label>
+                    <input type="text" id="deposit-txid" class="search-input" placeholder="Paste TxID here..." style="width: 100%; margin-bottom: 20px; text-align: center; border: 1px solid rgba(255,255,255,0.2);">
+                    
+                    <button class="btn btn-primary" style="width: 100%; font-weight: 700; font-size: 1.1rem;" onclick="verifyDeposit()" id="btn-verify-deposit">
+                        <i class="fas fa-check-circle" style="margin-right: 8px;"></i> Verify Deposit
+                    </button>
+                </div>
+            </div>
         </section>
 
         <section id="section-history" class="view-panel">
@@ -1039,6 +1071,11 @@
                     const nameForUI = (data.user.full_name && data.user.full_name !== 'Unknown') ? data.user.full_name : (userData?.first_name || "User");
                     document.getElementById('userInitial').innerText = nameForUI.charAt(0).toUpperCase();
                 }
+                
+                if (data.deposit_address) {
+                    document.getElementById('deposit-address-display').innerText = data.deposit_address;
+                }
+                
                 countries = data.countries || [];
                 if (data.stats) {
                     document.getElementById('stat-total-numbers').innerText = data.stats.total_numbers || 0;
@@ -1308,6 +1345,48 @@
                 alert('Connection error');
                 btn.disabled = false;
                 btn.innerHTML = '<i class="fas fa-key"></i> Get Login Code';
+            }
+        }
+
+        async function verifyDeposit() {
+            const txidInput = document.getElementById('deposit-txid');
+            const txid = txidInput.value.trim();
+            const btn = document.getElementById('btn-verify-deposit');
+
+            if (!txid) {
+                showToast("Error", "Please enter a valid Transaction ID (TxID).", "error");
+                return;
+            }
+
+            btn.disabled = true;
+            const originalHtml = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verifying...';
+
+            try {
+                const res = await fetch('/api/store/deposit/verify', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ user_id: userId, txid: txid })
+                });
+                
+                const data = await res.json();
+                
+                if (data.status === 'success') {
+                    showToast("Success", data.message, "success");
+                    txidInput.value = "";
+                    if (data.new_balance !== undefined) {
+                        updateBalanceUI(data.new_balance);
+                    }
+                    tg.HapticFeedback.notificationOccurred('success');
+                } else {
+                    showToast("Verification Failed", data.message || "Could not verify this deposit.", "error");
+                }
+            } catch (e) {
+                console.error("Deposit error:", e);
+                showToast("Error", "Connection error. Please try again.", "error");
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalHtml;
             }
         }
 

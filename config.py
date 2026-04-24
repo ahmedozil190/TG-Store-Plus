@@ -25,3 +25,8 @@ else:
 WEBAPP_URL = os.getenv("WEBAPP_URL", "https://web-production-5e98a.up.railway.app")
 STORE_URL = f"{WEBAPP_URL}/store"
 SELLER_URL = f"{WEBAPP_URL}/seller"
+
+# Binance Payment Config
+BINANCE_API_KEY = os.getenv("BINANCE_API_KEY", "")
+BINANCE_API_SECRET = os.getenv("BINANCE_API_SECRET", "")
+DEPOSIT_ADDRESS = os.getenv("DEPOSIT_ADDRESS", "TXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")

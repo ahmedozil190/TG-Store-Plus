@@ -90,3 +90,12 @@ class WithdrawalRequest(Base):
     transaction_id = Column(String(12), unique=True, nullable=True) # e.g. "TC782794467F"
     status = Column(Enum(WithdrawalStatus), default=WithdrawalStatus.PENDING)
     created_at = Column(DateTime, default=datetime.utcnow)
+
+class Deposit(Base):
+    __tablename__ = 'deposits'
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    user_id = Column(BigInteger, ForeignKey('users.id'), nullable=False)
+    amount = Column(Float, nullable=False)
+    txid = Column(String, unique=True, nullable=False) # Binance TxID
+    created_at = Column(DateTime, default=datetime.utcnow)
+
