@@ -803,18 +803,23 @@
                 <button class="tab-btn" onclick="switchDepositMethod('usdt_bep20', this)" style="font-size: 0.75rem; white-space: nowrap; flex: 1;">USDT (BEP20)</button>
             </div>
 
-            <div class="info-card" style="box-shadow: none; margin-bottom: 25px; flex-direction: column; align-items: center; text-align: center; padding: 25px 20px;">
-                <div id="deposit-method-icon" style="font-size: 2.5rem; color: #f3ba2f; margin-bottom: 12px;">
+            <div class="info-card" style="box-shadow: none; margin-bottom: 25px; flex-direction: column; align-items: center; text-align: center; padding: 30px 20px; background: linear-gradient(180deg, rgba(255,255,255,0.02) 0%, rgba(255,255,255,0) 100%);">
+                <div id="deposit-method-icon" style="width: 70px; height: 70px; background: rgba(243, 186, 47, 0.1); border-radius: 20px; display: flex; align-items: center; justify-content: center; font-size: 2.2rem; color: #f3ba2f; margin-bottom: 20px; border: 1px solid rgba(243, 186, 47, 0.2);">
                     <i class="fas fa-coins"></i>
                 </div>
-                <h3 id="deposit-method-title" style="margin-bottom: 10px; font-size: 1.1rem;">Binance Pay</h3>
-                <p id="deposit-method-desc" style="color: var(--text-s); font-size: 0.85rem; margin-bottom: 20px; line-height: 1.5;">
+                <h3 id="deposit-method-title" style="margin-bottom: 12px; font-size: 1.25rem; font-weight: 800; letter-spacing: -0.5px;">Binance Pay</h3>
+                <p id="deposit-method-desc" style="color: var(--text-s); font-size: 0.9rem; margin-bottom: 25px; line-height: 1.6; max-width: 90%;">
                     Please transfer USDT via Binance Internal Transfer (Binance Pay) to the Pay ID below.
                 </p>
 
-                <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 12px; width: 100%; word-break: break-all; font-family: monospace; font-size: 1rem; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px; cursor: pointer; position: relative;" 
-                     id="deposit-address-display" onclick="copyDepositAddress()">
-                    Loading Address...
+                <div style="position: relative; width: 100%; margin-bottom: 30px; group" onclick="copyDepositAddress()">
+                    <div style="background: var(--input-bg); padding: 18px; border-radius: 16px; width: 100%; word-break: break-all; font-family: 'JetBrains Mono', monospace; font-size: 1.1rem; border: 1px solid var(--border); cursor: pointer; transition: 0.3s var(--ease); font-weight: 600; color: var(--accent);" 
+                         id="deposit-address-display" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">
+                        Loading Address...
+                    </div>
+                    <div style="position: absolute; top: -10px; right: 10px; background: var(--accent); color: white; font-size: 0.65rem; padding: 4px 10px; border-radius: 8px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; box-shadow: 0 4px 10px var(--accent-glow);">
+                        <i class="fas fa-copy" style="margin-right: 4px;"></i> Click to Copy
+                    </div>
                 </div>
                 
                 <div style="width: 100%; text-align: left;">
@@ -1115,17 +1120,26 @@
             const addressEl = document.getElementById('deposit-address-display');
 
             if (method === 'binance_pay') {
-                iconEl.innerHTML = '<i class="fas fa-bolt" style="color: #f3ba2f;"></i>';
+                iconEl.innerHTML = '<i class="fas fa-bolt"></i>';
+                iconEl.style.background = 'rgba(243, 186, 47, 0.1)';
+                iconEl.style.color = '#f3ba2f';
+                iconEl.style.borderColor = 'rgba(243, 186, 47, 0.2)';
                 titleEl.innerText = 'Binance Pay';
                 descEl.innerText = currentLang === 'ar' ? 'يرجى تحويل USDT عبر التحويل الداخلي لباينانس (Binance Pay) إلى الـ Pay ID أدناه.' : 'Please transfer USDT via Binance Internal Transfer (Binance Pay) to the Pay ID below.';
                 addressEl.innerText = depositMethods.binance_pay || 'Not Set';
             } else if (method === 'trx_trc20') {
-                iconEl.innerHTML = '<i class="fas fa-coins" style="color: #ff0013;"></i>';
+                iconEl.innerHTML = '<i class="fas fa-coins"></i>';
+                iconEl.style.background = 'rgba(255, 0, 19, 0.1)';
+                iconEl.style.color = '#ff0013';
+                iconEl.style.borderColor = 'rgba(255, 0, 19, 0.2)';
                 titleEl.innerText = 'TRX (TRC20)';
                 descEl.innerText = currentLang === 'ar' ? 'يرجى إرسال عملة TRX (شبكة TRC20) إلى العنوان أدناه.' : 'Please send TRX (TRC20 network) to the address below.';
                 addressEl.innerText = depositMethods.trx_trc20 || 'Not Set';
             } else if (method === 'usdt_bep20') {
-                iconEl.innerHTML = '<i class="fas fa-shield-halved" style="color: #f3ba2f;"></i>';
+                iconEl.innerHTML = '<i class="fas fa-shield-halved"></i>';
+                iconEl.style.background = 'rgba(50, 215, 75, 0.1)';
+                iconEl.style.color = '#32d74b';
+                iconEl.style.borderColor = 'rgba(50, 215, 75, 0.2)';
                 titleEl.innerText = 'USDT (BEP20)';
                 descEl.innerText = currentLang === 'ar' ? 'يرجى إرسال USDT (شبكة BEP20 / BSC) إلى العنوان أدناه.' : 'Please send USDT (BEP20 / BSC network) to the address below.';
                 addressEl.innerText = depositMethods.usdt_bep20 || 'Not Set';
