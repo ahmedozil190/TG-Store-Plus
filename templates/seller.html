@@ -1166,8 +1166,10 @@
 
         <!-- View: Dashboard -->
         <div class="view-panel active" id="view-dashboard">
+            <div class="section-header" style="margin-top: 0;">
+                <i class="fas fa-wallet"></i> <span style="font-size: 0.8rem; font-weight: 700; letter-spacing: 1px;">FINANCIALS</span>
+            </div>
             <div class="info-card-stack">
-                <!-- Financials -->
                 <div class="info-card">
                     <div class="info-card-l">
                         <span class="info-card-lbl">Current Balance</span>
@@ -1195,12 +1197,16 @@
                         <i class="fas fa-arrow-up-right-from-square"></i>
                     </div>
                 </div>
+            </div>
 
-                <!-- Accounts Stats -->
+            <div class="section-header">
+                <i class="fas fa-chart-line"></i> <span style="font-size: 0.8rem; font-weight: 700; letter-spacing: 1px;">ACCOUNT STATISTICS</span>
+            </div>
+            <div class="info-card-stack">
                 <div class="info-card">
                     <div class="info-card-l">
                         <span class="info-card-lbl">Sold Numbers</span>
-                        <div class="info-card-val" id="statSold" style="color: var(--success)">0<span> NUM</span></div>
+                        <div class="info-card-val" id="statSold" style="color: var(--text-p)">0<span> NUM</span></div>
                     </div>
                     <div class="info-card-icon" style="background:rgba(16, 185, 129, 0.1); color: var(--success);">
                         <i class="fas fa-shopping-basket"></i>
@@ -1209,8 +1215,7 @@
                 <div class="info-card">
                     <div class="info-card-l">
                         <span class="info-card-lbl">Accepted Numbers</span>
-                        <div class="info-card-val" id="statAccepted" style="color: var(--accent)">0<span> NUM</span>
-                        </div>
+                        <div class="info-card-val" id="statAccepted" style="color: var(--text-p)">0<span> NUM</span></div>
                     </div>
                     <div class="info-card-icon" style="background:rgba(88, 101, 242, 0.1); color: var(--accent);">
                         <i class="fas fa-check-circle"></i>
@@ -1219,16 +1224,13 @@
                 <div class="info-card">
                     <div class="info-card-l">
                         <span class="info-card-lbl">Rejected Numbers</span>
-                        <div class="info-card-val" id="statRejected" style="color: var(--error)">0<span> NUM</span>
-                        </div>
+                        <div class="info-card-val" id="statRejected" style="color: var(--text-p)">0<span> NUM</span></div>
                     </div>
                     <div class="info-card-icon" style="background:rgba(239, 68, 68, 0.1); color: var(--error);">
                         <i class="fas fa-times-circle"></i>
                     </div>
                 </div>
             </div>
-
-
         </div>
 
         <!-- View: Submit (Wizard) -->
