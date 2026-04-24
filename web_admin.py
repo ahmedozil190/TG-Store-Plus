@@ -60,7 +60,9 @@ class DepositSubmit(BaseModel):
 class StoreSettingsSubmit(BaseModel):
     binance_api_key: str
     binance_api_secret: str
-    deposit_address: str
+    binance_pay_id: str
+    trx_address: str
+    usdt_bep20_address: str
 
 # Setup logging
 logging.basicConfig(level=logging.INFO)
@@ -454,10 +456,17 @@ async def get_store_data(user_id: int = None):
                 bot_name = await asyncio.to_thread(fetch_name)
             except: pass
 
-            # Fetch DEPOSIT_ADDRESS
+            # Fetch Deposit Addresses
             from config import DEPOSIT_ADDRESS
-            dep_address_obj = (await session.execute(select(AppSetting).where(AppSetting.key == "DEPOSIT_ADDRESS"))).scalar_one_or_none()
-            final_deposit_address = dep_address_obj.value if dep_address_obj and dep_address_obj.value else DEPOSIT_ADDRESS
+            addr_keys = ["BINANCE_PAY_ID", "TRX_ADDRESS", "USDT_BEP20_ADDRESS"]
+            addr_settings = {}
+            for k in addr_keys:
+                obj = (await session.execute(select(AppSetting).where(AppSetting.key == k))).scalar_one_or_none()
+                addr_settings[k] = obj.value if obj and obj.value else ""
+
+            final_binance_pay = addr_settings.get("BINANCE_PAY_ID") or DEPOSIT_ADDRESS
+            final_trx = addr_settings.get("TRX_ADDRESS") or ""
+            final_usdt_bep20 = addr_settings.get("USDT_BEP20_ADDRESS") or ""
 
         return {
             "bot_name": bot_name,
@@ -472,7 +481,11 @@ async def get_store_data(user_id: int = None):
                 "countries_count": countries_count,
                 "lowest_price": lowest_price
             },
-            "deposit_address": final_deposit_address
+            "deposit_methods": {
+                "binance_pay": final_binance_pay,
+                "trx_trc20": final_trx,
+                "usdt_bep20": final_usdt_bep20
+            }
         }
     except Exception as e:
         logger.error(f"Store Data Error: {e}")
@@ -995,19 +1008,18 @@ async def get_store_settings():
     try:
         from config import BINANCE_API_KEY, BINANCE_API_SECRET, DEPOSIT_ADDRESS
         async with async_session() as session:
-            keys = ["BINANCE_API_KEY", "BINANCE_API_SECRET", "DEPOSIT_ADDRESS"]
+            keys = [
+                "BINANCE_API_KEY", "BINANCE_API_SECRET", 
+                "BINANCE_PAY_ID", "TRX_ADDRESS", "USDT_BEP20_ADDRESS"
+            ]
             settings = {}
             for k in keys:
                 obj = (await session.execute(select(AppSetting).where(AppSetting.key == k))).scalar_one_or_none()
-                if obj:
-                    settings[k] = obj.value
-                else:
-                    settings[k] = ""
+                settings[k] = obj.value if obj else ""
             
-            # Fallbacks to config.py if empty in DB
+            # Fallbacks
             api_key = settings.get("BINANCE_API_KEY") or BINANCE_API_KEY
             api_secret = settings.get("BINANCE_API_SECRET") or BINANCE_API_SECRET
-            dep_address = settings.get("DEPOSIT_ADDRESS") or DEPOSIT_ADDRESS
             
             # Mask the secret for security
             masked_secret = ""
@@ -1019,7 +1031,9 @@ async def get_store_settings():
             return {
                 "binance_api_key": api_key,
                 "binance_api_secret_masked": masked_secret,
-                "deposit_address": dep_address
+                "binance_pay_id": settings.get("BINANCE_PAY_ID") or DEPOSIT_ADDRESS,
+                "trx_address": settings.get("TRX_ADDRESS") or "",
+                "usdt_bep20_address": settings.get("USDT_BEP20_ADDRESS") or ""
             }
     except Exception as e:
         logger.error(f"Get Store Settings Error: {e}")
@@ -1031,7 +1045,9 @@ async def save_store_settings(req: StoreSettingsSubmit):
         async with async_session() as session:
             updates = {
                 "BINANCE_API_KEY": req.binance_api_key.strip(),
-                "DEPOSIT_ADDRESS": req.deposit_address.strip()
+                "BINANCE_PAY_ID": req.binance_pay_id.strip(),
+                "TRX_ADDRESS": req.trx_address.strip(),
+                "USDT_BEP20_ADDRESS": req.usdt_bep20_address.strip()
             }
             if req.binance_api_secret and not req.binance_api_secret.startswith("*"):
                 updates["BINANCE_API_SECRET"] = req.binance_api_secret.strip()
