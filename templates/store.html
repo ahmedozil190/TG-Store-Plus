@@ -340,6 +340,9 @@
 
     <main class="main-content">
         <section id="section-home" class="view-panel active">
+            <div class="section-header" style="margin-top: 0;">
+                <i class="fas fa-wallet"></i> <span style="font-size: 0.8rem; font-weight: 700; letter-spacing: 1px;">FINANCIALS</span>
+            </div>
             <div class="info-card">
                 <div style="display: flex; flex-direction: column;">
                     <span class="info-card-lbl" data-i18n="balance">YOUR BALANCE</span>
@@ -368,6 +371,18 @@
                 </div>
             </div>
 
+            <div class="section-header">
+                <i class="fas fa-layer-group"></i> <span style="font-size: 0.8rem; font-weight: 700; letter-spacing: 1px;">INVENTORY</span>
+            </div>
+            <div class="info-card">
+                <div style="display: flex; flex-direction: column;">
+                    <span class="info-card-lbl" data-i18n="total_numbers">TOTAL NUMBERS</span>
+                    <span class="info-card-val" id="dash-total-numbers">0</span>
+                </div>
+                <div style="width: 45px; height: 45px; background: rgba(88, 101, 242, 0.1); color: var(--accent); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-list-ol"></i>
+                </div>
+            </div>
             <div class="info-card">
                 <div style="display: flex; flex-direction: column;">
                     <span class="info-card-lbl" data-i18n="countries">TOTAL COUNTRIES</span>
@@ -377,7 +392,6 @@
                     <i class="fas fa-globe"></i>
                 </div>
             </div>
-            
             <div class="info-card">
                 <div style="display: flex; flex-direction: column;">
                     <span class="info-card-lbl" data-i18n="lowest_price">LOWEST PRICE</span>
@@ -387,11 +401,6 @@
                     <i class="fas fa-tags"></i>
                 </div>
             </div>
-
-            <h3 style="margin: 25px 0 15px; font-size: 0.9rem; text-transform: uppercase; color: var(--text-s); letter-spacing: 1px;" data-i18n="quick_buy">Quick Access</h3>
-            <button class="primary-btn" onclick="switchNav('store', document.getElementById('m-store'))">
-                <i class="fas fa-rocket"></i> <span data-i18n="btn_start_shopping">Start Shopping</span>
-            </button>
         </section>
 
         <section id="section-store" class="view-panel">
@@ -644,6 +653,7 @@
                 countries = data.countries || [];
                 if (data.stats) {
                     document.getElementById('stat-total-numbers').innerText = data.stats.total_numbers || 0;
+                    document.getElementById('dash-total-numbers').innerText = data.stats.total_numbers || 0;
                     document.getElementById('stat-countries').innerText = data.stats.countries_count || 0;
                     document.getElementById('dash-countries').innerText = data.stats.countries_count || 0;
                     document.getElementById('stat-lowest-price').innerText = parseFloat(data.stats.lowest_price || 0).toFixed(2);
