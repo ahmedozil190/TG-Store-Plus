@@ -986,7 +986,10 @@
             sessionStorage.setItem('activeTab', id);
 
             if (id === 'store') fetchCountries();
-            if (id === 'history') fetchHistory();
+            if (id === 'history') {
+                currentHistoryPage = 1;
+                fetchHistory();
+            }
         }
 
         async function init() {
