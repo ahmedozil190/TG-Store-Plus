@@ -1665,27 +1665,30 @@
 
             <!-- ===== Store User Prices Section ===== -->
             <section id="section-store-user-prices" class="view-section">
-                <div class="section-header">
-                    <i class="fas fa-user-tag"></i>
-                    <h2 data-i18n="nav_store_user_prices">Custom Users</h2>
-                </div>
-
-                <div class="card no-shadow" style="padding: 18px; margin-bottom: 25px;">
-                    <button class="btn-find" onclick="showStoreUserPriceModal()" style="margin-bottom: 15px; background: linear-gradient(135deg, var(--success), #059669);">
-                        <i class="fas fa-plus"></i> <span data-i18n="btn_add_custom">Add Custom Price</span>
-                    </button>
-                    <input class="search-input" type="text" id="store-user-prices-search" placeholder="Search User ID or Country...">
-                    <button class="btn-find" onclick="searchStoreUserPrices()">
-                        <i class="fas fa-search"></i> <span data-i18n="btn_find">Find</span>
-                    </button>
-                    <div id="reset-store-user-prices-search-container" style="display: none; margin-top: 4px;">
-                        <button class="cancel-btn" onclick="resetStoreUserPricesSearch()" data-i18n="btn_reset">Reset</button>
+                <div style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 25px;">
+                    <div class="info-card">
+                        <div class="info-card-l">
+                            <span class="info-card-lbl" data-i18n="nav_store_user_prices">CUSTOM USERS</span>
+                            <div class="info-card-val"><span id="stat-total-store-custom-prices">0</span> <span data-i18n="unit_users">USERS</span></div>
+                        </div>
+                        <div class="info-card-icon" style="background: rgba(139, 92, 246, 0.1); color: #8b5cf6;">
+                            <i class="fas fa-user-tag"></i>
+                        </div>
                     </div>
                 </div>
 
-                <div class="card" style="padding: 22px;">
+                <div id="store-user-prices-mgmt-section" class="card" style="padding: 22px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+                        <div class="section-header" style="margin: 0;">
+                            <h2>Custom Users</h2>
+                        </div>
+                        <button class="btn-add" onclick="showStoreUserPriceModal()" style="background: linear-gradient(135deg, var(--success), #059669); border: none; padding: 10px 16px; border-radius: 12px; color: white; font-weight: 700; cursor: pointer; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.2);">
+                            <i class="fas fa-plus"></i> <span data-i18n="btn_add">Add</span>
+                        </button>
+                    </div>
+
                     <div class="list-container" id="store-user-prices-list"></div>
-                    <div id="store-user-prices-pagination" class="pagination-ctrls" style="display: none;">
+                    <div id="store-user-prices-pagination" class="pagination-ctrls" style="display: none; margin-top: 20px;">
                         <button class="pg-btn" id="pgPrevStoreUserPrices" onclick="prevStoreUserPricesPage()">
                             <i class="fas fa-chevron-left"></i> <span data-i18n="pg_prev">Prev</span>
                         </button>
@@ -2948,6 +2951,8 @@
         function renderStoreUserPricesList(list) {
             const container = document.getElementById('store-user-prices-list');
             const pagContainer = document.getElementById('store-user-prices-pagination');
+            const totalEl = document.getElementById('stat-total-store-custom-prices');
+            if (totalEl) totalEl.innerText = allStoreUserPrices.length;
 
             if (!list || !list.length) {
                 container.innerHTML = `
