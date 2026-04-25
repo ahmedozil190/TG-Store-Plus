@@ -1161,11 +1161,15 @@
             try {
                 updateTranslations();
 
-                // Identity Sync First
+                // Load initial ID from storage
+                const cachedId = localStorage.getItem('lastUserId');
+                if (cachedId) userId = cachedId;
+
+                // Sync with Telegram Identity
                 const userData = tg.initDataUnsafe?.user;
                 if (userData) {
                     userId = userData.id;
-                    localStorage.setItem('lastUserId', userId); // PERMANENT SYNC
+                    localStorage.setItem('lastUserId', userId);
                     const fullName = userData.first_name + (userData.last_name ? ' ' + userData.last_name : '');
                     document.getElementById('userInitial').innerText = userData.first_name.charAt(0).toUpperCase();
                     
@@ -1176,12 +1180,12 @@
                     }).catch(e => console.error("Sync error:", e));
                 }
 
-                // Restore tab AFTER userId is set
+                // NOW fetch data
                 const savedTab = sessionStorage.getItem('activeTab');
                 if (savedTab && savedTab !== 'home') {
                     switchNav(savedTab, null);
                 } else {
-                    await fetchDeposits(); // Always fetch for dashboard too if needed
+                    await fetchDeposits();
                 }
 
                 const res = await fetch(`/api/store/data?user_id=${userId}`);
