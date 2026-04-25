@@ -2017,11 +2017,21 @@
         const SALES_PER_PAGE = 10;
 
         function formatDateTime(isoStr) {
-            if (!isoStr) return '—';
+            if (!isoStr) return "N/A";
             try {
-                const d = new Date(isoStr);
-                return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) + ' ' + d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
-            } catch (e) { return isoStr; }
+                const d = new Date(isoStr + (isoStr.endsWith('Z') ? '' : 'Z'));
+                if (isNaN(d.getTime())) return isoStr;
+                const Y = d.getFullYear();
+                const M = String(d.getMonth() + 1).padStart(2, '0');
+                const Day = String(d.getDate()).padStart(2, '0');
+                let H = d.getHours();
+                const Min = String(d.getMinutes()).padStart(2, '0');
+                const ampm = H >= 12 ? 'PM' : 'AM';
+                H = H % 12;
+                H = H ? H : 12;
+                const HH = String(H).padStart(2, '0');
+                return `${Y}-${M}-${Day} ${HH}:${Min} ${ampm}`;
+            } catch(e) { return isoStr; }
         }
 
         function renderSalesList(list) {
