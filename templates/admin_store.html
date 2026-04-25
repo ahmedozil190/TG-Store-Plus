@@ -1580,7 +1580,9 @@
                             <span class="info-card-lbl" data-i18n="stat_sales">TOTAL SALES</span>
                             <div class="info-card-val">
                                 <span id="stat-sales-total-count">0</span>
-                                <span style="font-size: 0.85rem; color: var(--text-secondary); font-weight: 600; margin-left: 5px;" data-i18n="unit_ops">SALES</span>
+                                <span
+                                    style="font-size: 0.85rem; color: var(--text-secondary); font-weight: 600; margin-left: 5px;"
+                                    data-i18n="unit_ops">SALES</span>
                             </div>
                         </div>
                         <div class="info-card-icon" style="background: rgba(34, 197, 94, 0.1); color: var(--success);">
@@ -1592,7 +1594,8 @@
                             <span class="info-card-lbl">TOTAL REVENUE</span>
                             <div class="info-card-val">
                                 <span id="stat-sales-total-amount">0.00</span>
-                                <span style="font-size: 0.85rem; color: var(--text-secondary); font-weight: 600; margin-left: 5px;">USD</span>
+                                <span
+                                    style="font-size: 0.85rem; color: var(--text-secondary); font-weight: 600; margin-left: 5px;">USD</span>
                             </div>
                         </div>
                         <div class="info-card-icon" style="background: rgba(139, 92, 246, 0.1); color: #8b5cf6;">
@@ -1640,34 +1643,51 @@
                 </div>
                 <div class="card" style="padding: 22px;">
                     <div style="margin-bottom: 25px;">
-                        <h3 style="font-size: 1rem; margin-bottom: 15px; color: var(--accent);"><i class="fas fa-wallet" style="margin-right: 8px;"></i> Binance Integration</h3>
-                        
+                        <h3 style="font-size: 1rem; margin-bottom: 15px; color: var(--accent);"><i class="fas fa-wallet"
+                                style="margin-right: 8px;"></i> Binance Integration</h3>
+
                         <div class="form-group" style="margin-bottom: 15px;">
-                            <label style="font-size: 0.85rem; color: var(--text-s); margin-bottom: 8px; display: block;">Binance API Key</label>
-                            <input type="text" id="setting-binance-key" class="search-input" style="margin-bottom: 0;" placeholder="Enter API Key">
+                            <label
+                                style="font-size: 0.85rem; color: var(--text-s); margin-bottom: 8px; display: block;">Binance
+                                API Key</label>
+                            <input type="text" id="setting-binance-key" class="search-input" style="margin-bottom: 0;"
+                                placeholder="Enter API Key">
                         </div>
-                        
+
                         <div class="form-group" style="margin-bottom: 15px;">
-                            <label style="font-size: 0.85rem; color: var(--text-s); margin-bottom: 8px; display: block;">Binance API Secret</label>
-                            <input type="text" id="setting-binance-secret" class="search-input" style="margin-bottom: 0;" placeholder="Enter Secret Key (Hidden)">
+                            <label
+                                style="font-size: 0.85rem; color: var(--text-s); margin-bottom: 8px; display: block;">Binance
+                                API Secret</label>
+                            <input type="text" id="setting-binance-secret" class="search-input"
+                                style="margin-bottom: 0;" placeholder="Enter Secret Key (Hidden)">
                         </div>
 
                         <hr style="border: none; border-top: 1px solid var(--border); margin: 20px 0;">
-                        <h3 style="font-size: 1rem; margin-bottom: 15px; color: var(--accent);"><i class="fas fa-coins" style="margin-right: 8px;"></i> Deposit Addresses</h3>
+                        <h3 style="font-size: 1rem; margin-bottom: 15px; color: var(--accent);"><i class="fas fa-coins"
+                                style="margin-right: 8px;"></i> Deposit Addresses</h3>
 
                         <div class="form-group" style="margin-bottom: 15px;">
-                            <label style="font-size: 0.85rem; color: var(--text-s); margin-bottom: 8px; display: block;">Binance Pay ID</label>
-                            <input type="text" id="setting-binance-pay-id" class="search-input" style="margin-bottom: 0;" placeholder="Enter Binance Pay ID">
+                            <label
+                                style="font-size: 0.85rem; color: var(--text-s); margin-bottom: 8px; display: block;">Binance
+                                Pay ID</label>
+                            <input type="text" id="setting-binance-pay-id" class="search-input"
+                                style="margin-bottom: 0;" placeholder="Enter Binance Pay ID">
                         </div>
 
                         <div class="form-group" style="margin-bottom: 15px;">
-                            <label style="font-size: 0.85rem; color: var(--text-s); margin-bottom: 8px; display: block;">TRX Address (TRC20)</label>
-                            <input type="text" id="setting-trx-address" class="search-input" style="margin-bottom: 0;" placeholder="Enter TRX TRC20 Address">
+                            <label
+                                style="font-size: 0.85rem; color: var(--text-s); margin-bottom: 8px; display: block;">TRX
+                                Address (TRC20)</label>
+                            <input type="text" id="setting-trx-address" class="search-input" style="margin-bottom: 0;"
+                                placeholder="Enter TRX TRC20 Address">
                         </div>
 
                         <div class="form-group" style="margin-bottom: 15px;">
-                            <label style="font-size: 0.85rem; color: var(--text-s); margin-bottom: 8px; display: block;">USDT Address (BEP20)</label>
-                            <input type="text" id="setting-usdt-bep20-address" class="search-input" style="margin-bottom: 0;" placeholder="Enter USDT BEP20 Address">
+                            <label
+                                style="font-size: 0.85rem; color: var(--text-s); margin-bottom: 8px; display: block;">USDT
+                                Address (BEP20)</label>
+                            <input type="text" id="setting-usdt-bep20-address" class="search-input"
+                                style="margin-bottom: 0;" placeholder="Enter USDT BEP20 Address">
                         </div>
                     </div>
 
@@ -1877,7 +1897,7 @@
 
         function switchNav(id, btn, skipToggle = false) {
             if (!skipToggle) closeNav();
-            
+
             // 1. Reset Pagination Variables
             currentPage = 1;
             currentPricePage = 1;
@@ -1900,7 +1920,7 @@
             // 4. Render page 1 data WHILE section is still hidden
             if (id === 'users') renderUsers(allUsers);
             if (id === 'prices') renderPrices(allPrices);
-            if (id === 'sales') fetchSalesHistory(1);
+            if (id === 'sales') renderSalesList(allTransactions);
             if (id === 'home') renderSales(allTransactions);
             if (id === 'settings') fetchStoreSettings();
 
@@ -1930,7 +1950,7 @@
             }
         }
 
-        window.onhashchange = function() {
+        window.onhashchange = function () {
             const h = location.hash.replace('#', '') || 'home';
             const btn = document.getElementById('menu-' + (h === 'home' ? 'dashboard' : h));
             switchNav(h, btn, true);
@@ -1993,100 +2013,109 @@
         }
 
         let currentSalesPage = 1;
-        let totalSalesPages = 1;
-        let currentSalesQuery = "";
+        let filteredSales = null;
+        const SALES_PER_PAGE = 10;
 
-        async function fetchSalesHistory(page = 1, q = "") {
+        function renderSalesList(list) {
             const container = document.getElementById('sales-list');
             const pagContainer = document.getElementById('sales-pagination');
-            currentSalesPage = page;
-            currentSalesQuery = q;
+            
+            // Calculate Stats
+            const totalCount = allTransactions.length;
+            const totalAmount = allTransactions.reduce((acc, curr) => acc + Number(curr.price), 0);
+            
+            document.getElementById('stat-sales-total-count').innerText = totalCount;
+            document.getElementById('stat-sales-total-amount').innerText = totalAmount.toFixed(2);
 
-            try {
-                console.log(`Fetching Sales History: page=${page}, q=${q}`);
-                const res = await fetch(`/api/admin/store/sales?page=${page}&q=${encodeURIComponent(q)}`);
-                const data = await res.json();
-                console.log("Sales Data Received:", data);
+            if (!list || !list.length) {
+                container.innerHTML = `
+                <div style="text-align: center; padding: 40px 20px; background: var(--card-glass); border-radius: 16px; border: 1px dashed var(--border); margin-top: 10px; backdrop-filter: blur(10px);">
+                    <i class="fas fa-receipt" style="font-size: 2.5rem; color: var(--text-secondary); opacity: 0.3; margin-bottom: 12px;"></i>
+                    <p style="color: var(--text-secondary); font-weight: 600; font-size: 0.95rem;">${translations[currentLang].no_sales}</p>
+                </div>`;
+                pagContainer.style.display = 'none';
+                return;
+            }
 
-                const list = data.sales || [];
-                totalSalesPages = data.total_pages || 1;
+            const totalPages = Math.ceil(list.length / SALES_PER_PAGE);
+            const start = (currentSalesPage - 1) * SALES_PER_PAGE;
+            const paged = list.slice(start, start + SALES_PER_PAGE);
 
-                if (!list.length) {
-                    container.innerHTML = `
-                    <div style="text-align: center; padding: 40px 20px; background: var(--card-glass); border-radius: 16px; border: 1px dashed var(--border); margin-top: 10px; backdrop-filter: blur(10px);">
-                        <i class="fas fa-receipt" style="font-size: 2.5rem; color: var(--text-secondary); opacity: 0.3; margin-bottom: 12px;"></i>
-                        <p style="color: var(--text-secondary); font-weight: 600; font-size: 0.95rem;">${translations[currentLang].no_sales}</p>
-                    </div>`;
-                    pagContainer.style.display = 'none';
-                    return;
-                }
+            const rowS = "background: transparent; border: 1px solid var(--border); padding: 14px 18px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; gap: 15px;";
+            const lblS = "color: var(--text-secondary); font-size: 0.8rem; font-weight: 700; text-transform: uppercase;";
 
-                const rowS = "background: transparent; border: 1px solid var(--border); padding: 14px 18px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; gap: 15px;";
-                const lblS = "color: var(--text-secondary); font-size: 0.8rem; font-weight: 700; text-transform: uppercase;";
-
-                container.innerHTML = list.map(item => `
-                    <div class="user-card" style="padding: 20px; margin-bottom: 15px; cursor: default;">
-                        <div style="display: flex; flex-direction: column; gap: 10px;">
-                            <div style="${rowS}">
-                                <span style="${lblS}">${currentLang === 'ar' ? 'رقم الهاتف' : 'Phone'}</span>
-                                <span style="color: var(--success); font-weight: 800; font-size: 1.1rem; text-align: right; direction: ltr;">${item.phone}</span>
-                            </div>
-                            <div style="${rowS}">
-                                <span style="${lblS}">${currentLang === 'ar' ? 'الدولة' : 'Country'}</span>
-                                <span style="color: #3b82f6; font-weight: 700; font-size: 0.95rem; text-align: right;">${item.country}</span>
-                            </div>
-                            <div style="${rowS}">
-                                <span style="${lblS}">${currentLang === 'ar' ? 'المشتري' : 'Buyer'}</span>
-                                <span style="color: #8b5cf6; font-weight: 800; font-size: 1rem; text-align: right;">${item.buyer_id}</span>
-                            </div>
-                            <div style="${rowS}">
-                                <span style="${lblS}">${currentLang === 'ar' ? 'السعر' : 'Price'}</span>
-                                <span style="color: var(--accent); font-weight: 900; font-size: 1.2rem; text-align: right;">$${Number(item.price).toFixed(2)}</span>
-                            </div>
-                            <div style="${rowS}">
-                                <span style="${lblS}">${currentLang === 'ar' ? 'التاريخ' : 'Date'}</span>
-                                <span style="color: #fdd835; font-weight: 600; font-size: 0.85rem; text-align: right;">${formatDateTime(item.date)}</span>
-                            </div>
+            container.innerHTML = paged.map(item => `
+                <div class="user-card" style="padding: 20px; margin-bottom: 15px; cursor: default;">
+                    <div style="display: flex; flex-direction: column; gap: 10px;">
+                        <div style="${rowS}">
+                            <span style="${lblS}">${currentLang === 'ar' ? 'رقم الهاتف' : 'Phone'}</span>
+                            <span style="color: var(--success); font-weight: 800; font-size: 1.1rem; text-align: right; direction: ltr;">${item.phone}</span>
+                        </div>
+                        <div style="${rowS}">
+                            <span style="${lblS}">${currentLang === 'ar' ? 'الدولة' : 'Country'}</span>
+                            <span style="color: #3b82f6; font-weight: 700; font-size: 0.95rem; text-align: right;">${item.country}</span>
+                        </div>
+                        <div style="${rowS}">
+                            <span style="${lblS}">${currentLang === 'ar' ? 'المشتري' : 'Buyer'}</span>
+                            <span style="color: #8b5cf6; font-weight: 800; font-size: 1rem; text-align: right;">${item.buyer_id}</span>
+                        </div>
+                        <div style="${rowS}">
+                            <span style="${lblS}">${currentLang === 'ar' ? 'السعر' : 'Price'}</span>
+                            <span style="color: var(--accent); font-weight: 900; font-size: 1.2rem; text-align: right;">$${Number(item.price).toFixed(2)}</span>
+                        </div>
+                        <div style="${rowS}">
+                            <span style="${lblS}">${currentLang === 'ar' ? 'التاريخ' : 'Date'}</span>
+                            <span style="color: #fdd835; font-weight: 600; font-size: 0.85rem; text-align: right;">${formatDateTime(item.date)}</span>
                         </div>
                     </div>
-                `).join('');
+                </div>
+            `).join('');
 
-                if (totalSalesPages > 1) {
-                    pagContainer.style.display = 'flex';
-                    document.getElementById('pgInfoSales').innerText = `Page ${currentSalesPage} of ${totalSalesPages}`;
-                    document.getElementById('pgPrevSales').disabled = (currentSalesPage === 1);
-                    document.getElementById('pgNextSales').disabled = (currentSalesPage === totalSalesPages);
-                } else {
-                    pagContainer.style.display = 'none';
-                }
-            } catch (e) {
-                console.error("Sales History Error:", e);
+            if (totalPages > 1) {
+                pagContainer.style.display = 'flex';
+                document.getElementById('pgInfoSales').innerText = `Page ${currentSalesPage} of ${totalPages}`;
+                document.getElementById('pgPrevSales').disabled = (currentSalesPage === 1);
+                document.getElementById('pgNextSales').disabled = (currentSalesPage === totalPages);
+            } else {
+                pagContainer.style.display = 'none';
             }
         }
 
         function searchSales() {
-            const q = document.getElementById('sales-search').value.trim();
-            if (q) document.getElementById('reset-sales-search-container').style.display = 'block';
-            else document.getElementById('reset-sales-search-container').style.display = 'none';
-            fetchSalesHistory(1, q);
+            const q = document.getElementById('sales-search').value.trim().toLowerCase();
+            if (!q) { filteredSales = null; currentSalesPage = 1; renderSalesList(allTransactions); return; }
+            filteredSales = allTransactions.filter(item => 
+                String(item.phone).includes(q) || 
+                String(item.buyer_id).includes(q) ||
+                (item.country && item.country.toLowerCase().includes(q))
+            );
+            currentSalesPage = 1;
+            document.getElementById('reset-sales-search-container').style.display = 'block';
+            renderSalesList(filteredSales);
         }
 
         function resetSalesSearch() {
             document.getElementById('sales-search').value = '';
+            filteredSales = null;
+            currentSalesPage = 1;
             document.getElementById('reset-sales-search-container').style.display = 'none';
-            fetchSalesHistory(1, "");
+            renderSalesList(allTransactions);
         }
 
         function prevSalesPage() {
             if (currentSalesPage > 1) {
-                fetchSalesHistory(currentSalesPage - 1, currentSalesQuery);
+                currentSalesPage--;
+                renderSalesList(filteredSales || allTransactions);
                 document.getElementById('sales-mgmt-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
             }
         }
 
         function nextSalesPage() {
-            if (currentSalesPage < totalSalesPages) {
-                fetchSalesHistory(currentSalesPage + 1, currentSalesQuery);
+            const list = filteredSales || allTransactions;
+            const totalPages = Math.ceil(list.length / SALES_PER_PAGE);
+            if (currentSalesPage < totalPages) {
+                currentSalesPage++;
+                renderSalesList(list);
                 document.getElementById('sales-mgmt-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
             }
         }
@@ -2094,11 +2123,11 @@
         function setSalesFilter(filter, btn) {
             document.querySelectorAll('#section-sales .tab-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
+            currentSalesPage = 1;
             if (filter === 'recent') {
-                // If it's the full history view, maybe we just show page 1
-                fetchSalesHistory(1, "");
+                renderSalesList(allTransactions.slice(0, 5));
             } else {
-                fetchSalesHistory(1, "");
+                renderSalesList(allTransactions);
             }
         }
 
@@ -2612,7 +2641,7 @@
                 const data = await res.json();
                 document.getElementById('setting-binance-key').value = data.binance_api_key || "";
                 document.getElementById('setting-binance-secret').value = data.binance_api_secret_masked || "";
-                
+
                 // Set deposit addresses
                 document.getElementById('setting-binance-pay-id').value = data.binance_pay_id || "";
                 document.getElementById('setting-trx-address').value = data.trx_address || "";
