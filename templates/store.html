@@ -713,7 +713,7 @@
                 <i class="fas fa-shopping-cart"></i> <span data-i18n="nav_store">Buy Number</span>
             </div>
             <div class="nav-item" id="m-history" onclick="switchNav('history', this)">
-                <span data-i18n="nav_history">Orders History</span>
+                <i class="fas fa-clock-rotate-left"></i> <span data-i18n="nav_history">Orders History</span>
             </div>
             <div class="nav-item" id="m-deposit" onclick="switchNav('deposit', this)">
                 <i class="fas fa-wallet"></i> <span data-i18n="nav_deposit">Deposit</span>
@@ -975,10 +975,7 @@
             <div class="info-card" style="margin-bottom: 25px;">
                 <div class="info-card-l">
                     <span class="info-card-lbl">Total Orders</span>
-                    <div class="info-card-val">
-                        <span id="hist-total-orders">0</span>
-                        <span style="font-size: 0.85rem; color: var(--text-s); font-weight: 600;">ORDERS</span>
-                    </div>
+                    <div class="info-card-val" id="hist-total-orders">0 <span>ORDERS</span></div>
                 </div>
                 <div class="info-card-icon" style="background: rgba(88, 101, 242, 0.1); color: var(--accent);">
                     <i class="fas fa-shopping-bag"></i>
@@ -987,7 +984,6 @@
 
             <div id="history-section" class="card" style="padding: 22px; margin-top: 15px;">
                 <div class="section-header" style="margin-top: 0; margin-bottom: 35px;">
-                    <i class="fas fa-shopping-bag"></i>
                     <span style="font-size: 0.8rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;"
                         data-i18n="hist_title">Orders History</span>
                 </div>
