@@ -1292,15 +1292,15 @@ async def add_store_user_price(data: UserStorePriceCreate):
             )
             existing = (await session.execute(stmt)).scalar()
             if existing:
-                existing.sell_price = data.sell_price
-            else:
-                new_usp = UserStorePrice(
-                    user_id=data.user_id,
-                    country_code=data.country_code,
-                    iso_code=data.iso_code,
-                    sell_price=data.sell_price
-                )
-                session.add(new_usp)
+                raise HTTPException(status_code=400, detail="This country is already added for this user. Please edit the existing entry instead.")
+            
+            new_usp = UserStorePrice(
+                user_id=data.user_id,
+                country_code=data.country_code,
+                iso_code=data.iso_code,
+                sell_price=data.sell_price
+            )
+            session.add(new_usp)
         await session.commit()
         return {"status": "success"}
 
