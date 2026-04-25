@@ -1764,6 +1764,16 @@
                     </div>
                 </div>
 
+                <!-- Unique Search Box Card -->
+                <div class="card no-shadow" style="padding: 12px; margin-bottom: 25px; background: var(--card-glass); border: 1px solid var(--border);">
+                    <div class="unique-search-container" style="margin-bottom: 0;">
+                        <i class="fas fa-search unique-search-icon"></i>
+                        <input type="text" id="up-search" class="unique-search-input" 
+                               placeholder="${currentLang === 'ar' ? 'البحث عن مستخدم أو دولة...' : 'Search for user or country...'}" 
+                               oninput="onUpSearchInput()">
+                    </div>
+                </div>
+
                 <div id="user-prices-mgmt-section" class="card" style="padding: 22px;">
                     <div
                         style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
@@ -1773,14 +1783,6 @@
                         <button class="btn-add" onclick="openUserPriceModal()">
                             <i class="fas fa-plus"></i> <span data-i18n="btn_add">Add</span>
                         </button>
-                    </div>
-
-                    <!-- Unique Search Box -->
-                    <div class="unique-search-container">
-                        <i class="fas fa-search unique-search-icon"></i>
-                        <input type="text" id="up-search" class="unique-search-input" 
-                               placeholder="${currentLang === 'ar' ? 'البحث عن مستخدم أو دولة...' : 'Search for user or country...'}" 
-                               oninput="onUpSearchInput()">
                     </div>
 
                     <div class="list-container" id="user-prices-list">
