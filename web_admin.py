@@ -418,6 +418,20 @@ async def get_store_data(user_id: int = None):
                         iso = getattr(cp, 'iso_code', None) or 'XX'
                         flag = get_flag_emoji(iso)
                         price = cp.price
+                        
+                        if user_id:
+                            from database.models import UserStorePrice
+                            from sqlalchemy import or_
+                            cc_clean = cp.country_code.strip().replace('+', '')
+                            cc_plus = f"+{cc_clean}"
+                            usp = (await session.execute(
+                                select(UserStorePrice).where(
+                                    UserStorePrice.user_id == user_id,
+                                    or_(UserStorePrice.country_code == cc_clean, UserStorePrice.country_code == cc_plus)
+                                )
+                            )).scalar()
+                            if usp:
+                                price = usp.sell_price
                 except: pass
                 
                 countries.append({
@@ -535,6 +549,21 @@ async def store_buy(data: StoreBuy):
             # Fetch current price from CountryPrice to ensure it matches admin settings
             cp = (await session.execute(select(CountryPrice).where(CountryPrice.country_name == account.country))).scalar()
             final_price = cp.price if cp else account.price
+            
+            # Check for Custom User Price
+            if cp:
+                from database.models import UserStorePrice
+                from sqlalchemy import or_
+                cc_clean = cp.country_code.strip().replace('+', '')
+                cc_plus = f"+{cc_clean}"
+                usp = (await session.execute(
+                    select(UserStorePrice).where(
+                        UserStorePrice.user_id == data.user_id,
+                        or_(UserStorePrice.country_code == cc_clean, UserStorePrice.country_code == cc_plus)
+                    )
+                )).scalar()
+                if usp:
+                    final_price = usp.sell_price
             
             if user.balance_store < final_price: raise HTTPException(status_code=400, detail="رصيدك غير كافٍ")
             user.balance_store -= final_price
