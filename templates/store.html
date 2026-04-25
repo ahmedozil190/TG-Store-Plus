@@ -1648,9 +1648,6 @@
             if (target >= 1 && target <= totalDepPages) {
                 currentDepPage = target;
                 await fetchDeposits();
-                // Smooth scroll to top of history section
-                const section = document.getElementById('deposit-history-container');
-                if (section) section.scrollIntoView({ behavior: 'smooth', block: 'start' });
             }
         }
     </script>
