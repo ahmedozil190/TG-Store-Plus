@@ -25,16 +25,27 @@ async def init_db():
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
         
-        # Auto-migration: Check if transaction_id exists in withdrawal_requests
+        # Auto-migration: Check columns for various tables
         try:
-            # Check existing columns
-            def check_columns(connection):
+            # 1. withdrawal_requests.transaction_id
+            def check_withdraw_cols(connection):
                 cursor = connection.execute(text("PRAGMA table_info(withdrawal_requests)"))
                 return [row[1] for row in cursor]
             
-            columns = await conn.run_sync(check_columns)
-            if 'transaction_id' not in columns:
+            w_cols = await conn.run_sync(check_withdraw_cols)
+            if 'transaction_id' not in w_cols:
                 await conn.execute(text("ALTER TABLE withdrawal_requests ADD COLUMN transaction_id VARCHAR(12)"))
                 print("Successfully added transaction_id column to withdrawal_requests")
+            
+            # 2. deposits.method
+            def check_deposit_cols(connection):
+                cursor = connection.execute(text("PRAGMA table_info(deposits)"))
+                return [row[1] for row in cursor]
+            
+            d_cols = await conn.run_sync(check_deposit_cols)
+            if 'method' not in d_cols:
+                await conn.execute(text("ALTER TABLE deposits ADD COLUMN method VARCHAR(50)"))
+                print("Successfully added method column to deposits")
+                
         except Exception as e:
-            print(f"Migration check failed or not needed: {e}")
+            print(f"Migration check failed: {e}")
