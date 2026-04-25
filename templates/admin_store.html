@@ -1682,7 +1682,7 @@
                         <div class="section-header" style="margin: 0;">
                             <h2>Custom Users</h2>
                         </div>
-                        <button class="btn-add" onclick="showStoreUserPriceModal()" style="background: linear-gradient(135deg, var(--success), #059669); border: none; padding: 10px 16px; border-radius: 12px; color: white; font-weight: 700; cursor: pointer; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.2);">
+                        <button class="btn-add" onclick="showStoreUserPriceModal()">
                             <i class="fas fa-plus"></i> <span data-i18n="btn_add">Add</span>
                         </button>
                     </div>
@@ -2957,8 +2957,8 @@
             if (!list || !list.length) {
                 container.innerHTML = `
                 <div style="text-align: center; padding: 40px 20px; background: var(--card-glass); border-radius: 16px; border: 1px dashed var(--border); margin-top: 0; backdrop-filter: blur(10px);">
-                    <i class="fas fa-user-tag" style="font-size: 2.5rem; color: var(--text-secondary); opacity: 0.3; margin-bottom: 12px;"></i>
-                    <p style="color: var(--text-secondary); font-weight: 600; font-size: 0.95rem;">${translations[currentLang].no_data || 'No custom prices found'}</p>
+                    <i class="fas fa-user-tag" style="font-size: 2.5rem; color: var(--text-secondary); opacity: 0.15; margin-bottom: 12px;"></i>
+                    <p style="color: var(--text-secondary); font-weight: 600; font-size: 0.95rem;">${currentLang === 'ar' ? 'لا يوجد مستخدمين' : 'No users found'}</p>
                 </div>`;
                 pagContainer.style.display = 'none';
                 return;
