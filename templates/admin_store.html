@@ -1790,10 +1790,8 @@
             </div>
             <input type="hidden" id="m-sup-id">
             
-            <div style="display: flex; gap: 15px; margin-top: 25px;">
-                <button class="btn-cancel" onclick="closeStoreUserPriceModal()" data-i18n="btn_cancel" style="flex: 1; padding: 14px; background: transparent; border: 1px solid var(--border); color: var(--text-p); border-radius: 12px; cursor: pointer; font-weight: 700;">Cancel</button>
-                <button class="btn-save" onclick="saveStoreUserPrice()" data-i18n="btn_save" style="flex: 1; padding: 14px; background: linear-gradient(135deg, var(--success), #059669); border: none; color: white; border-radius: 12px; cursor: pointer; font-weight: 700; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);">Save</button>
-            </div>
+            <button class="primary-btn" onclick="saveStoreUserPrice()" data-i18n="btn_save_custom">Save Custom User</button>
+            <button class="cancel-btn" onclick="closeStoreUserPriceModal()" data-i18n="nav_close">Close</button>
         </div>
     </div>
 
@@ -1881,7 +1879,7 @@
                 search_countries_ph: "Search countries...",
                 confirm_title: "Are you sure?",
                 confirm_delete_msg: "This action cannot be undone.",
-                btn_confirm: "Delete Now",
+                btn_save_custom: "Save Custom User",
                 btn_cancel: "Cancel",
                 lbl_full_name: "Full Name",
                 lbl_current_balance: "Current Balance",
@@ -1910,6 +1908,7 @@
                 by_user: "بواسطة",
                 btn_add: "إضافة",
                 btn_save: "إضافة دولة",
+                btn_save_custom: "حفظ سعر المستخدم",
                 btn_reset: "إعادة ضبط",
                 modal_title: "إضافة دولة جديدة",
                 lbl_code: "كود",
@@ -2165,49 +2164,14 @@
             const rowS = "background: transparent; border: 1px solid var(--border); padding: 14px 18px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; gap: 15px;";
             const lblS = "color: var(--text-secondary); font-size: 0.8rem; font-weight: 700; text-transform: uppercase;";
 
-                        let html = '';
-            paged.forEach(up => {
-                html += `
-                <div class="user-card" style="position: relative; cursor: default; margin-bottom: 15px;">
-                    <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px;">
-                        <!-- Country Name -->
-                        <div style="background: transparent; border: 1px solid var(--border); padding: 14px 18px; border-radius: 12px; display: flex; justify-content: space-between; align-items: flex-start; gap: 20px;">
-                            <span style="color: var(--text-secondary); font-size: 0.8rem; font-weight: 700; text-transform: uppercase; flex-shrink: 0;">${currentLang === 'ar' ? 'الدولة' : 'Name'}</span>
-                            <span style="color: var(--success); font-weight: 800; font-size: 1.1rem; text-align: right; word-break: break-all; flex: 1; min-width: 0;">${up.country_name}</span>
-                        </div>
-                        <!-- Country Code -->
-                        <div style="background: transparent; border: 1px solid var(--border); padding: 14px 18px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center;">
-                            <span style="color: var(--text-secondary); font-size: 0.8rem; font-weight: 700; text-transform: uppercase;">${currentLang === 'ar' ? 'كود' : 'Code'}</span>
-                            <span style="color: var(--accent-purple); font-weight: 800; font-size: 1.1rem;">+${up.country_code}</span>
-                        </div>
-                        <!-- Sell Price -->
-                        <div style="background: transparent; border: 1px solid var(--border); padding: 14px 18px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center;">
-                            <span style="color: var(--text-secondary); font-size: 0.8rem; font-weight: 700; text-transform: uppercase;">${currentLang === 'ar' ? 'السعر' : 'Price'}</span>
-                            <span style="color: var(--accent); font-weight: 900; font-size: 1.1rem;">$${Number(up.sell_price).toFixed(2)}</span>
-                        </div>
-                        <!-- User Name -->
-                        <div style="background: transparent; border: 1px solid var(--border); padding: 14px 18px; border-radius: 12px; display: flex; justify-content: space-between; align-items: flex-start; gap: 20px;">
-                            <span style="color: var(--text-secondary); font-size: 0.8rem; font-weight: 700; text-transform: uppercase; flex-shrink: 0;">${currentLang === 'ar' ? 'المستخدم' : 'User'}</span>
-                            <span style="color: #3b82f6; font-weight: 800; font-size: 0.95rem; text-align: right; word-break: break-all; flex: 1; min-width: 0;">${up.user_name}</span>
-                        </div>
-                        <!-- User ID -->
-                        <div style="background: transparent; border: 1px solid var(--border); padding: 14px 18px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center;">
-                            <span style="color: var(--text-secondary); font-size: 0.8rem; font-weight: 700; text-transform: uppercase;">${currentLang === 'ar' ? 'معرف المستخدم' : 'User ID'}</span>
-                            <span style="color: #f59e0b; font-weight: 800; font-size: 1.1rem;"><code>${up.user_id}</code></span>
-                        </div>
+            container.innerHTML = paged.map(item => `
+                <div class="list-item">
+                    <div class="item-info">
+                        <h4 style="direction: ltr; text-align: left;"><i class="fas fa-check-circle" style="color: var(--success); margin-right: 5px;"></i> ${item.phone}</h4>
+                        <p style="margin-top: 4px;">${item.country} | <span style="color: var(--accent); font-weight: 700;">$${Number(item.price).toFixed(2)}</span> <span style="color: var(--text-secondary); font-size: 0.8rem; margin-left: 8px;">(${translations[currentLang].by_user}: ${item.buyer_id})</span></p>
                     </div>
-                    <!-- Action Buttons -->
-                    <div style="display: flex; gap: 10px;">
-                        <button class="primary-btn" style="flex: 1; background: rgba(96, 165, 250, 0.1); color: var(--accent); border: 1px solid rgba(96, 165, 250, 0.2); box-shadow: none; padding: 14px; font-size: 0.95rem;" onclick='editStoreUserPrice(${JSON.stringify(up).replace(/'/g, "&#39;")})'>
-                            <i class="fas fa-edit" style="${currentLang === 'ar' ? 'margin-left: 8px;' : 'margin-right: 8px;'}"></i> ${currentLang === 'ar' ? 'تعديل' : 'Edit'}
-                        </button>
-                        <button class="primary-btn" style="flex: 1; background: rgba(239, 68, 68, 0.1); color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.2); box-shadow: none; padding: 14px; font-size: 0.95rem;" onclick="deleteStoreUserPrice(${up.id})">
-                            <i class="fas fa-trash" style="${currentLang === 'ar' ? 'margin-left: 8px;' : 'margin-right: 8px;'}"></i> ${currentLang === 'ar' ? 'حذف' : 'Delete'}
-                        </button>
-                    </div>
-                </div>`;
-            });
-            container.innerHTML = html;
+                </div>
+            `).join('');
 
             if (totalPages > 1) {
                 pagContainer.style.display = 'flex';
