@@ -1087,7 +1087,7 @@
         let currentHistoryPage = 1;
         const HISTORY_LIMIT = 10;
         let totalHistoryPages = 1;
-        let userId = tg.initDataUnsafe?.user?.id || 0;
+        let userId = localStorage.getItem('lastUserId') || tg.initDataUnsafe?.user?.id || 0;
 
         const translations = {
             en: {
@@ -1165,6 +1165,7 @@
                 const userData = tg.initDataUnsafe?.user;
                 if (userData) {
                     userId = userData.id;
+                    localStorage.setItem('lastUserId', userId); // PERMANENT SYNC
                     const fullName = userData.first_name + (userData.last_name ? ' ' + userData.last_name : '');
                     document.getElementById('userInitial').innerText = userData.first_name.charAt(0).toUpperCase();
                     
