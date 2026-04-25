@@ -1683,14 +1683,26 @@
             <!-- ===== Store User Prices Section ===== -->
             <section id="section-store-user-prices" class="view-section">
                 <div style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 25px;">
+                    <!-- Stat 1: Total Users -->
                     <div class="info-card">
                         <div class="info-card-l">
-                            <span class="info-card-lbl" data-i18n="nav_store_user_prices">CUSTOM USERS</span>
+                            <span class="info-card-lbl">TOTAL USERS</span>
                             <div class="info-card-val"><span id="stat-total-store-custom-prices">0</span> <span
                                     data-i18n="unit_users">USERS</span></div>
                         </div>
                         <div class="info-card-icon" style="background: rgba(139, 92, 246, 0.1); color: #8b5cf6;">
                             <i class="fas fa-user-tag"></i>
+                        </div>
+                    </div>
+                    <!-- Stat 2: Total Countries -->
+                    <div class="info-card">
+                        <div class="info-card-l">
+                            <span class="info-card-lbl">TOTAL COUNTRIES</span>
+                            <div class="info-card-val"><span id="stat-total-store-custom-countries">0</span> <span
+                                    data-i18n="unit_countries">COUNTRIES</span></div>
+                        </div>
+                        <div class="info-card-icon" style="background: rgba(245, 158, 11, 0.1); color: #f59e0b;">
+                            <i class="fas fa-globe"></i>
                         </div>
                     </div>
                 </div>
@@ -1706,7 +1718,13 @@
                         </button>
                     </div>
 
-                    <div class="list-container" id="store-user-prices-list"></div>
+                    <!-- Search Box -->
+                    <div class="search-container" style="margin-bottom: 22px;">
+                        <i class="fas fa-search search-icon"></i>
+                        <input type="text" id="sup-search" class="search-input" 
+                               placeholder="${currentLang === 'ar' ? 'البحث عن مستخدم أو دولة...' : 'Search for user or country...'}" 
+                               oninput="onSupSearchInput()">
+                    </div>
                     <div id="store-user-prices-pagination" class="pagination-ctrls"
                         style="display: none; margin-top: 20px;">
                         <button class="pg-btn" id="pgPrevStoreUserPrices" onclick="prevStoreUserPricesPage()">
@@ -2978,10 +2996,17 @@
         function renderStoreUserPricesList(list) {
             const container = document.getElementById('store-user-prices-list');
             const pagContainer = document.getElementById('store-user-prices-pagination');
-            const totalEl = document.getElementById('stat-total-store-custom-prices');
-            if (totalEl) {
+            
+            // Update Stats
+            const totalUsersEl = document.getElementById('stat-total-store-custom-prices');
+            const totalCountriesEl = document.getElementById('stat-total-store-custom-countries');
+            if (totalUsersEl) {
                 const uniqueIds = new Set(allStoreUserPrices.map(p => p.user_id));
-                totalEl.innerText = uniqueIds.size;
+                totalUsersEl.innerText = uniqueIds.size;
+            }
+            if (totalCountriesEl) {
+                const uniqueCountries = new Set(allStoreUserPrices.map(p => p.iso_code));
+                totalCountriesEl.innerText = uniqueCountries.size;
             }
 
             if (!list || !list.length) {
@@ -3080,20 +3105,21 @@
         function prevStoreUserPricesPage() { gotoStoreUserPricesPage(currentStoreUserPricesPage - 1); }
         function nextStoreUserPricesPage() { gotoStoreUserPricesPage(currentStoreUserPricesPage + 1); }
 
-        function searchStoreUserPrices() {
-            const q = document.getElementById('store-user-prices-search').value.toLowerCase().trim();
-            if (!q) { filteredStoreUserPrices = null; currentStoreUserPricesPage = 1; renderStoreUserPricesList(allStoreUserPrices); return; }
-            filteredStoreUserPrices = allStoreUserPrices.filter(u => String(u.user_id).includes(q) || String(u.country_name).toLowerCase().includes(q) || String(u.country_code).includes(q));
+        // Search logic for Custom Users
+        function onSupSearchInput() {
+            const query = document.getElementById('sup-search').value.toLowerCase().trim();
+            if (!query) {
+                filteredStoreUserPrices = null;
+            } else {
+                filteredStoreUserPrices = allStoreUserPrices.filter(p => 
+                    String(p.user_id).includes(query) || 
+                    (p.country_name || '').toLowerCase().includes(query) ||
+                    (p.iso_code || '').toLowerCase().includes(query) ||
+                    (p.user_name || '').toLowerCase().includes(query)
+                );
+            }
             currentStoreUserPricesPage = 1;
-            renderStoreUserPricesList(filteredStoreUserPrices);
-            document.getElementById('reset-store-user-prices-search-container').style.display = 'block';
-        }
-        function resetStoreUserPricesSearch() {
-            document.getElementById('store-user-prices-search').value = '';
-            document.getElementById('reset-store-user-prices-search-container').style.display = 'none';
-            filteredStoreUserPrices = null;
-            currentStoreUserPricesPage = 1;
-            renderStoreUserPricesList(allStoreUserPrices);
+            renderStoreUserPricesList(filteredStoreUserPrices || allStoreUserPrices);
         }
 
         // Store User Price Modal CRUD
