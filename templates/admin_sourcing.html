@@ -2330,8 +2330,7 @@
         function openUserPriceModal(up = null) {
             const modal = document.getElementById('user-price-modal');
             modal.classList.add('active');
-            const card = modal.querySelector('.modal-card');
-            if (card) card.scrollTop = 0;
+            modal.scrollTop = 0;
             document.getElementById('up-country-group').style.display = 'none';
             document.getElementById('up-country-container').innerHTML = '';
 

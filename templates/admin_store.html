@@ -3039,8 +3039,7 @@
             document.getElementById('m-sup-sell-price').value = '';
             const modal = document.getElementById('store-user-price-modal');
             modal.classList.add('active');
-            const card = modal.querySelector('.modal-card');
-            if (card) card.scrollTop = 0;
+            modal.scrollTop = 0;
         }
         function closeStoreUserPriceModal(e) {
             if (e && e.target !== e.currentTarget) return;
@@ -3130,8 +3129,7 @@
             document.getElementById('store-user-price-modal-title').innerText = currentLang === 'ar' ? 'تعديل سعر المستخدم' : 'Edit Custom User';
             const modal = document.getElementById('store-user-price-modal');
             modal.classList.add('active');
-            const card = modal.querySelector('.modal-card');
-            if (card) card.scrollTop = 0;
+            modal.scrollTop = 0;
         }
         async function saveStoreUserPrice() {
             const btn = document.querySelector('#store-user-price-modal .primary-btn');
