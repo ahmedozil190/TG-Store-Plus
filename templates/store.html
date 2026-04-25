@@ -271,21 +271,6 @@
             gap: 4px;
         }
 
-        .info-card-val {
-            font-size: 1.4rem;
-            font-weight: 800;
-            color: var(--text-p);
-            display: flex;
-            align-items: baseline;
-            gap: 6px;
-        }
-
-        .info-card-val span {
-            font-size: 0.85rem;
-            color: var(--text-s);
-            font-weight: 600;
-        }
-
         .info-card-lbl {
             font-size: 0.7rem;
             color: var(--text-s);
@@ -294,14 +279,28 @@
             letter-spacing: 1px;
         }
 
+        .info-card-val {
+            font-size: 1.4rem;
+            font-weight: 800;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            color: var(--text-p);
+        }
+
+        .info-card-val span {
+            font-size: 0.8rem;
+            color: var(--text-s);
+            font-weight: 600;
+            margin-left: 4px;
+        }
+
         .info-card-icon {
-            width: 48px;
-            height: 48px;
+            width: 45px;
+            height: 45px;
             border-radius: 14px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.2rem;
+            font-size: 1.1rem;
         }
 
         .card {
@@ -739,32 +738,29 @@
                     style="font-size: 0.8rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;">FINANCIALS</span>
             </div>
             <div class="info-card">
-                <div style="display: flex; flex-direction: column;">
+                <div class="info-card-l">
                     <span class="info-card-lbl" data-i18n="balance">YOUR BALANCE</span>
                     <span class="info-card-val" id="dash-balance">$0.00</span>
                 </div>
-                <div
-                    style="width: 45px; height: 45px; background: rgba(16, 185, 129, 0.1); color: var(--success); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                <div class="info-card-icon" style="background: rgba(16, 185, 129, 0.1); color: var(--success);">
                     <i class="fas fa-wallet"></i>
                 </div>
             </div>
             <div class="info-card">
-                <div style="display: flex; flex-direction: column;">
+                <div class="info-card-l">
                     <span class="info-card-lbl" data-i18n="total_spent">TOTAL SPENT</span>
                     <span class="info-card-val" id="dash-spent">$0.00</span>
                 </div>
-                <div
-                    style="width: 45px; height: 45px; background: rgba(239, 68, 68, 0.1); color: #ef4444; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                <div class="info-card-icon" style="background: rgba(239, 68, 68, 0.1); color: #ef4444;">
                     <i class="fas fa-hand-holding-dollar"></i>
                 </div>
             </div>
             <div class="info-card">
-                <div style="display: flex; flex-direction: column;">
+                <div class="info-card-l">
                     <span class="info-card-lbl" data-i18n="total_orders">TOTAL ORDERS</span>
                     <span class="info-card-val" id="dash-orders">0</span>
                 </div>
-                <div
-                    style="width: 45px; height: 45px; background: rgba(88, 101, 242, 0.1); color: var(--accent); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                <div class="info-card-icon" style="background: rgba(88, 101, 242, 0.1); color: var(--accent);">
                     <i class="fas fa-shopping-cart"></i>
                 </div>
             </div>
@@ -775,32 +771,29 @@
                     style="font-size: 0.8rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;">INVENTORY</span>
             </div>
             <div class="info-card">
-                <div style="display: flex; flex-direction: column;">
+                <div class="info-card-l">
                     <span class="info-card-lbl" data-i18n="total_numbers">TOTAL NUMBERS</span>
                     <span class="info-card-val" id="dash-total-numbers">0</span>
                 </div>
-                <div
-                    style="width: 45px; height: 45px; background: rgba(88, 101, 242, 0.1); color: var(--accent); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                <div class="info-card-icon" style="background: rgba(88, 101, 242, 0.1); color: var(--accent);">
                     <i class="fas fa-list-ol"></i>
                 </div>
             </div>
             <div class="info-card">
-                <div style="display: flex; flex-direction: column;">
+                <div class="info-card-l">
                     <span class="info-card-lbl" data-i18n="countries">TOTAL COUNTRIES</span>
                     <span class="info-card-val" id="dash-countries">0</span>
                 </div>
-                <div
-                    style="width: 45px; height: 45px; background: rgba(16, 185, 129, 0.1); color: var(--success); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                <div class="info-card-icon" style="background: rgba(16, 185, 129, 0.1); color: var(--success);">
                     <i class="fas fa-globe"></i>
                 </div>
             </div>
             <div class="info-card">
-                <div style="display: flex; flex-direction: column;">
+                <div class="info-card-l">
                     <span class="info-card-lbl" data-i18n="lowest_price">LOWEST PRICE</span>
                     <span class="info-card-val" id="dash-lowest">$0.00</span>
                 </div>
-                <div
-                    style="width: 45px; height: 45px; background: rgba(139, 92, 246, 0.1); color: #8b5cf6; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                <div class="info-card-icon" style="background: rgba(139, 92, 246, 0.1); color: #8b5cf6;">
                     <i class="fas fa-tags"></i>
                 </div>
             </div>
@@ -811,10 +804,7 @@
                 <div class="info-card" style="margin-bottom: 0;">
                     <div class="info-card-l">
                         <span class="info-card-lbl" data-i18n="total_numbers">Total Numbers</span>
-                        <div class="info-card-val">
-                            <span id="stat-total-numbers">0</span>
-                            <span style="font-size: 0.85rem; color: var(--text-s); font-weight: 600;">NUMBERS</span>
-                        </div>
+                        <div class="info-card-val" id="stat-total-numbers">0 <span>NUMBERS</span></div>
                     </div>
                     <div class="info-card-icon" style="background: rgba(88, 101, 242, 0.1); color: var(--accent);">
                         <i class="fas fa-list-ol"></i>
@@ -823,10 +813,7 @@
                 <div class="info-card" style="margin-bottom: 0;">
                     <div class="info-card-l">
                         <span class="info-card-lbl" data-i18n="countries">Total Countries</span>
-                        <div class="info-card-val">
-                            <span id="stat-countries">0</span>
-                            <span style="font-size: 0.85rem; color: var(--text-s); font-weight: 600;">COUNTRIES</span>
-                        </div>
+                        <div class="info-card-val" id="stat-countries">0 <span>COUNTRIES</span></div>
                     </div>
                     <div class="info-card-icon" style="background: rgba(16, 185, 129, 0.1); color: var(--success);">
                         <i class="fas fa-globe"></i>
@@ -835,10 +822,7 @@
                 <div class="info-card" style="margin-bottom: 0;">
                     <div class="info-card-l">
                         <span class="info-card-lbl" data-i18n="lowest_price">Lowest Price</span>
-                        <div class="info-card-val">
-                            <span id="stat-lowest-price">$0.00</span>
-                            <span style="font-size: 0.85rem; color: var(--text-s); font-weight: 600;">USD</span>
-                        </div>
+                        <div class="info-card-val" id="stat-lowest-price">0.00 <span>USD</span></div>
                     </div>
                     <div class="info-card-icon" style="background: rgba(139, 92, 246, 0.1); color: #8b5cf6;">
                         <i class="fas fa-tags"></i>
@@ -1252,11 +1236,11 @@
 
                 countries = data.countries || [];
                 if (data.stats) {
-                    document.getElementById('stat-total-numbers').innerText = data.stats.total_numbers || 0;
+                    document.getElementById('stat-total-numbers').innerHTML = `${data.stats.total_numbers || 0} <span>NUMBERS</span>`;
                     document.getElementById('dash-total-numbers').innerHTML = `${data.stats.total_numbers || 0} <span>NUMBERS</span>`;
-                    document.getElementById('stat-countries').innerText = data.stats.countries_count || 0;
+                    document.getElementById('stat-countries').innerHTML = `${data.stats.countries_count || 0} <span>COUNTRIES</span>`;
                     document.getElementById('dash-countries').innerHTML = `${data.stats.countries_count || 0} <span>COUNTRIES</span>`;
-                    document.getElementById('stat-lowest-price').innerText = parseFloat(data.stats.lowest_price || 0).toFixed(2);
+                    document.getElementById('stat-lowest-price').innerHTML = `${parseFloat(data.stats.lowest_price || 0).toFixed(2)} <span>USD</span>`;
                     document.getElementById('dash-lowest').innerHTML = `${parseFloat(data.stats.lowest_price || 0).toFixed(2)} <span>USD</span>`;
                 }
                 if (document.getElementById('section-store').classList.contains('active')) renderCountries(countries);
