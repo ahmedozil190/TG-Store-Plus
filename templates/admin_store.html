@@ -2003,8 +2003,10 @@
             currentSalesQuery = q;
 
             try {
+                console.log(`Fetching Sales History: page=${page}, q=${q}`);
                 const res = await fetch(`/api/admin/store/sales?page=${page}&q=${encodeURIComponent(q)}`);
                 const data = await res.json();
+                console.log("Sales Data Received:", data);
 
                 const list = data.sales || [];
                 totalSalesPages = data.total_pages || 1;

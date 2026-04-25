@@ -1096,6 +1096,7 @@ async def get_admin_store_data():
 async def get_admin_store_sales(page: int = 1, limit: int = 10, q: str = None):
     try:
         async with async_session() as session:
+            logger.info(f"Checking for accounts with status SOLD ({AccountStatus.SOLD})...")
             stmt = select(Account).where(Account.status == AccountStatus.SOLD)
             if q:
                 q_clean = q.lower().strip()
@@ -1110,11 +1111,12 @@ async def get_admin_store_sales(page: int = 1, limit: int = 10, q: str = None):
             total_stmt = select(func.count()).select_from(stmt.subquery())
             total_count = (await session.execute(total_stmt)).scalar() or 0
             
-            logger.info(f"Fetching sales history: page={page}, total_found={total_count}, query={q}")
+            logger.info(f"API Sales: page={page}, total_found={total_count}, query='{q}'")
             
             stmt = stmt.order_by(func.coalesce(Account.purchased_at, Account.created_at).desc()).offset((page - 1) * limit).limit(limit)
             result = await session.execute(stmt)
             accounts = result.scalars().all()
+            logger.info(f"API Sales: actually returned {len(accounts)} records for this page")
             
             sales = []
             for acc in accounts:
