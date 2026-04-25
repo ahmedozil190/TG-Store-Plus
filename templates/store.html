@@ -914,19 +914,20 @@
             </div>
 
             <!-- Deposit History Section -->
-            <div id="deposit-history-container" style="margin-top: 40px;">
-                <div class="section-header">
-                    <i class="fas fa-clock-rotate-left"></i>
-                    <h2 data-t="dep_title">Deposit History</h2>
+            <div class="info-card" id="deposit-history-container" style="padding: 22px; margin-top: 30px; margin-bottom: 0;">
+                <div class="section-header" style="margin-top: 0; margin-bottom: 35px;">
+                    <h2 style="font-weight: 600; margin: 0; font-size: 1rem; letter-spacing: 0.5px;" data-t="dep_title">Deposit History</h2>
                 </div>
 
-                <div id="deposits-empty" class="empty-state" style="display: none; padding: 40px 20px;">
-                    <div class="empty-icon"><i class="fas fa-receipt"></i></div>
-                    <p data-t="dep_empty">No deposits found</p>
-                </div>
-
-                <div id="deposits-list" style="display: none; flex-direction: column; gap: 15px;">
+                <div id="deposits-list" style="display: none; flex-direction: column; gap: 0;">
                     <!-- Deposits will be injected here -->
+                </div>
+
+                <div id="deposits-empty"
+                    style="text-align: center; padding: 40px 20px; background: var(--bg-elevated); border-radius: 16px; border: 1px dashed var(--border); margin-top: 0; display: none;">
+                    <i class="fas fa-history"
+                        style="font-size: 2.5rem; color: var(--text-s); opacity: 0.15; margin-bottom: 12px;"></i>
+                    <p style="color: var(--text-s); font-weight: 600; font-size: 0.95rem;" data-t="dep_empty">No deposits found</p>
                 </div>
 
                 <!-- Pagination for Deposits -->
