@@ -3122,14 +3122,14 @@
             document.getElementById('m-sup-user-id').value = item.user_id;
             document.getElementById('m-sup-code').value = item.country_code;
             document.getElementById('m-sup-sell-price').value = item.sell_price;
-            
-            // Trigger dynamic country field logic
-            await onSupCountryCodeInput(item.iso_code);
 
             document.getElementById('store-user-price-modal-title').innerText = currentLang === 'ar' ? 'تعديل سعر المستخدم' : 'Edit Custom User';
             const modal = document.getElementById('store-user-price-modal');
             modal.classList.add('active');
             modal.scrollTop = 0;
+
+            // Trigger dynamic country field logic (non-blocking)
+            onSupCountryCodeInput(item.iso_code);
         }
         async function saveStoreUserPrice() {
             const btn = document.querySelector('#store-user-price-modal .primary-btn');
