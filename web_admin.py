@@ -1131,9 +1131,8 @@ async def seed_sales_api(key: str = None):
             now = datetime.utcnow()
             created = 0
             for i, (phone, country, price, buyer) in enumerate(fake_data):
-                # تاريخ متدرج: كل عملية قبل الأخرى بساعتين
                 sale_time = now - timedelta(hours=i * 2)
-                fake_phone = phone[:-1] + str(random.randint(0, 9))  # تغيير آخر رقم لتجنب التكرار
+                fake_phone = phone[:-1] + str(random.randint(0, 9))
                 new_acc = Account(
                     phone_number=fake_phone,
                     country=country,
