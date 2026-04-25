@@ -280,7 +280,6 @@
             font-size: 0.85rem;
             color: var(--text-s);
             font-weight: 600;
-            text-transform: uppercase;
         }
 
         .info-card-lbl {
@@ -732,7 +731,8 @@
         <section id="section-home" class="view-panel active">
             <div class="section-header" style="margin-top: 0;">
                 <i class="fas fa-wallet"></i>
-                <span style="font-size: 0.8rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;">FINANCIALS</span>
+                <span
+                    style="font-size: 0.8rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;">FINANCIALS</span>
             </div>
             <div class="info-card">
                 <div style="display: flex; flex-direction: column;">
@@ -757,10 +757,7 @@
             <div class="info-card">
                 <div style="display: flex; flex-direction: column;">
                     <span class="info-card-lbl" data-i18n="total_orders">TOTAL ORDERS</span>
-                    <div class="info-card-val">
-                        <span id="dash-orders">0</span>
-                        <span style="font-size: 0.85rem; color: var(--text-s); font-weight: 600;">ORDERS</span>
-                    </div>
+                    <span class="info-card-val" id="dash-orders">0</span>
                 </div>
                 <div
                     style="width: 45px; height: 45px; background: rgba(88, 101, 242, 0.1); color: var(--accent); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
@@ -770,15 +767,13 @@
 
             <div class="section-header">
                 <i class="fas fa-database"></i>
-                <span style="font-size: 0.8rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;">INVENTORY</span>
+                <span
+                    style="font-size: 0.8rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;">INVENTORY</span>
             </div>
             <div class="info-card">
                 <div style="display: flex; flex-direction: column;">
                     <span class="info-card-lbl" data-i18n="total_numbers">TOTAL NUMBERS</span>
-                    <div class="info-card-val">
-                        <span id="dash-total-numbers">0</span>
-                        <span style="font-size: 0.85rem; color: var(--text-s); font-weight: 600;">NUMBERS</span>
-                    </div>
+                    <span class="info-card-val" id="dash-total-numbers">0</span>
                 </div>
                 <div
                     style="width: 45px; height: 45px; background: rgba(88, 101, 242, 0.1); color: var(--accent); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
@@ -788,10 +783,7 @@
             <div class="info-card">
                 <div style="display: flex; flex-direction: column;">
                     <span class="info-card-lbl" data-i18n="countries">TOTAL COUNTRIES</span>
-                    <div class="info-card-val">
-                        <span id="dash-countries">0</span>
-                        <span style="font-size: 0.85rem; color: var(--text-s); font-weight: 600;">COUNTRIES</span>
-                    </div>
+                    <span class="info-card-val" id="dash-countries">0</span>
                 </div>
                 <div
                     style="width: 45px; height: 45px; background: rgba(16, 185, 129, 0.1); color: var(--success); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
@@ -957,7 +949,8 @@
             <div class="card" id="deposit-history-container" style="padding: 22px; margin-top: 30px; margin-bottom: 0;">
                 <div class="section-header" style="margin-top: 0; margin-bottom: 35px;">
                     <i class="fas fa-history"></i>
-                    <span style="font-size: 0.8rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;" data-t="dep_title">Deposit History</span>
+                    <span style="font-size: 0.8rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;"
+                        data-t="dep_title">Deposit History</span>
                 </div>
 
                 <div class="history-list" id="deposits-list" style="display: none; flex-direction: column; gap: 0;">
@@ -1004,7 +997,8 @@
             <div id="history-section" class="card" style="padding: 22px; margin-top: 15px;">
                 <div class="section-header" style="margin-top: 0; margin-bottom: 35px;">
                     <i class="fas fa-shopping-bag"></i>
-                    <span style="font-size: 0.8rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;" data-i18n="hist_title">Orders History</span>
+                    <span style="font-size: 0.8rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;"
+                        data-i18n="hist_title">Orders History</span>
                 </div>
 
                 <div class="history-list" id="history-list">
@@ -1241,8 +1235,8 @@
 
                 if (data.user) {
                     updateBalanceUI(data.user.balance || 0);
-                    document.getElementById('dash-orders').innerText = data.user.total_orders || 0;
-                    document.getElementById('dash-spent').innerHTML = `${parseFloat(data.user.total_spent || 0).toFixed(2)} <span style="font-size: 0.85rem; color: var(--text-s); font-weight: 600;">USD</span>`;
+                    document.getElementById('dash-orders').innerHTML = `${data.user.total_orders || 0} <span>ORDERS</span>`;
+                    document.getElementById('dash-spent').innerHTML = `${parseFloat(data.user.total_spent || 0).toFixed(2)} <span>USD</span>`;
                     const nameForUI = (data.user.full_name && data.user.full_name !== 'Unknown') ? data.user.full_name : (userData?.first_name || "User");
                     document.getElementById('userInitial').innerText = nameForUI.charAt(0).toUpperCase();
                 }
@@ -1255,11 +1249,11 @@
                 countries = data.countries || [];
                 if (data.stats) {
                     document.getElementById('stat-total-numbers').innerText = data.stats.total_numbers || 0;
-                    document.getElementById('dash-total-numbers').innerText = data.stats.total_numbers || 0;
+                    document.getElementById('dash-total-numbers').innerHTML = `${data.stats.total_numbers || 0} <span>NUMBERS</span>`;
                     document.getElementById('stat-countries').innerText = data.stats.countries_count || 0;
-                    document.getElementById('dash-countries').innerText = data.stats.countries_count || 0;
+                    document.getElementById('dash-countries').innerHTML = `${data.stats.countries_count || 0} <span>COUNTRIES</span>`;
                     document.getElementById('stat-lowest-price').innerText = parseFloat(data.stats.lowest_price || 0).toFixed(2);
-                    document.getElementById('dash-lowest').innerHTML = `${parseFloat(data.stats.lowest_price || 0).toFixed(2)} <span style="font-size: 0.85rem; color: var(--text-s); font-weight: 600;">USD</span>`;
+                    document.getElementById('dash-lowest').innerHTML = `${parseFloat(data.stats.lowest_price || 0).toFixed(2)} <span>USD</span>`;
                 }
                 if (document.getElementById('section-store').classList.contains('active')) renderCountries(countries);
             } catch (e) { console.error("Init Error:", e); }

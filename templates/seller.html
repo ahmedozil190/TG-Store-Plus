@@ -343,7 +343,6 @@
             font-size: 0.8rem;
             color: var(--text-s);
             font-weight: 600;
-            text-transform: uppercase;
             margin-left: 4px;
         }
 
@@ -1210,7 +1209,8 @@
                 <div class="info-card">
                     <div class="info-card-l">
                         <span class="info-card-lbl">Sold Numbers</span>
-                        <div class="info-card-val" id="statSold" style="color: var(--text-p)">0<span> NUMBERS</span></div>
+                        <div class="info-card-val" id="statSold" style="color: var(--text-p)">0<span> NUMBERS</span>
+                        </div>
                     </div>
                     <div class="info-card-icon" style="background:rgba(16, 185, 129, 0.1); color: var(--success);">
                         <i class="fas fa-shopping-basket"></i>
@@ -1542,7 +1542,7 @@
         }
         function changeView(viewId) {
             closeNav();
-            
+
             // Reset Pagination & Scroll
             currentSourcingPage = 1;
             currentWithdrawPage = 1;
