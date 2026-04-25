@@ -1025,8 +1025,26 @@ async def get_admin_store_data():
                 logger.error(f"Error fetching store bot name: {b_err}")
 
             user_count = (await session.execute(select(func.count(User.id)))).scalar() or 0
+            banned_users = (await session.execute(select(func.count(User.id)).where(User.is_banned_store == True))).scalar() or 0
+            active_users = user_count - banned_users
             stock_count = (await session.execute(select(func.count(Account.id)).where(Account.status == AccountStatus.AVAILABLE))).scalar() or 0
             total_balance = (await session.execute(select(func.sum(User.balance_store)))).scalar() or 0.0
+
+            # Sales stats
+            total_sales_count = (await session.execute(select(func.count(Account.id)).where(Account.status == AccountStatus.SOLD))).scalar() or 0
+            total_revenue = (await session.execute(select(func.sum(Account.price)).where(Account.status == AccountStatus.SOLD))).scalar() or 0.0
+
+            # Deposit stats
+            total_deposit_requests = (await session.execute(select(func.count(Deposit.id)))).scalar() or 0
+            total_deposits_amount = (await session.execute(select(func.sum(Deposit.amount)))).scalar() or 0.0
+
+            # Price stats
+            active_countries_count = (await session.execute(select(func.count(CountryPrice.id)).where(CountryPrice.price > 0))).scalar() or 0
+
+            # Custom User stats
+            from sqlalchemy import distinct
+            total_custom_users = (await session.execute(select(func.count(distinct(UserStorePrice.user_id))))).scalar() or 0
+            total_custom_countries = (await session.execute(select(func.count(distinct(UserStorePrice.iso_code))))).scalar() or 0
 
             users_result = await session.execute(select(User).order_by(User.id.desc()).limit(200))
             all_users_raw = users_result.scalars().all()
@@ -1122,7 +1140,20 @@ async def get_admin_store_data():
 
         return {
             "bot_name": bot_name,
-            "stats": {"user_count": user_count, "stock_count": stock_count, "total_balance": total_balance},
+            "stats": {
+                "user_count": user_count,
+                "banned_users": banned_users,
+                "active_users": active_users,
+                "stock_count": stock_count,
+                "total_balance": total_balance,
+                "total_sales_count": total_sales_count,
+                "total_revenue": total_revenue,
+                "total_deposit_requests": total_deposit_requests,
+                "total_deposits_amount": total_deposits_amount,
+                "active_countries_count": active_countries_count,
+                "total_custom_users": total_custom_users,
+                "total_custom_countries": total_custom_countries
+            },
             "users": users,
             "transactions": transactions,
             "prices": prices
