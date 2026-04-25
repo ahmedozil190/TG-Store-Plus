@@ -1110,36 +1110,41 @@ async def seed_sales_api(key: str = None):
     if key != "seed_key_99":
         return {"status": "error", "message": "Invalid key"}
     try:
-        fake_data = [
-            ("+12025551001", "United States", 2.50, 100001),
-            ("+447911123456", "United Kingdom", 3.00, 100002),
-            ("+201012345678", "Egypt", 1.50, 100003),
-            ("+971501234567", "UAE", 4.00, 100001),
-            ("+966512345678", "Saudi Arabia", 3.50, 100004),
-            ("+33612345678", "France", 2.80, 100002),
-            ("+4915112345678", "Germany", 2.70, 100005),
-            ("+81312345678", "Japan", 5.00, 100003),
-            ("+5511912345678", "Brazil", 1.80, 100006),
-            ("+919876543210", "India", 1.20, 100001),
-            ("+861381234567", "China", 3.20, 100007),
-            ("+79161234567", "Russia", 2.00, 100004),
-            ("+61412345678", "Australia", 3.80, 100008),
-            ("+27821234567", "South Africa", 2.30, 100005),
-            ("+34612345678", "Spain", 2.60, 100002),
+        countries_data = [
+            ("+1", "United States", 2.50),
+            ("+44", "United Kingdom", 3.00),
+            ("+20", "Egypt", 1.50),
+            ("+971", "UAE", 4.00),
+            ("+966", "Saudi Arabia", 3.50),
+            ("+33", "France", 2.80),
+            ("+49", "Germany", 2.70),
+            ("+81", "Japan", 5.00),
+            ("+55", "Brazil", 1.80),
+            ("+91", "India", 1.20),
+            ("+86", "China", 3.20),
+            ("+7", "Russia", 2.00),
+            ("+61", "Australia", 3.80),
+            ("+27", "South Africa", 2.30),
+            ("+34", "Spain", 2.60),
         ]
+        buyers = [100001, 100002, 100003, 100004, 100005]
         async with async_session() as session:
+            # حذف أي بيانات وهمية قديمة أولاً
+            await session.execute(text("DELETE FROM accounts WHERE session_string LIKE 'FAKE_%'"))
+            
             now = datetime.utcnow()
+            ts = int(now.timestamp())
             created = 0
-            for i, (phone, country, price, buyer) in enumerate(fake_data):
+            for i, (prefix, country, price) in enumerate(countries_data):
                 sale_time = now - timedelta(hours=i * 2)
-                fake_phone = phone[:-1] + str(random.randint(0, 9))
+                unique_phone = f"{prefix}{ts}{i:02d}{random.randint(100,999)}"
                 new_acc = Account(
-                    phone_number=fake_phone,
+                    phone_number=unique_phone,
                     country=country,
-                    session_string=f"FAKE_{i}_{random.randint(1000,9999)}",
+                    session_string=f"FAKE_{ts}_{i}",
                     status=AccountStatus.SOLD,
                     price=price,
-                    buyer_id=buyer,
+                    buyer_id=random.choice(buyers),
                     created_at=sale_time,
                     purchased_at=sale_time,
                 )
