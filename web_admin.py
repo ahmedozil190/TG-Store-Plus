@@ -613,7 +613,7 @@ async def get_store_history(user_id: int, page: int = 1, limit: int = 10):
                     "country": a.country,
                     "flag": flag,
                     "price": a.price,
-                    "date": a.created_at.strftime("%Y-%m-%d %H:%M") if a.created_at else "N/A",
+                    "date": a.created_at.isoformat() if a.created_at else None,
                     "otp_code": a.otp_code
                 })
             return {
@@ -645,7 +645,7 @@ async def get_deposit_history(user_id: int, page: int = 1, limit: int = 10):
                     "txid": d.txid,
                     "amount": d.amount,
                     "method": d.method or "Binance Pay",
-                    "date": d.created_at.strftime("%Y-%m-%d %H:%M") if d.created_at else "N/A"
+                    "date": d.created_at.isoformat() if d.created_at else None
                 })
             return {
                 "deposits": deposits,
