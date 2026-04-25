@@ -1101,13 +1101,13 @@ async def cleanup_fake_api(key: str = None):
             # 1. Delete accounts with our dummy session strings
             await session.execute(text("DELETE FROM accounts WHERE session_string LIKE 'SEED_%' OR session_string = 'DUMMY_SESSION_STRING' OR session_string = 'SEED_DUMMY_SESSION'"))
             
-            # 2. Real Fix: Migrate old NULL purchased_at dates to created_at
+            # 2. Fix NULL dates
             await session.execute(text("UPDATE accounts SET purchased_at = created_at WHERE status = 'sold' AND purchased_at IS NULL"))
             
             await session.commit()
-            return {"status": "success", "message": "Cleanup complete and Database migrated successfully. Sales history should now be visible."}
+            return {"status": "success", "message": "Cleanup complete and Dates fixed. Sales history should now show up."}
     except Exception as e:
-        logger.error(f"Cleanup & Migration API Error: {e}")
+        logger.error(f"Cleanup API Error: {e}")
         return {"status": "error", "message": str(e)}
 
 @app.get("/api/admin/store/settings")
