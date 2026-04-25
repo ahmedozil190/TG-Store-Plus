@@ -1087,7 +1087,7 @@
         let currentHistoryPage = 1;
         const HISTORY_LIMIT = 10;
         let totalHistoryPages = 1;
-        let userId = localStorage.getItem('lastUserId') || tg.initDataUnsafe?.user?.id || 0;
+        let userId = tg.initDataUnsafe?.user?.id || 0;
 
         const translations = {
             en: {
@@ -1161,18 +1161,13 @@
             try {
                 updateTranslations();
 
-                // Load initial ID from storage
-                const cachedId = localStorage.getItem('lastUserId');
-                if (cachedId) userId = cachedId;
-
-                // Sync with Telegram Identity
+                // Identity Sync First
                 const userData = tg.initDataUnsafe?.user;
                 if (userData) {
                     userId = userData.id;
-                    localStorage.setItem('lastUserId', userId);
                     const fullName = userData.first_name + (userData.last_name ? ' ' + userData.last_name : '');
                     document.getElementById('userInitial').innerText = userData.first_name.charAt(0).toUpperCase();
-                    
+
                     fetch(`/api/admin/user/sync`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
@@ -1180,12 +1175,12 @@
                     }).catch(e => console.error("Sync error:", e));
                 }
 
-                // NOW fetch data
+                // Restore tab AFTER userId is set
                 const savedTab = sessionStorage.getItem('activeTab');
                 if (savedTab && savedTab !== 'home') {
                     switchNav(savedTab, null);
                 } else {
-                    await fetchDeposits();
+                    await fetchDeposits(); // Always fetch for dashboard too if needed
                 }
 
                 const res = await fetch(`/api/store/data?user_id=${userId}`);
@@ -1577,14 +1572,15 @@
             }
         }
 
-        init();
         let currentDepPage = 1;
         let totalDepPages = 1;
+
+        init();
 
         async function fetchDeposits() {
             if (!userId) {
                 console.warn("DEBUG: fetchDeposits waiting for userId...");
-                setTimeout(fetchDeposits, 500); 
+                setTimeout(fetchDeposits, 500);
                 return;
             }
 
@@ -1604,7 +1600,7 @@
             const empty = document.getElementById('deposits-empty');
             const pagination = document.getElementById('depositPagination');
             const items = data.deposits || [];
-            
+
             list.style.opacity = '1';
             if (items.length === 0) {
                 list.style.display = 'none';
@@ -1651,4 +1647,5 @@
         }
     </script>
 </body>
+
 </html>
