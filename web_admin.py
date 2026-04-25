@@ -1102,15 +1102,21 @@ async def cleanup_fake_api(key: str = None):
             del_res = await session.execute(text("DELETE FROM accounts WHERE session_string LIKE 'SEED_%' OR session_string = 'DUMMY_SESSION_STRING' OR session_string = 'SEED_DUMMY_SESSION'"))
             deleted_count = del_res.rowcount
             
-            # 2. إصلاح تواريخ المبيعات الأصلية
-            upd_res = await session.execute(text("UPDATE accounts SET purchased_at = created_at WHERE status = 'sold' AND purchased_at IS NULL"))
-            updated_count = upd_res.rowcount
+            # 2. تشخيص: كم عدد المبيعات الموجودة وما هي قيمة الحالة المخزنة فعلياً
+            diag = await session.execute(text("SELECT status, count(*), sum(CASE WHEN purchased_at IS NULL THEN 1 ELSE 0 END) as null_dates FROM accounts GROUP BY status"))
+            status_info = [{"status": row[0], "count": row[1], "null_dates": row[2]} for row in diag.fetchall()]
+            
+            # 3. إصلاح تواريخ المبيعات - نجرب كل الاحتمالات
+            upd1 = await session.execute(text("UPDATE accounts SET purchased_at = created_at WHERE status = 'SOLD' AND purchased_at IS NULL"))
+            upd2 = await session.execute(text("UPDATE accounts SET purchased_at = created_at WHERE status = 'sold' AND purchased_at IS NULL"))
+            total_updated = upd1.rowcount + upd2.rowcount
             
             await session.commit()
             return {
                 "status": "success", 
-                "message": f"Deleted {deleted_count} fake records and updated {updated_count} old records.",
-                "details": "If updated_count is 0, it means no records matched the criteria."
+                "deleted": deleted_count,
+                "dates_fixed": total_updated,
+                "database_status_values": status_info
             }
     except Exception as e:
         logger.error(f"Cleanup API Error: {e}")
