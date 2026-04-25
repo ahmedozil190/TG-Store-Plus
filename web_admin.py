@@ -587,6 +587,11 @@ async def get_store_history(user_id: int, page: int = 1, limit: int = 10):
                     "date": a.created_at.strftime("%Y-%m-%d %H:%M") if a.created_at else "N/A",
                     "otp_code": a.otp_code
                 })
+            return {
+                "orders": history,
+                "total_pages": total_pages,
+                "current_page": page,
+                "total_count": total_count
             }
     except Exception as e:
         logger.error(f"Store History Error: {e}")
