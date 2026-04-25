@@ -3100,7 +3100,7 @@
             
             // Set dynamic country field logic
             const iso = item.iso_code || 'XX';
-            const flag = getFlagEmoji(iso);
+            const flag = iso && iso !== 'XX' ? String.fromCodePoint(...[...iso.toUpperCase()].map(c => 127397 + c.charCodeAt(0))) : '🌐';
             document.getElementById('m-sup-country-group').style.display = 'block';
             document.getElementById('m-sup-country-container').innerHTML = `
                 <div class="country-option selected" style="padding: 12px; border: 1px solid var(--accent); border-radius: 12px; background: rgba(59, 130, 246, 0.1);">
@@ -3113,7 +3113,7 @@
             document.getElementById('store-user-price-modal').classList.add('active');
         }
         async function saveStoreUserPrice() {
-            const btn = document.querySelector('#store-user-price-modal .btn-save');
+            const btn = document.querySelector('#store-user-price-modal .primary-btn');
             const uid = document.getElementById('m-sup-user-id').value.trim();
             const cc = document.getElementById('m-sup-code').value.trim().replace('+', '');
             
@@ -3158,21 +3158,16 @@
             btn.innerHTML = originalHtml;
         }
 
-        function deleteStoreUserPrice(id) {
-            showConfirm(
-                currentLang === 'ar' ? 'حذف السعر' : 'Delete Price',
-                currentLang === 'ar' ? 'هل أنت متأكد من حذف هذا السعر المخصص؟' : 'Are you sure you want to delete this custom price?',
-                async () => {
-                    try {
-                        const res = await fetch(`/api/admin/store/user-prices/${id}`, { method: 'DELETE' });
-                        if (res.ok) {
-                            fetchStoreUserPrices();
-                        } else {
-                            tg.showAlert("Failed to delete.");
-                        }
-                    } catch(e) { console.error(e); tg.showAlert("Error deleting."); }
+        async function deleteStoreUserPrice(id) {
+            if (!confirm(currentLang === 'ar' ? 'هل أنت متأكد من حذف هذا السعر المخصص؟' : 'Are you sure you want to delete this custom price?')) return;
+            try {
+                const res = await fetch(`/api/admin/store/user-prices/${id}`, { method: 'DELETE' });
+                if (res.ok) {
+                    fetchStoreUserPrices();
+                } else {
+                    tg.showAlert("Failed to delete.");
                 }
-            );
+            } catch(e) { console.error(e); tg.showAlert("Error deleting."); }
         }
 
         const savedView = sessionStorage.getItem('last_view_admin_store') || 'home';
