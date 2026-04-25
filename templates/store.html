@@ -1165,6 +1165,8 @@
                     switchNav(savedTab, null);
                 }
 
+                await fetchDeposits();
+
                 // Identity Sync
                 const userData = tg.initDataUnsafe?.user;
                 if (userData) {
@@ -1568,12 +1570,14 @@
         let totalDepPages = 1;
 
         async function fetchDeposits() {
-            const list = document.getElementById('deposits-list');
             try {
                 const res = await fetch(`/api/store/deposits?user_id=${userId}&page=${currentDepPage}&limit=5`);
                 const data = await res.json();
+                console.log("DEBUG: Deposits API Response:", data);
                 renderDeposits(data);
-            } catch (e) { console.error("Fetch deposits error:", e); }
+            } catch (e) { 
+                console.error("DEBUG: Fetch deposits error:", e); 
+            }
         }
 
         function renderDeposits(data) {
