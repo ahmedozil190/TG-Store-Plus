@@ -2331,8 +2331,6 @@
             const modal = document.getElementById('user-price-modal');
             modal.classList.add('active');
             modal.scrollTop = 0;
-            document.getElementById('up-country-group').style.display = 'none';
-            document.getElementById('up-country-container').innerHTML = '';
 
             if (up) {
                 document.getElementById('user-price-modal-title').innerText = translations[currentLang].modal_edit_custom;
@@ -3388,8 +3386,7 @@
             document.getElementById('m-code').value = '';
             document.getElementById('m-buy').value = '';
             document.getElementById('m-delay').value = '';
-            document.getElementById('m-country-group').style.display = 'none';
-            document.getElementById('m-country-container').innerHTML = '';
+            document.getElementById('m-country-container').innerHTML = `<input type="text" class="input-field" value="${currentLang === 'ar' ? 'بانتظار الكود...' : 'Waiting...'}" readonly style="cursor: not-allowed;">`;
             document.getElementById('price-modal').classList.add('active');
         }
 
