@@ -3048,10 +3048,10 @@
             currentStoreUserPricesPage = p;
             renderStoreUserPricesList(list);
             
-            // Scroll back to top of the section
-            const section = document.getElementById('section-store-user-prices');
-            if (section) {
-                section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            // Scroll back to top of the management card specifically
+            const scroller = document.getElementById('store-user-prices-mgmt-section');
+            if (scroller) {
+                scroller.scrollIntoView({ behavior: 'smooth' });
             }
         }
 
