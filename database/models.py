@@ -50,6 +50,7 @@ class Account(Base):
     buyer_id = Column(BigInteger, ForeignKey('users.id'), nullable=True)
     otp_code = Column(String, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
+    purchased_at = Column(DateTime, nullable=True)
 
 class Transaction(Base):
     __tablename__ = 'transactions'

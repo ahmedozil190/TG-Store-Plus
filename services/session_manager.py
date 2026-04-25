@@ -135,7 +135,7 @@ async def submit_app_code(user_id: int, phone_number: str, phone_code_hash: str,
             pass # Client might already be terminated by log_out()
         login_clients.pop(user_id, None)
 
-async def get_telegram_login_code(session_string: str) -> str | None:
+async def get_telegram_login_code(session_string: str, after_ts: float = None) -> str | None:
     import time
     client = await create_client(session_string)
     code = None
@@ -143,17 +143,23 @@ async def get_telegram_login_code(session_string: str) -> str | None:
     
     try:
         await client.connect()
-        async for message in client.get_chat_history(777000, limit=3):
-            # Only consider messages from the last 120 seconds (2 minutes)
+        async for message in client.get_chat_history(777000, limit=5):
             msg_ts = message.date.timestamp() if message.date else 0
-            if (now - msg_ts) > 120:
+            
+            # 1. Use after_ts if provided (Purchase time)
+            if after_ts and msg_ts < after_ts:
+                continue
+                
+            # 2. Fallback to 120s window if no after_ts
+            if not after_ts and (now - msg_ts) > 120:
                 continue
 
             text = message.text
             if not text:
                 continue
             
-            # The code is usually a 5-digit number
+            # The code is usually a 5-digit number, often with "Login code:" context
+            # We look for the most recent one that matches the pattern
             match = re.search(r'\b(\d{5})\b', text)
             if match:
                 code = match.group(1)

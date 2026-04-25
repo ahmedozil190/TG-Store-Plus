@@ -226,6 +226,9 @@ async def run_migrations():
             try:
                 await conn.execute(sqlalchemy.text("ALTER TABLE accounts ADD COLUMN created_at DATETIME"))
             except: pass
+            try:
+                await conn.execute(sqlalchemy.text("ALTER TABLE accounts ADD COLUMN purchased_at DATETIME"))
+            except: pass
 
             # Add missing columns to country_prices table
             try:
@@ -530,6 +533,8 @@ async def store_buy(data: StoreBuy):
             user.balance_store -= final_price
             account.status = AccountStatus.SOLD
             account.buyer_id = user.id
+            account.otp_code = None  # Clear any stale OTP code
+            account.purchased_at = datetime.now()
             account.price = final_price # Log the actual price paid in the account record
             txn = Transaction(user_id=user.id, type=TransactionType.BUY, amount=-final_price)
             session.add(txn)
@@ -566,7 +571,10 @@ async def store_get_code(user_id: int, phone: str):
             account = (await session.execute(stmt)).scalar_one_or_none()
             if not account: raise HTTPException(status_code=404, detail="Account not found")
             
-            code = await get_telegram_login_code(account.session_string)
+            code = await get_telegram_login_code(
+                account.session_string, 
+                after_ts=account.purchased_at.timestamp() if account.purchased_at else None
+            )
             if code:
                 account.otp_code = code
                 await session.commit()
