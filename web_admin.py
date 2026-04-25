@@ -1098,62 +1098,12 @@ async def cleanup_fake_api(key: str = None):
         return {"status": "error", "message": "Invalid key"}
     try:
         async with async_session() as session:
-            del_res = await session.execute(text("DELETE FROM accounts WHERE session_string LIKE 'SEED_%' OR session_string LIKE 'FAKE_%' OR session_string = 'DUMMY_SESSION_STRING'"))
+            # Delete accounts with our dummy session strings
+            await session.execute(text("DELETE FROM accounts WHERE session_string LIKE 'SEED_%' OR session_string = 'DUMMY_SESSION_STRING' OR session_string = 'SEED_DUMMY_SESSION'"))
             await session.commit()
-            return {"status": "success", "message": f"Deleted {del_res.rowcount} fake records."}
+            return {"status": "success", "message": "Cleanup complete. Fake data removed."}
     except Exception as e:
         logger.error(f"Cleanup API Error: {e}")
-        return {"status": "error", "message": str(e)}
-
-@app.get("/api/admin/system/seed-sales")
-async def seed_sales_api(key: str = None):
-    if key != "seed_key_99":
-        return {"status": "error", "message": "Invalid key"}
-    try:
-        countries_data = [
-            ("+1", "United States", 2.50),
-            ("+44", "United Kingdom", 3.00),
-            ("+20", "Egypt", 1.50),
-            ("+971", "UAE", 4.00),
-            ("+966", "Saudi Arabia", 3.50),
-            ("+33", "France", 2.80),
-            ("+49", "Germany", 2.70),
-            ("+81", "Japan", 5.00),
-            ("+55", "Brazil", 1.80),
-            ("+91", "India", 1.20),
-            ("+86", "China", 3.20),
-            ("+7", "Russia", 2.00),
-            ("+61", "Australia", 3.80),
-            ("+27", "South Africa", 2.30),
-            ("+34", "Spain", 2.60),
-        ]
-        buyers = [100001, 100002, 100003, 100004, 100005]
-        async with async_session() as session:
-            # حذف أي بيانات وهمية قديمة أولاً
-            await session.execute(text("DELETE FROM accounts WHERE session_string LIKE 'FAKE_%'"))
-            
-            now = datetime.utcnow()
-            ts = int(now.timestamp())
-            created = 0
-            for i, (prefix, country, price) in enumerate(countries_data):
-                sale_time = now - timedelta(hours=i * 2)
-                unique_phone = f"{prefix}{ts}{i:02d}{random.randint(100,999)}"
-                new_acc = Account(
-                    phone_number=unique_phone,
-                    country=country,
-                    session_string=f"FAKE_{ts}_{i}",
-                    status=AccountStatus.SOLD,
-                    price=price,
-                    buyer_id=random.choice(buyers),
-                    created_at=sale_time,
-                    purchased_at=sale_time,
-                )
-                session.add(new_acc)
-                created += 1
-            await session.commit()
-            return {"status": "success", "message": f"Created {created} fake sales records."}
-    except Exception as e:
-        logger.error(f"Seed Sales Error: {e}")
         return {"status": "error", "message": str(e)}
 
 @app.get("/api/admin/store/settings")
