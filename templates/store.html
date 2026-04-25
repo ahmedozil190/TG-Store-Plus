@@ -319,17 +319,20 @@
         .user-card:active {
             transform: scale(0.98);
         }
-            padding: 20px;
-            transition: all 0.3s var(--ease);
-            box-shadow: var(--shadow);
-        }
 
         .section-header {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
             margin: 25px 0 15px 0;
             color: var(--text-s);
+        }
+
+        .section-header h2 {
+            font-size: 1rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            margin: 0;
         }
 
         .section-header h2 {
@@ -722,7 +725,7 @@
         <section id="section-home" class="view-panel active">
             <div class="section-header" style="margin-top: 0;">
                 <i class="fas fa-wallet"></i>
-                <span style="font-size: 0.8rem; font-weight: 800; letter-spacing: 1px; text-transform: uppercase;">FINANCIALS</span>
+                <span style="font-size: 0.8rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;">FINANCIALS</span>
             </div>
             <div class="info-card">
                 <div style="display: flex; flex-direction: column;">
@@ -757,7 +760,7 @@
 
             <div class="section-header">
                 <i class="fas fa-database"></i>
-                <span style="font-size: 0.8rem; font-weight: 800; letter-spacing: 1px; text-transform: uppercase;">INVENTORY</span>
+                <span style="font-size: 0.8rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;">INVENTORY</span>
             </div>
             <div class="info-card">
                 <div style="display: flex; flex-direction: column;">
@@ -937,7 +940,8 @@
             <!-- Deposit History Section -->
             <div class="card" id="deposit-history-container" style="padding: 22px; margin-top: 30px; margin-bottom: 0;">
                 <div class="section-header" style="margin-top: 0; margin-bottom: 35px;">
-                    <h2 style="font-weight: 600; margin: 0; font-size: 1rem; letter-spacing: 0.5px;" data-t="dep_title">Deposit History</h2>
+                    <i class="fas fa-history"></i>
+                    <span style="font-size: 0.8rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;" data-t="dep_title">Deposit History</span>
                 </div>
 
                 <div class="history-list" id="deposits-list" style="display: none; flex-direction: column; gap: 0;">
@@ -948,12 +952,15 @@
                     style="text-align: center; padding: 40px 20px; background: var(--bg-elevated); border-radius: 16px; border: 1px dashed var(--border); margin-top: 0; display: none;">
                     <i class="fas fa-history"
                         style="font-size: 2.5rem; color: var(--text-s); opacity: 0.15; margin-bottom: 12px;"></i>
-                    <p style="color: var(--text-s); font-weight: 600; font-size: 0.95rem;" data-t="dep_empty">No deposits found</p>
+                    <p style="color: var(--text-s); font-weight: 600; font-size: 0.95rem;" data-t="dep_empty">No
+                        deposits found</p>
                 </div>
 
                 <!-- Pagination for Deposits -->
-                <div id="depositPagination" class="pagination-ctrls" style="display: none; margin-top: 25px; background: transparent;">
-                    <button class="pg-btn" style="background: transparent;" id="pgPrevDep" onclick="moveDepositPage(-1)">
+                <div id="depositPagination" class="pagination-ctrls"
+                    style="display: none; margin-top: 25px; background: transparent;">
+                    <button class="pg-btn" style="background: transparent;" id="pgPrevDep"
+                        onclick="moveDepositPage(-1)">
                         <i class="fas fa-chevron-left"></i> <span>Prev</span>
                     </button>
                     <span id="pgInfoDep" class="pg-info">Page 1 of 1</span>
@@ -980,7 +987,8 @@
 
             <div id="history-section" class="card" style="padding: 22px; margin-top: 15px;">
                 <div class="section-header" style="margin-top: 0; margin-bottom: 35px;">
-                    <h2 data-i18n="hist_title">Orders History</h2>
+                    <i class="fas fa-shopping-bag"></i>
+                    <span style="font-size: 0.8rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;" data-i18n="hist_title">Orders History</span>
                 </div>
 
                 <div class="history-list" id="history-list">
