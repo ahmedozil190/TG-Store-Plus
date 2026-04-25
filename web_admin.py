@@ -534,7 +534,7 @@ async def store_buy(data: StoreBuy):
             account.status = AccountStatus.SOLD
             account.buyer_id = user.id
             account.otp_code = None  # Clear any stale OTP code
-            account.purchased_at = datetime.now()
+            account.purchased_at = datetime.utcnow()
             account.price = final_price # Log the actual price paid in the account record
             txn = Transaction(user_id=user.id, type=TransactionType.BUY, amount=-final_price)
             session.add(txn)
