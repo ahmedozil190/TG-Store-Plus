@@ -2217,7 +2217,10 @@
             const container = document.getElementById('user-prices-list');
             const pagContainer = document.getElementById('user-prices-pagination');
             const totalEl = document.getElementById('stat-total-custom-prices');
-            if (totalEl) totalEl.innerText = allUserPrices.length;
+            if (totalEl) {
+                const uniqueIds = new Set(allUserPrices.map(p => p.user_id));
+                totalEl.innerText = uniqueIds.size;
+            }
 
             if (!container) return;
             if (!allUserPrices.length) {
@@ -2325,7 +2328,10 @@
         }
 
         function openUserPriceModal(up = null) {
-            document.getElementById('user-price-modal').classList.add('active');
+            const modal = document.getElementById('user-price-modal');
+            modal.classList.add('active');
+            const card = modal.querySelector('.modal-card');
+            if (card) card.scrollTop = 0;
             document.getElementById('up-country-group').style.display = 'none';
             document.getElementById('up-country-container').innerHTML = '';
 

@@ -868,8 +868,9 @@ async def get_sourcing_data():
             banned_users = (await session.execute(select(func.count(User.id)).where(User.is_banned_sourcing == True))).scalar() or 0
             active_users = total_users - banned_users
             
-            # Custom User Prices stats
-            total_custom_prices = (await session.execute(select(func.count(UserCountryPrice.id)))).scalar() or 0
+            # Custom User Prices stats (Unique Users)
+            from sqlalchemy import distinct
+            total_custom_prices = (await session.execute(select(func.count(distinct(UserCountryPrice.user_id))))).scalar() or 0
             
             recent_result = await session.execute(
                 select(Account).order_by(Account.id.desc()).limit(50)

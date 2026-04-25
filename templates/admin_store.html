@@ -2939,7 +2939,10 @@
             const container = document.getElementById('store-user-prices-list');
             const pagContainer = document.getElementById('store-user-prices-pagination');
             const totalEl = document.getElementById('stat-total-store-custom-prices');
-            if (totalEl) totalEl.innerText = allStoreUserPrices.length;
+            if (totalEl) {
+                const uniqueIds = new Set(allStoreUserPrices.map(p => p.user_id));
+                totalEl.innerText = uniqueIds.size;
+            }
 
             if (!list || !list.length) {
                 container.innerHTML = `
@@ -3034,7 +3037,10 @@
             document.getElementById('m-sup-country-container').innerHTML = '';
             
             document.getElementById('m-sup-sell-price').value = '';
-            document.getElementById('store-user-price-modal').classList.add('active');
+            const modal = document.getElementById('store-user-price-modal');
+            modal.classList.add('active');
+            const card = modal.querySelector('.modal-card');
+            if (card) card.scrollTop = 0;
         }
         function closeStoreUserPriceModal(e) {
             if (e && e.target !== e.currentTarget) return;
@@ -3122,7 +3128,10 @@
             await onSupCountryCodeInput(item.iso_code);
 
             document.getElementById('store-user-price-modal-title').innerText = currentLang === 'ar' ? 'تعديل سعر المستخدم' : 'Edit Custom User';
-            document.getElementById('store-user-price-modal').classList.add('active');
+            const modal = document.getElementById('store-user-price-modal');
+            modal.classList.add('active');
+            const card = modal.querySelector('.modal-card');
+            if (card) card.scrollTop = 0;
         }
         async function saveStoreUserPrice() {
             const btn = document.querySelector('#store-user-price-modal .primary-btn');
