@@ -1063,7 +1063,7 @@ async def get_admin_store_data():
                     "price": acc.price, 
                     "phone": acc.phone_number,
                     "country": f"{flag} {acc.country}",
-                    "date": acc.purchased_at.isoformat() if acc.purchased_at else None
+                    "date": (acc.purchased_at or acc.created_at).isoformat() if (acc.purchased_at or acc.created_at) else None
                 })
 
             # Fetch all prices for store panel
