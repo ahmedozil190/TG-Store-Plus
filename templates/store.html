@@ -1577,16 +1577,16 @@
         let totalDepPages = 1;
 
         async function fetchDeposits() {
-            console.log("DEBUG: fetchDeposits called with userId:", userId);
-            const list = document.getElementById('deposits-list');
-            const empty = document.getElementById('deposits-empty');
-            
             if (!userId) {
-                console.warn("DEBUG: fetchDeposits skipped - userId is 0");
+                console.warn("DEBUG: fetchDeposits waiting for userId...");
+                setTimeout(fetchDeposits, 500); 
                 return;
             }
 
-            list.style.opacity = '0.5';
+            console.log("DEBUG: fetchDeposits calling API for userId:", userId);
+            const list = document.getElementById('deposits-list');
+            if (list) list.style.opacity = '0.5';
+
             try {
                 const res = await fetch(`/api/store/deposits?user_id=${userId}&page=${currentDepPage}&limit=5`);
                 const data = await res.json();
