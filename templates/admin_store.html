@@ -2016,6 +2016,14 @@
         let filteredSales = null;
         const SALES_PER_PAGE = 10;
 
+        function formatDateTime(isoStr) {
+            if (!isoStr) return '—';
+            try {
+                const d = new Date(isoStr);
+                return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) + ' ' + d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+            } catch (e) { return isoStr; }
+        }
+
         function renderSalesList(list) {
             const container = document.getElementById('sales-list');
             const pagContainer = document.getElementById('sales-pagination');
