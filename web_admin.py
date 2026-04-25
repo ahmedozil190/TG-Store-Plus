@@ -1088,6 +1088,10 @@ async def get_admin_store_data():
             "transactions": transactions,
             "prices": prices
         }
+    except Exception as e:
+        logger.error(f"Store Admin Data Error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 @app.get("/api/admin/store/sales")
 async def get_admin_store_sales(page: int = 1, limit: int = 10, q: str = None):
     try:
