@@ -1768,7 +1768,7 @@
     <!-- ===== Store User Price Modal ===== -->
     <div id="store-user-price-modal" class="modal-overlay" onclick="closeStoreUserPriceModal(event)">
         <div class="modal-card" onclick="event.stopPropagation()">
-            <h3 data-i18n="modal_store_user_title">Custom Buyer Discount</h3>
+            <h3 id="store-user-price-modal-title" data-i18n="modal_add_custom">Add Custom User</h3>
             <div class="form-group">
                 <label data-i18n="lbl_user_id">User ID</label>
                 <input type="number" id="m-sup-user-id" class="input-field" placeholder="123456789">
@@ -1777,13 +1777,16 @@
                 <label data-i18n="lbl_code">Country Code</label>
                 <input type="text" id="m-sup-code" class="input-field" placeholder="1" oninput="onSupCountryCodeInput()">
             </div>
-            <div class="form-group">
-                <label data-i18n="lbl_iso">ISO Code</label>
-                <input type="text" id="m-sup-iso" class="input-field" placeholder="US">
+            
+            <!-- Dynamic Country Field -->
+            <div id="m-sup-country-group" class="form-group" style="display: none;">
+                <label id="m-sup-country-label">Detected Country</label>
+                <div id="m-sup-country-container"></div>
             </div>
+
             <div class="form-group">
-                <label data-i18n="lbl_price">Selling Price ($)</label>
-                <input type="number" step="0.01" id="m-sup-sell-price" class="input-field" placeholder="2.50">
+                <label data-i18n="lbl_price">Selling Price</label>
+                <input type="number" step="0.01" id="m-sup-sell-price" class="input-field" placeholder="1.0">
             </div>
             <input type="hidden" id="m-sup-id">
             
@@ -3032,7 +3035,10 @@
             document.getElementById('m-sup-id').value = '';
             document.getElementById('m-sup-user-id').value = '';
             document.getElementById('m-sup-code').value = '';
-            document.getElementById('m-sup-iso').value = 'XX';
+            
+            document.getElementById('m-sup-country-group').style.display = 'none';
+            document.getElementById('m-sup-country-container').innerHTML = '';
+            
             document.getElementById('m-sup-sell-price').value = '';
             document.getElementById('store-user-price-modal').classList.add('active');
         }
@@ -3040,31 +3046,98 @@
             if (e && e.target !== e.currentTarget) return;
             document.getElementById('store-user-price-modal').classList.remove('active');
         }
-        async function onSupCountryCodeInput() {
-            let cc = document.getElementById('m-sup-code').value.trim();
-            if (cc.startsWith('+')) cc = cc.substring(1);
-            if (cc.length < 1) return;
+        async function onSupCountryCodeInput(selectedIso = null) {
+            const code = document.getElementById('m-sup-code').value.trim().replace('+', '');
+            const group = document.getElementById('m-sup-country-group');
+            const container = document.getElementById('m-sup-country-container');
+
+            if (code.length < 1) {
+                group.style.display = 'none';
+                return;
+            }
+
             try {
-                const res = await fetch(`/api/admin/countries-for-code/${cc}`);
+                const res = await fetch(`/api/admin/countries-for-code/${code}`);
                 const data = await res.json();
+
                 if (data && data.length > 0) {
-                    document.getElementById('m-sup-iso').value = data[0].iso || 'XX';
+                    group.style.display = 'block';
+                    if (data.length === 1) {
+                        // Single country
+                        container.innerHTML = `
+                            <input type="text" id="m-sup-iso-box" class="input-field" value="${data[0].flag} ${data[0].name}" readonly 
+                                   data-iso="${data[0].iso}" data-name="${data[0].name}"
+                                   style="background: var(--bg); opacity: 0.8; cursor: not-allowed;">
+                        `;
+                    } else {
+                        // Multiple countries
+                        container.innerHTML = `
+                            <div style="max-height: 160px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding-right: 5px;">
+                                ${data.map(c => `
+                                    <div class="sup-country-option-btn" data-iso="${c.iso}" data-name="${c.name}" onclick="selectSupCountryOption(this)" style="padding: 10px 14px; border: 1px solid var(--border); border-radius: 8px; cursor: pointer; display: flex; align-items: center; gap: 12px; transition: 0.2s; background: var(--bg);">
+                                        <span style="font-size: 1.4rem;">${c.flag}</span>
+                                        <span style="font-weight: 600; font-size: 0.95rem; color: var(--text-p);">${c.name}</span>
+                                    </div>
+                                `).join('')}
+                            </div>
+                            <input type="hidden" id="m-sup-iso-box" data-iso="" data-name="">
+                        `;
+
+                        // Auto-select if selectedIso provided
+                        if (selectedIso) {
+                            setTimeout(() => {
+                                const btn = container.querySelector(`.sup-country-option-btn[data-iso="${selectedIso}"]`);
+                                if (btn) selectSupCountryOption(btn);
+                            }, 50);
+                        }
+                    }
+                } else {
+                    group.style.display = 'none';
                 }
-            } catch(e) {}
+            } catch(e) {
+                group.style.display = 'none';
+            }
         }
-        function editStoreUserPrice(item) {
+
+        function selectSupCountryOption(el) {
+            document.querySelectorAll('.sup-country-option-btn').forEach(b => {
+                b.style.borderColor = 'var(--border)';
+                b.style.background = 'var(--bg)';
+            });
+            el.style.borderColor = 'var(--accent-purple)';
+            el.style.background = 'rgba(139, 92, 246, 0.1)';
+
+            const hiddenInput = document.getElementById('m-sup-iso-box');
+            if (hiddenInput) {
+                hiddenInput.setAttribute('data-iso', el.getAttribute('data-iso'));
+                hiddenInput.setAttribute('data-name', el.getAttribute('data-name'));
+                hiddenInput.value = el.getAttribute('data-iso');
+            }
+        }
+
+        async function editStoreUserPrice(item) {
             document.getElementById('m-sup-id').value = item.id;
             document.getElementById('m-sup-user-id').value = item.user_id;
             document.getElementById('m-sup-code').value = item.country_code;
-            document.getElementById('m-sup-iso').value = item.iso_code || 'XX';
             document.getElementById('m-sup-sell-price').value = item.sell_price;
+            
+            await onSupCountryCodeInput(item.iso_code);
+            const box = document.getElementById('m-sup-iso-box');
+            if (box && data.length === 1) box.value = item.iso_code; // Optional
+
             document.getElementById('store-user-price-modal').classList.add('active');
         }
         async function saveStoreUserPrice() {
             const btn = document.querySelector('#store-user-price-modal .btn-save');
             const uid = document.getElementById('m-sup-user-id').value.trim();
-            const cc = document.getElementById('m-sup-code').value.trim();
-            const iso = document.getElementById('m-sup-iso').value.trim();
+            const cc = document.getElementById('m-sup-code').value.trim().replace('+', '');
+            
+            let iso = 'XX';
+            const isoBox = document.getElementById('m-sup-iso-box');
+            if (isoBox && isoBox.hasAttribute('data-iso')) {
+                iso = isoBox.getAttribute('data-iso') || 'XX';
+            }
+
             const sp = document.getElementById('m-sup-sell-price').value.trim();
             
             if (!uid || !cc || !sp) {
