@@ -2940,7 +2940,7 @@
         let allStoreUserPrices = [];
         let filteredStoreUserPrices = null;
         let currentStoreUserPricesPage = 1;
-        const SUP_PER_PAGE = 10;
+        const SUP_PER_PAGE = 5;
 
         async function fetchStoreUserPrices() {
             try {
@@ -3089,9 +3089,9 @@
                     } else {
                         // Multiple countries
                         container.innerHTML = `
-                            <div style="max-height: 160px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding-right: 5px;">
+                            <div style="max-height: 200px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding-right: 5px; border: 1px solid rgba(255,255,255,0.05); border-radius: 10px; padding: 5px;">
                                 ${data.map(c => `
-                                    <div class="sup-country-option-btn" data-iso="${c.iso}" data-name="${c.name}" onclick="selectSupCountryOption(this)" style="padding: 10px 14px; border: 1px solid var(--border); border-radius: 8px; cursor: pointer; display: flex; align-items: center; gap: 12px; transition: 0.2s; background: var(--bg);">
+                                    <div class="sup-country-option-btn" data-iso="${c.iso}" data-name="${c.name}" onclick="selectSupCountryOption(this)" style="padding: 12px 14px; border: 1px solid var(--border); border-radius: 8px; cursor: pointer; display: flex; align-items: center; gap: 12px; transition: 0.2s; background: var(--bg);">
                                         <span style="font-size: 1.4rem;">${c.flag}</span>
                                         <span style="font-weight: 600; font-size: 0.95rem; color: var(--text-p);">${c.name}</span>
                                     </div>
