@@ -599,50 +599,6 @@ async def purge_sold_accounts(key: str):
         logger.error(f"System Purge Error: {e}")
         return {"status": "error", "message": str(e)}
 
-@app.get("/api/v1/debug/add-fake-deposits")
-async def add_fake_deposits():
-    try:
-        async with async_session() as session:
-            # Get a random user to assign these to, or use a placeholder
-            user_stmt = select(User).limit(1)
-            user = (await session.execute(user_stmt)).scalar_one_or_none()
-            user_id = user.id if user else 123456789
-            
-            fake_txs = []
-            methods = ["Binance Pay", "TRX (TRC20)", "USDT (BEP20)"]
-            for i in range(10):
-                txid = f"FAKE_{random.randint(100000, 999999)}_{i}"
-                amount = round(random.uniform(5.0, 50.0), 2)
-                method = random.choice(methods)
-                # Randomize date over the last 3 days
-                created = datetime.utcnow() - timedelta(hours=random.randint(1, 72), minutes=random.randint(0, 59))
-                fake_txs.append(Deposit(
-                    user_id=user_id,
-                    amount=amount,
-                    txid=txid,
-                    method=method,
-                    created_at=created
-                ))
-            
-            session.add_all(fake_txs)
-            await session.commit()
-            return {"status": "success", "message": "Added 10 fake deposits", "user_id": user_id}
-    except Exception as e:
-        logger.error(f"Debug Add Error: {e}")
-        return {"status": "error", "message": str(e)}
-
-@app.get("/api/v1/debug/clear-fake-deposits")
-async def clear_fake_deposits():
-    try:
-        async with async_session() as session:
-            stmt = delete(Deposit).where(Deposit.txid.like("FAKE_%"))
-            await session.execute(stmt)
-            await session.commit()
-            return {"status": "success", "message": "Cleared all fake deposits"}
-    except Exception as e:
-        logger.error(f"Debug Clear Error: {e}")
-        return {"status": "error", "message": str(e)}
-
 @app.get("/api/store/get-code")
 async def store_get_code(user_id: int, phone: str):
     try:
