@@ -541,7 +541,6 @@
             border-radius: var(--radius);
             padding: 20px;
             box-shadow: var(--shadow);
-            scroll-margin-top: 100px;
         }
 
         /* ========== Stat Row Card ========== */
@@ -1611,7 +1610,8 @@
                         <div class="info-card-l">
                             <span class="info-card-lbl">TOTAL REQUESTS</span>
                             <div class="info-card-val"><span id="home-total-deposit-requests">0</span>
-                                <span>REQUESTS</span></div>
+                                <span>REQUESTS</span>
+                            </div>
                         </div>
                         <div class="info-card-icon" style="background: rgba(245, 158, 11, 0.1); color: var(--warning);">
                             <i class="fas fa-file-invoice"></i>
@@ -1862,7 +1862,8 @@
                     <div class="info-card">
                         <div class="info-card-l">
                             <span class="info-card-lbl">TOTAL REQUESTS</span>
-                            <div class="info-card-val"><span id="stat-deposits-total-requests">0</span> <span data-i18n="unit_requests">REQUESTS</span></div>
+                            <div class="info-card-val"><span id="stat-deposits-total-requests">0</span> <span
+                                    data-i18n="unit_requests">REQUESTS</span></div>
                         </div>
                         <div class="info-card-icon" style="background: rgba(245, 158, 11, 0.1); color: var(--warning);">
                             <i class="fas fa-file-invoice"></i>
@@ -1873,7 +1874,8 @@
                         <div class="info-card-l">
                             <span class="info-card-lbl">TOTAL DEPOSITS</span>
                             <div class="info-card-val"><span id="stat-deposits-total-amount">0.00</span> <span
-                                    style="font-size: 0.85rem; color: var(--text-secondary); font-weight: 600;">USD</span></div>
+                                    style="font-size: 0.85rem; color: var(--text-secondary); font-weight: 600;">USD</span>
+                            </div>
                         </div>
                         <div class="info-card-icon" style="background: rgba(16, 185, 129, 0.1); color: var(--success);">
                             <i class="fas fa-coins"></i>
@@ -1894,7 +1896,7 @@
                 </div>
 
                 <!-- History Card -->
-                <div class="card" id="deposits-history-section-card" style="padding: 22px;">
+                <div class="card" id="deposits-history-card" style="padding: 22px;">
                     <div class="section-header" id="deposits-history-header" style="margin: 0 0 35px 0;">
                         <h2>Deposits History</h2>
                     </div>
@@ -3278,7 +3280,7 @@
             if (currentDepositsPage > 1) {
                 currentDepositsPage--;
                 renderDepositsList(filteredDeposits || allDeposits);
-                document.getElementById('deposits-history-section-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
+                document.getElementById('deposits-history-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
             }
         }
         function nextDepositsPage() {
@@ -3287,7 +3289,7 @@
             if (currentDepositsPage < totalPages) {
                 currentDepositsPage++;
                 renderDepositsList(list);
-                document.getElementById('deposits-history-section-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
+                document.getElementById('deposits-history-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
             }
         }
 
