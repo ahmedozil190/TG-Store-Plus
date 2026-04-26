@@ -1860,6 +1860,32 @@
                     <h2 data-i18n="nav_deposits">Deposits</h2>
                 </div>
 
+                <!-- Top Stats Cards -->
+                <div style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 25px;">
+                    <!-- Stat 1: Total Requests -->
+                    <div class="info-card">
+                        <div class="info-card-l">
+                            <span class="info-card-lbl">TOTAL REQUESTS</span>
+                            <div class="info-card-val"><span id="stat-deposits-total-requests">0</span> <span data-i18n="unit_requests">REQUESTS</span></div>
+                        </div>
+                        <div class="info-card-icon" style="background: rgba(245, 158, 11, 0.1); color: var(--warning);">
+                            <i class="fas fa-file-invoice"></i>
+                        </div>
+                    </div>
+                    <!-- Stat 2: Total Deposits -->
+                    <div class="info-card">
+                        <div class="info-card-l">
+                            <span class="info-card-lbl">TOTAL DEPOSITS</span>
+                            <div class="info-card-val"><span id="stat-deposits-total-amount">0.00</span> <span
+                                    style="font-size: 0.85rem; color: var(--text-secondary); font-weight: 600;">USD</span></div>
+                        </div>
+                        <div class="info-card-icon" style="background: rgba(16, 185, 129, 0.1); color: var(--success);">
+                            <i class="fas fa-coins"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Search Card -->
                 <div class="card no-shadow" style="padding: 18px; margin-bottom: 25px;">
                     <input class="search-input" type="text" id="deposits-search"
                         placeholder="Search User ID or TxID...">
@@ -1871,7 +1897,12 @@
                     </div>
                 </div>
 
-                <div class="card" style="padding: 22px;">
+                <!-- History Card -->
+                <div class="card no-shadow" style="padding: 22px;">
+                    <div class="section-header" style="margin: 0 0 20px 0;">
+                        <i class="fas fa-clock-rotate-left"></i>
+                        <h2>Deposits History</h2>
+                    </div>
                     <div class="list-container" id="deposits-list"></div>
                     <div id="deposits-pagination" class="pagination-ctrls" style="display: none;">
                         <button class="pg-btn" id="pgPrevDeposits" onclick="prevDepositsPage()">
@@ -2357,6 +2388,12 @@
                 const htda = document.getElementById('home-total-deposits-amount');
                 if (htdr) htdr.innerText = data.stats.total_deposit_requests || 0;
                 if (htda) htda.innerText = parseFloat(data.stats.total_deposits_amount || 0).toFixed(2);
+
+                // Deposits Section (New Stats)
+                const dtr = document.getElementById('stat-deposits-total-requests');
+                const dta = document.getElementById('stat-deposits-total-amount');
+                if (dtr) dtr.innerText = data.stats.total_deposit_requests || 0;
+                if (dta) dta.innerText = parseFloat(data.stats.total_deposits_amount || 0).toFixed(2);
 
                 // Selling Prices (Home)
                 const hac = document.getElementById('home-active-countries');
@@ -3165,6 +3202,15 @@
             const container = document.getElementById('deposits-list');
             const pagContainer = document.getElementById('deposits-pagination');
 
+            // Update Top Stats
+            const reqEl = document.getElementById('stat-deposits-total-requests');
+            const amtEl = document.getElementById('stat-deposits-total-amount');
+            if (reqEl) reqEl.innerText = allDeposits.length;
+            if (amtEl) {
+                const sum = allDeposits.reduce((acc, curr) => acc + Number(curr.amount), 0);
+                amtEl.innerText = sum.toFixed(2);
+            }
+
             if (!list || !list.length) {
                 container.innerHTML = `
                 <div style="text-align: center; padding: 40px 20px; background: var(--card-glass); border-radius: 16px; border: 1px dashed var(--border); margin-top: 0; backdrop-filter: blur(10px);">
@@ -3182,23 +3228,30 @@
             const rowS = "background: transparent; border: 1px solid var(--border); padding: 14px 18px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; gap: 15px;";
             const lblS = "color: var(--text-secondary); font-size: 0.8rem; font-weight: 700; text-transform: uppercase;";
 
-            container.innerHTML = paged.map(item => `
+            container.innerHTML = paged.map(item => {
+                const methodDisp = (item.method || 'Binance Pay').replace(' Pay', '');
+                const details = `$${Number(item.amount).toFixed(2)} - ${methodDisp}`;
+                return `
                 <div class="user-card" style="padding: 20px; margin-bottom: 15px; cursor: default;">
                     <div style="display: flex; flex-direction: column; gap: 10px;">
+                        <!-- Status -->
+                        <div style="${rowS}">
+                            <span style="${lblS}">${currentLang === 'ar' ? 'الحالة' : 'STATUS'}</span>
+                            <span style="color: #32d74b; font-weight: 900; font-size: 0.9rem; display: flex; align-items: center; gap: 8px; letter-spacing: 0.5px;">
+                                <i class="fas fa-check-circle"></i> APPROVED
+                            </span>
+                        </div>
+                        <!-- Details -->
+                        <div style="${rowS}">
+                            <span style="${lblS}">${currentLang === 'ar' ? 'التفاصيل' : 'DETAILS'}</span>
+                            <span style="color: var(--accent); font-weight: 800; font-size: 1rem;">${details}</span>
+                        </div>
                         <div style="${rowS}">
                             <span style="${lblS}">${currentLang === 'ar' ? 'المستخدم' : 'User'}</span>
                             <div style="text-align: right;">
                                 <div style="color: var(--text-primary); font-weight: 700; font-size: 0.95rem;">${item.user_name}</div>
                                 <div style="color: var(--text-secondary); font-size: 0.8rem;">${item.user_handle} (${item.user_id})</div>
                             </div>
-                        </div>
-                        <div style="${rowS}">
-                            <span style="${lblS}">${currentLang === 'ar' ? 'المبلغ' : 'Amount'}</span>
-                            <span style="color: var(--success); font-weight: 800; font-size: 1.1rem;">$${Number(item.amount).toFixed(2)}</span>
-                        </div>
-                        <div style="${rowS}">
-                            <span style="${lblS}">${currentLang === 'ar' ? 'الطريقة' : 'Method'}</span>
-                            <span style="color: #3b82f6; font-weight: 700; font-size: 0.95rem;">${item.method}</span>
                         </div>
                         <div style="${rowS}">
                             <span style="${lblS}">${currentLang === 'ar' ? 'رقم العملية' : 'TxID'}</span>
@@ -3210,7 +3263,8 @@
                         </div>
                     </div>
                 </div>
-            `).join('');
+            `;
+            }).join('');
 
             pagContainer.style.display = totalPages > 1 ? 'flex' : 'none';
             document.getElementById('pgInfoDeposits').innerText = `Page ${currentDepositsPage} / ${totalPages}`;
