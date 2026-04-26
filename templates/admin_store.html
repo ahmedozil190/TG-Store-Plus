@@ -2092,18 +2092,6 @@
 
             <!-- ===== Settings Section ===== -->
             <section id="section-settings" class="view-section">
-                <style>
-                    .settings-menu { display: none; flex-direction: column; gap: 10px; }
-                    .settings-menu.active { display: flex; }
-                    .settings-item { background: var(--card-bg); padding: 15px; border-radius: 12px; display: flex; align-items: center; cursor: pointer; border: 1px solid var(--border); transition: 0.2s; }
-                    .settings-item:hover { border-color: var(--accent); }
-                    .settings-icon-box { width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 8px; margin-right: 15px; font-size: 1.2rem; }
-                    .settings-text { flex-grow: 1; font-weight: 600; }
-                    .settings-arrow { color: var(--text-secondary); }
-                    .settings-sub-view { display: none; }
-                    .settings-sub-view.active { display: block; }
-                    .settings-back-btn { margin-bottom: 20px; font-weight: 600; color: var(--accent); cursor: pointer; display: flex; align-items: center; gap: 8px; }
-                </style>
                 <div class="section-header">
                     <i class="fas fa-cog"></i>
                     <h2 data-i18n="nav_settings">Settings</h2>
@@ -2111,15 +2099,6 @@
 
                 <!-- Main Settings Menu -->
                 <div id="settings-main-menu" class="settings-menu active">
-                    <!-- Bot Name & Links -->
-                    <div class="settings-item" onclick="openSettingSub('bot-links')">
-                        <div class="settings-icon-box" style="background: rgba(239, 68, 68, 0.1); color: #ef4444;">
-                            <i class="fas fa-robot"></i>
-                        </div>
-                        <span class="settings-text">Bot Name & Links</span>
-                        <i class="fas fa-chevron-right settings-arrow"></i>
-                    </div>
-
                     <!-- Payments & Integration -->
                     <div class="settings-item" onclick="openSettingSub('payments')">
                         <div class="settings-icon-box" style="background: rgba(59, 130, 246, 0.1); color: #3b82f6;">
@@ -2137,48 +2116,11 @@
                         <span class="settings-text">Subscriptions Channels</span>
                         <i class="fas fa-chevron-right settings-arrow"></i>
                     </div>
-
-                    <!-- Points & Rewards -->
-                    <div class="settings-item" onclick="openSettingSub('rewards')">
-                        <div class="settings-icon-box" style="background: rgba(245, 158, 11, 0.1); color: #f59e0b;">
-                            <i class="fas fa-coins"></i>
-                        </div>
-                        <span class="settings-text">Points & Rewards</span>
-                        <i class="fas fa-chevron-right settings-arrow"></i>
-                    </div>
-
-                    <!-- Penalty System -->
-                    <div class="settings-item" onclick="openSettingSub('penalty')">
-                        <div class="settings-icon-box" style="background: rgba(239, 68, 68, 0.1); color: #ef4444;">
-                            <i class="fas fa-gavel"></i>
-                        </div>
-                        <span class="settings-text">Penalty System</span>
-                        <i class="fas fa-chevron-right settings-arrow"></i>
-                    </div>
-
-                    <!-- Backup & Cloud -->
-                    <div class="settings-item" onclick="openSettingSub('cloud')">
-                        <div class="settings-icon-box" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">
-                            <i class="fas fa-cloud-upload-alt"></i>
-                        </div>
-                        <span class="settings-text">Cloud Migration & Backup</span>
-                        <i class="fas fa-chevron-right settings-arrow"></i>
-                    </div>
                 </div>
 
                 <!-- Sub-Settings Views -->
                 <div id="settings-sub-container">
                     
-                    <!-- 1. Bot Name & Links -->
-                    <div id="sub-bot-links" class="settings-sub-view">
-                        <div class="settings-back-btn" onclick="closeSettingSub()">
-                            <i class="fas fa-arrow-left"></i> Back to Settings
-                        </div>
-                        <div class="card" style="padding: 22px;">
-                            <h3 style="font-size: 1.1rem; margin-bottom: 20px; color: #ef4444;"><i class="fas fa-robot" style="margin-right: 8px;"></i> Bot Name & Links</h3>
-                            <p style="color: var(--text-s); font-size: 0.9rem; margin-bottom: 20px;">This feature is currently in development. You will be able to customize your bot's name and official links here.</p>
-                        </div>
-                    </div>
 
                     <!-- 2. Payments & Integration -->
                     <div id="sub-payments" class="settings-sub-view">
@@ -2249,39 +2191,6 @@
                         <div class="card" style="padding: 22px;">
                             <h3 style="font-size: 1.1rem; margin-bottom: 20px; color: #8b5cf6;"><i class="fas fa-broadcast-tower" style="margin-right: 8px;"></i> Subscriptions</h3>
                             <p style="color: var(--text-s); font-size: 0.9rem;">Manage your official channels and subscription requirements here.</p>
-                        </div>
-                    </div>
-
-                    <!-- 4. Rewards -->
-                    <div id="sub-rewards" class="settings-sub-view">
-                        <div class="settings-back-btn" onclick="closeSettingSub()">
-                            <i class="fas fa-arrow-left"></i> Back to Settings
-                        </div>
-                        <div class="card" style="padding: 22px;">
-                            <h3 style="font-size: 1.1rem; margin-bottom: 20px; color: #f59e0b;"><i class="fas fa-coins" style="margin-right: 8px;"></i> Points & Rewards</h3>
-                            <p style="color: var(--text-s); font-size: 0.9rem;">Configure point systems and customer rewards to boost engagement.</p>
-                        </div>
-                    </div>
-
-                    <!-- 5. Penalty -->
-                    <div id="sub-penalty" class="settings-sub-view">
-                        <div class="settings-back-btn" onclick="closeSettingSub()">
-                            <i class="fas fa-arrow-left"></i> Back to Settings
-                        </div>
-                        <div class="card" style="padding: 22px;">
-                            <h3 style="font-size: 1.1rem; margin-bottom: 20px; color: #ef4444;"><i class="fas fa-gavel" style="margin-right: 8px;"></i> Penalty System</h3>
-                            <p style="color: var(--text-s); font-size: 0.9rem;">Setup rules and automatic penalties for user misconduct.</p>
-                        </div>
-                    </div>
-
-                    <!-- 6. Cloud -->
-                    <div id="sub-cloud" class="settings-sub-view">
-                        <div class="settings-back-btn" onclick="closeSettingSub()">
-                            <i class="fas fa-arrow-left"></i> Back to Settings
-                        </div>
-                        <div class="card" style="padding: 22px;">
-                            <h3 style="font-size: 1.1rem; margin-bottom: 20px; color: #10b981;"><i class="fas fa-cloud-upload-alt" style="margin-right: 8px;"></i> Cloud & Backup</h3>
-                            <p style="color: var(--text-s); font-size: 0.9rem;">Manage cloud migrations and scheduled system backups.</p>
                         </div>
                     </div>
 
