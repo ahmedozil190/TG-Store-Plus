@@ -447,14 +447,15 @@ async def get_store_data(user_id: int = None):
             countries_map = {}
             for row in local_results:
                 name, count = row
-                countries_map[name] = {"name": name, "count": count, "server_id": None}
+                map_key = f"{name}|__local__"
+                countries_map[map_key] = {"name": name, "count": count, "server_id": None, "server_name": "Local"}
 
             # 2. External Stock
             active_servers = (await session.execute(select(ApiServer).where(ApiServer.is_active == True))).scalars().all()
-            logger.info(f"Active external servers: {len(active_servers)} — {[f'{s.name}({s.server_type})' for s in active_servers]}")
+            logger.info(f"Active external servers: {len(active_servers)}")
             for srv in active_servers:
                 try:
-                    logger.info(f"Processing server: {srv.name} (type={srv.server_type}, url={srv.url})")
+                    logger.info(f"Processing server: {srv.name} ({srv.url})")
                     provider = ExternalProvider(
                         srv.name, srv.url, srv.api_key, srv.profit_margin,
                         server_type=getattr(srv, 'server_type', 'standard'),
@@ -517,8 +518,7 @@ async def get_store_data(user_id: int = None):
                             if isinstance(q_node, dict): spider_counts = q_node
 
                     if spider_prices:
-                        # Spider-specific split-data merge path
-                        logger.info(f"[{srv.name}] Using SPIDER path: {len(spider_prices)} prices, {len(spider_counts)} quantities")
+                        # If we found Spider-specific split data, merge it
                         for code, price in spider_prices.items():
                             try:
                                 countries_list.append({
@@ -527,10 +527,8 @@ async def get_store_data(user_id: int = None):
                                     "count": int(spider_counts.get(code, 999))
                                 })
                             except: continue
-                        logger.info(f"[{srv.name}] Spider path produced {len(countries_list)} entries")
                     else:
                         # Fallback to Super Parser for TG-Lion and others
-                        logger.info(f"[{srv.name}] Using SUPER PARSER path (no 'result' key or no split data)")
                         data_node = find_country_node(srv_countries)
                         if not data_node:
                             data_node = srv_countries
@@ -594,18 +592,20 @@ async def get_store_data(user_id: int = None):
                             p_price = float(c.get("price", c.get("rate", c.get("cost", 0))))
                             if count <= 0: continue
                             
-                            if name not in countries_map:
-                                countries_map[name] = {
+                            map_key = f"{name}|{srv.name}"
+                            if map_key not in countries_map:
+                                countries_map[map_key] = {
                                     "name": name,
                                     "flag": resolved_flag,
                                     "iso": resolved_iso,
                                     "count": count,
                                     "server_id": srv.id,
+                                    "server_name": srv.name,
                                     "p_price": p_price,
                                     "calc_price": provider.calculate_price(p_price)
                                 }
                             else:
-                                countries_map[name]["count"] += count
+                                countries_map[map_key]["count"] += count
                         except Exception as parse_err:
                             logger.warning(f"[{srv.name}] Failed to parse entry: {c} — {parse_err}")
                             continue
@@ -655,7 +655,8 @@ async def get_store_data(user_id: int = None):
                     "name": name,
                     "flag": flag,
                     "buy_price": price,
-                    "count": c_data["count"]
+                    "count": c_data["count"],
+                    "server_name": c_data.get("server_name", "Local")
                 })
             
             countries.sort(key=lambda x: x["name"])
@@ -728,9 +729,13 @@ async def get_store_data(user_id: int = None):
             final_trx = addr_settings.get("TRX_ADDRESS") or ""
             final_usdt_bep20 = addr_settings.get("USDT_BEP20_ADDRESS") or ""
 
+        # Build servers list for frontend filter
+        server_names = sorted(set(c["server_name"] for c in countries))
+
         return {
             "bot_name": bot_name,
             "countries": countries,
+            "servers": server_names,
             "user": {
                 "balance": balance,
                 "total_orders": total_orders,

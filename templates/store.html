@@ -386,6 +386,79 @@
             gap: 12px;
         }
 
+        /* ─── Server Filter Bar ─── */
+        .server-filter-bar {
+            display: none;
+            gap: 8px;
+            overflow-x: auto;
+            padding: 0 0 8px 0;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        .server-filter-bar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .server-filter-bar.visible {
+            display: flex;
+        }
+
+        .server-chip {
+            flex-shrink: 0;
+            padding: 10px 18px;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.25s var(--ease);
+            border: 1.5px solid var(--border);
+            background: var(--bg-elevated);
+            color: var(--text-s);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            white-space: nowrap;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        .server-chip:active {
+            transform: scale(0.95);
+        }
+
+        .server-chip.active {
+            background: var(--accent);
+            color: #fff;
+            border-color: var(--accent);
+            box-shadow: 0 4px 15px var(--accent-glow);
+        }
+
+        .server-chip .chip-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: currentColor;
+            opacity: 0.5;
+        }
+
+        .server-chip.active .chip-dot {
+            background: #fff;
+            opacity: 1;
+            box-shadow: 0 0 6px rgba(255,255,255,0.6);
+        }
+
+        .server-chip .chip-count {
+            font-size: 0.7rem;
+            font-weight: 800;
+            opacity: 0.6;
+            margin-left: 2px;
+        }
+
+        .server-chip.active .chip-count {
+            opacity: 0.9;
+        }
+
         .country-card {
             background: var(--bg-elevated);
             border: 1px solid var(--border);
@@ -832,6 +905,7 @@
                     <input type="text" id="store-search" class="search-input" placeholder="Search countries..."
                         oninput="filterStore()">
                 </div>
+                <div class="server-filter-bar" id="server-filter-bar"></div>
             </div>
             <div class="grid-container" id="countries-grid"></div>
         </section>
@@ -1105,6 +1179,8 @@
 
         let currentLang = 'en';
         let countries = [];
+        let serversList = [];
+        let activeServerFilter = 'all';
         let selectedCountry = null;
         let currentHistoryPage = 1;
         const HISTORY_LIMIT = 10;
@@ -1228,6 +1304,8 @@
                 }
 
                 countries = data.countries || [];
+                serversList = data.servers || [];
+                renderServerFilters();
                 if (data.stats) {
                     document.getElementById('stat-total-numbers').innerHTML = `${data.stats.total_numbers || 0} <span>NUMBERS</span>`;
                     document.getElementById('dash-completed-orders').innerHTML = `${data.user.completed_orders || 0} <span>ORDERS</span>`;
@@ -1330,7 +1408,53 @@
 
         function filterStore() {
             const q = document.getElementById('store-search').value.toLowerCase();
-            renderCountries(countries.filter(c => c.name.toLowerCase().includes(q)));
+            let filtered = countries;
+            if (activeServerFilter !== 'all') {
+                filtered = filtered.filter(c => c.server_name === activeServerFilter);
+            }
+            if (q) {
+                filtered = filtered.filter(c => c.name.toLowerCase().includes(q));
+            }
+            renderCountries(filtered);
+        }
+
+        function renderServerFilters() {
+            const bar = document.getElementById('server-filter-bar');
+            if (!serversList || serversList.length <= 1) {
+                bar.classList.remove('visible');
+                return;
+            }
+            bar.classList.add('visible');
+
+            // Count per server
+            const countMap = {};
+            countries.forEach(c => {
+                countMap[c.server_name] = (countMap[c.server_name] || 0) + 1;
+            });
+
+            let html = `<div class="server-chip active" onclick="setServerFilter('all', this)">
+                <span class="chip-dot"></span>
+                <span>${currentLang === 'ar' ? 'الكل' : 'All'}</span>
+                <span class="chip-count">${countries.length}</span>
+            </div>`;
+
+            serversList.forEach(name => {
+                const cnt = countMap[name] || 0;
+                html += `<div class="server-chip" onclick="setServerFilter('${name.replace(/'/g, "\\'")}', this)">
+                    <span class="chip-dot"></span>
+                    <span>${name}</span>
+                    <span class="chip-count">${cnt}</span>
+                </div>`;
+            });
+
+            bar.innerHTML = html;
+        }
+
+        function setServerFilter(server, el) {
+            activeServerFilter = server;
+            document.querySelectorAll('.server-chip').forEach(c => c.classList.remove('active'));
+            if (el) el.classList.add('active');
+            filterStore();
         }
 
         function openBuyModal(c) {
