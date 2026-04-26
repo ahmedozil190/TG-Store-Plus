@@ -97,38 +97,55 @@ def get_flag_emoji(country_code: str):
         return "🌐"
 
 def resolve_country_info(country_code_str: str, full_phone: str = None):
-    """Resolve ISO code and Country Name. If full_phone is provided, detects specific region."""
+    """Resolve ISO code and Country Name. Handles numeric codes, Alpha-2, and Alpha-3."""
+    import pycountry
+    import phonenumbers
+    import re
     try:
+        code_str = str(country_code_str).strip().upper().lstrip('+')
+        if not code_str: return "Unknown", "🌐", "XX"
+
+        # 1. Handle if it's already an ISO code (Alpha-2 or Alpha-3)
+        if not code_str.isdigit() and len(code_str) in [2, 3]:
+            try:
+                country = None
+                if len(code_str) == 2:
+                    country = pycountry.countries.get(alpha_2=code_str)
+                else:
+                    country = pycountry.countries.get(alpha_3=code_str)
+                
+                if country:
+                    name = re.sub(r'\s*\(?[A-Z]{2,3}\)?\s*$', '', country.name).strip()
+                    iso = country.alpha_2
+                    return name, get_flag_emoji(iso), iso
+            except: pass
+
+        # 2. Handle if full_phone is provided
         if full_phone:
             try:
                 parsed = phonenumbers.parse(full_phone if full_phone.startswith('+') else f"+{full_phone}")
                 iso_code = phonenumbers.region_code_for_number(parsed)
-                name = pycountry.countries.get(alpha_2=iso_code).name
+                country = pycountry.countries.get(alpha_2=iso_code)
+                name = country.name if country else iso_code
                 name = re.sub(r'\s*\(?[A-Z]{2,3}\)?\s*$', '', name).strip()
                 return name, get_flag_emoji(iso_code), iso_code
             except: pass
 
-        # Fallback to calling code prefix
-        code = country_code_str.strip().lstrip('+').lstrip('0')
-        if not code: return "Unknown", "🌐", "XX"
+        # 3. Handle numeric calling code prefix
+        if code_str.isdigit():
+            try:
+                numeric_code = int(code_str)
+                iso_code = phonenumbers.region_code_for_country_code(numeric_code)
+                flag = get_flag_emoji(iso_code)
+                
+                name = f"Country {numeric_code}"
+                country = pycountry.countries.get(alpha_2=iso_code)
+                if country:
+                    name = re.sub(r'\s*\(?[A-Z]{2,3}\)?\s*$', '', country.name).strip()
+                return name, flag, iso_code
+            except: pass
         
-        numeric_code = int(code)
-        # For +1, region_code_for_country_code returns 'US'
-        iso_code = phonenumbers.region_code_for_country_code(numeric_code)
-        flag = get_flag_emoji(iso_code)
-        
-        # Resolve name using pycountry for accuracy
-        name = f"Country {numeric_code}"
-        try:
-            country = pycountry.countries.get(alpha_2=iso_code)
-            if country:
-                # pycountry names are clean, but let's ensure no extra codes are appended
-                name = country.name
-                # Remove common suffixes like "EG", "(EG)", etc.
-                name = re.sub(r'\s*\(?[A-Z]{2,3}\)?\s*$', '', name).strip()
-        except: pass
-        
-        return name, flag, iso_code
+        return f"Code {code_str}", "🌐", "XX"
     except Exception as e:
         logger.error(f"Error resolving country {country_code_str}: {e}")
         return f"Code {country_code_str}", "🌐", "XX"
@@ -486,12 +503,10 @@ async def get_store_data(user_id: int = None):
                             if code.lower() in ["status", "message", "error", "ok", "msg", "currency", "success"]: continue
                             
                             if isinstance(val, dict):
-                                # Case A: {"EG": {"count": 10, "price": 1.2}}
                                 entry = val.copy()
                                 entry["country"] = code
                                 countries_list.append(entry)
                             elif isinstance(val, (int, float, str)):
-                                # Case B: {"EG": "1.2"} or {"EG": 1.2}
                                 try:
                                     price_val = float(val)
                                     countries_list.append({
@@ -509,7 +524,7 @@ async def get_store_data(user_id: int = None):
                         
                         # Resolve human name & flag if it looks like a code
                         resolved_name, resolved_flag, resolved_iso = resolve_country_info(str(raw_name))
-                        name = resolved_name if resolved_name and resolved_name != "Unknown" else str(raw_name)
+                        name = resolved_name if resolved_name and "Code " not in resolved_name else str(raw_name)
                         
                         try:
                             count = int(c.get("count", 0))
