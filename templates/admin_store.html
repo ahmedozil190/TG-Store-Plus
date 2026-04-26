@@ -622,21 +622,19 @@
             background: var(--bg-elevated);
             border: 1px solid var(--border);
             border-radius: 20px;
-            padding: 16px 20px;
+            padding: 20px 24px;
             display: flex;
             align-items: center;
-            gap: 16px;
+            gap: 20px;
             cursor: pointer;
-            transition: all 0.2s var(--ease);
+            transition: all 0.3s var(--ease);
             position: relative;
             overflow: hidden;
         }
 
         .settings-item:hover {
-            background: var(--card-glass);
-            border-color: var(--accent);
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            transform: scale(1.02);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
         }
 
         .settings-item:active {
@@ -2109,7 +2107,7 @@
 
             <!-- ===== Settings Main Menu Section ===== -->
             <section id="section-settings" class="view-section">
-                <div style="height: 25px;"></div>
+                <div style="height: 10px;"></div>
                 <div id="settings-main-menu" class="settings-menu active">
                     <!-- Payments & Integration -->
                     <div class="settings-item" onclick="switchNav('settings-payments', null)">
