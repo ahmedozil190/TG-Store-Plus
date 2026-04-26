@@ -454,7 +454,7 @@ async def get_store_data(user_id: int = None):
                     if not raw_name: continue
                     
                     # Try to resolve human name if it looks like a code
-                    resolved_name, _ = resolve_country_info(str(raw_name))
+                    resolved_name, _, _ = resolve_country_info(str(raw_name))
                     name = resolved_name if resolved_name and resolved_name != "Unknown" else raw_name
                     
                     count = int(c.get("count", 0))
@@ -1483,6 +1483,7 @@ async def get_servers():
 
 @app.post("/api/admin/store/servers")
 async def save_server(data: ApiServerSubmit):
+    logger.info(f"Saving server: {data.dict()}")
     async with async_session() as session:
         if data.id:
             srv = await session.get(ApiServer, data.id)

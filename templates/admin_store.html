@@ -3496,7 +3496,7 @@
                     body: JSON.stringify({
                         id: id ? parseInt(id) : null,
                         name, url, api_key: key,
-                        profit_margin: parseFloat(profit),
+                        profit_margin: parseFloat(profit) || 20,
                         is_active: active
                     })
                 });
