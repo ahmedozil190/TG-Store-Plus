@@ -541,6 +541,7 @@
             border-radius: var(--radius);
             padding: 20px;
             box-shadow: var(--shadow);
+            scroll-margin-top: 100px;
         }
 
         /* ========== Stat Row Card ========== */
@@ -1893,7 +1894,7 @@
                 </div>
 
                 <!-- History Card -->
-                <div class="card" style="padding: 22px;">
+                <div class="card" id="deposits-history-section-card" style="padding: 22px;">
                     <div class="section-header" id="deposits-history-header" style="margin: 0 0 35px 0;">
                         <h2>Deposits History</h2>
                     </div>
@@ -3277,7 +3278,7 @@
             if (currentDepositsPage > 1) {
                 currentDepositsPage--;
                 renderDepositsList(filteredDeposits || allDeposits);
-                document.getElementById('deposits-history-header').scrollIntoView({ behavior: 'smooth', block: 'start' });
+                document.getElementById('deposits-history-section-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
             }
         }
         function nextDepositsPage() {
@@ -3286,7 +3287,7 @@
             if (currentDepositsPage < totalPages) {
                 currentDepositsPage++;
                 renderDepositsList(list);
-                document.getElementById('deposits-history-header').scrollIntoView({ behavior: 'smooth', block: 'start' });
+                document.getElementById('deposits-history-section-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
             }
         }
 
