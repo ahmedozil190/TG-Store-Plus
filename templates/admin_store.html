@@ -3484,19 +3484,19 @@
                 <div class="user-card" style="padding: 20px; margin-bottom: ${isLast ? '0' : '15px'}; cursor: default;">
                     <div style="display: flex; flex-direction: column; gap: 10px;">
                         
-                        <!-- Server Name -->
-                        <div style="${rowS}">
-                            <span style="${lblS}">${currentLang === 'ar' ? 'المزود' : 'PROVIDER'}</span>
-                            <span style="color: #10b981; font-weight: 800; font-size: 1.05rem; text-align: right; word-break: break-all; flex: 1; margin-left: 10px; display: flex; align-items: center; justify-content: flex-end; gap: 8px;">
-                                <i class="fas fa-server" style="opacity: 0.5;"></i> ${s.name}
-                            </span>
-                        </div>
-                        
                         <!-- Status -->
                         <div style="${rowS}">
                             <span style="${lblS}">${currentLang === 'ar' ? 'الحالة' : 'STATUS'}</span>
-                            <span class="badge ${s.is_active ? 'badge-success' : 'badge-danger'}" style="font-size: 0.75rem; padding: 4px 10px;">
+                            <span style="color: ${s.is_active ? '#10b981' : '#ef4444'}; font-weight: 800; font-size: 0.95rem; letter-spacing: 0.5px;">
                                 ${s.is_active ? (currentLang === 'ar' ? 'نشط' : 'ACTIVE') : (currentLang === 'ar' ? 'غير نشط' : 'INACTIVE')}
+                            </span>
+                        </div>
+
+                        <!-- Server Name -->
+                        <div style="${rowS}">
+                            <span style="${lblS}">${currentLang === 'ar' ? 'المزود' : 'PROVIDER'}</span>
+                            <span style="color: #10b981; font-weight: 800; font-size: 1.05rem; text-align: right; word-break: break-all; flex: 1; margin-left: 10px;">
+                                ${s.name}
                             </span>
                         </div>
                         
@@ -3504,15 +3504,15 @@
                         <div style="${rowS}">
                             <span style="${lblS}">${currentLang === 'ar' ? 'النوع' : 'TYPE'}</span>
                             <span style="color: #8b5cf6; font-weight: 700; font-size: 0.9rem; text-align: right; flex: 1;">
-                                <i class="fas fa-microchip" style="margin-right: 4px; opacity: 0.7;"></i> ${s.server_type || 'standard'}
+                                ${s.server_type || 'standard'}
                             </span>
                         </div>
                         
                         <!-- Profit Margin -->
                         <div style="${rowS}">
-                            <span style="${lblS}">${currentLang === 'ar' ? 'هامش الربح' : 'PROFIT MARGIN'}</span>
+                            <span style="${lblS}">${currentLang === 'ar' ? 'الربح' : 'PROFIT'}</span>
                             <span style="color: #ff9f0a; font-weight: 800; font-size: 0.95rem;">
-                                +${s.profit_margin}% <i class="fas fa-chart-line" style="margin-left: 4px; opacity: 0.7;"></i>
+                                ${s.profit_margin}%
                             </span>
                         </div>
                         
@@ -3576,12 +3576,14 @@
             document.getElementById('server-modal').classList.add('active');
         }
         async function deleteServer(id) {
-            if (!confirm("Are you sure you want to delete this server?")) return;
-            try {
-                const res = await fetch(`/api/admin/store/servers/${id}`, { method: 'DELETE' });
-                if (res.ok) fetchServers();
-                else tg.showAlert("Failed to delete.");
-            } catch (e) { console.error(e); }
+            tg.showConfirm(currentLang === 'ar' ? 'هل أنت متأكد من حذف هذا المزود؟' : 'Are you sure you want to delete this provider?', async (agreed) => {
+                if (!agreed) return;
+                try {
+                    const res = await fetch(`/api/admin/store/servers/${id}`, { method: 'DELETE' });
+                    if (res.ok) fetchServers();
+                    else tg.showAlert(currentLang === 'ar' ? 'فشل الحذف' : 'Failed to delete.');
+                } catch (e) { console.error(e); }
+            });
         }
 
         applyTheme();
