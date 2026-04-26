@@ -457,17 +457,17 @@ async def get_store_data(user_id: int = None):
                     count = int(c.get("count", 0))
                     p_price = float(c.get("price", 0))
                     if count <= 0: continue
-                        
-                        if name not in countries_map:
-                            countries_map[name] = {
-                                "name": name,
-                                "count": count,
-                                "server_id": srv.id,
-                                "p_price": p_price,
-                                "calc_price": provider.calculate_price(p_price)
-                            }
-                        else:
-                            countries_map[name]["count"] += count
+                    
+                    if name not in countries_map:
+                        countries_map[name] = {
+                            "name": name,
+                            "count": count,
+                            "server_id": srv.id,
+                            "p_price": p_price,
+                            "calc_price": provider.calculate_price(p_price)
+                        }
+                    else:
+                        countries_map[name]["count"] += count
 
             # 3. Final Assembly with Metadata & Pricing
             final_countries = []
