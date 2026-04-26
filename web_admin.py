@@ -421,6 +421,7 @@ async def get_store_data(user_id: int = None):
             ).group_by(Account.country)
             
             local_results = (await session.execute(stmt)).all()
+            logger.info(f"Local results: {len(local_results)} countries")
             
             countries_map = {}
             for row in local_results:
@@ -429,7 +430,9 @@ async def get_store_data(user_id: int = None):
 
             # 2. External Stock
             active_servers = (await session.execute(select(ApiServer).where(ApiServer.is_active == True))).scalars().all()
+            logger.info(f"Active external servers: {len(active_servers)}")
             for srv in active_servers:
+                logger.info(f"Processing server: {srv.name} ({srv.url})")
                 provider = ExternalProvider(srv.name, srv.url, srv.api_key, srv.profit_margin)
                 srv_countries = await provider.get_countries()
                 
@@ -470,7 +473,7 @@ async def get_store_data(user_id: int = None):
                         countries_map[name]["count"] += count
 
             # 3. Final Assembly with Metadata & Pricing
-            final_countries = []
+            countries = []
             for name, c_data in countries_map.items():
                 flag = "🌐"
                 price = 1.0
@@ -497,7 +500,7 @@ async def get_store_data(user_id: int = None):
                     if usp:
                         price = usp.sell_price
                 
-                final_countries.append({
+                countries.append({
                     "name": name,
                     "flag": flag,
                     "buy_price": price,

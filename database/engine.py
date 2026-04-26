@@ -46,6 +46,19 @@ async def init_db():
             if 'method' not in d_cols:
                 await conn.execute(text("ALTER TABLE deposits ADD COLUMN method VARCHAR(50)"))
                 print("Successfully added method column to deposits")
+
+            # 3. accounts.server_id & hash_code
+            def check_account_cols(connection):
+                cursor = connection.execute(text("PRAGMA table_info(accounts)"))
+                return [row[1] for row in cursor]
+            
+            a_cols = await conn.run_sync(check_account_cols)
+            if 'server_id' not in a_cols:
+                await conn.execute(text("ALTER TABLE accounts ADD COLUMN server_id INTEGER"))
+                print("Successfully added server_id column to accounts")
+            if 'hash_code' not in a_cols:
+                await conn.execute(text("ALTER TABLE accounts ADD COLUMN hash_code TEXT"))
+                print("Successfully added hash_code column to accounts")
                 
         except Exception as e:
             print(f"Migration check failed: {e}")

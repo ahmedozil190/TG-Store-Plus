@@ -2551,6 +2551,7 @@
             if (id === 'sales') renderSalesList(allTransactions);
             if (id === 'home') renderSales(allTransactions);
             if (id.startsWith('settings')) fetchStoreSettings();
+            if (id === 'settings-servers') fetchServers();
             if (id === 'deposits') fetchDeposits();
             if (id === 'store-user-prices') fetchStoreUserPrices();
 
