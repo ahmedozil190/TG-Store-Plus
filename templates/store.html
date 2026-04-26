@@ -111,6 +111,12 @@
         .page-title {
             font-size: 1rem;
             font-weight: 800;
+            background: linear-gradient(90deg, var(--accent), var(--accent-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
         }
 
         .user-avatar {
@@ -333,11 +339,7 @@
 
         .section-header h2 {
             font-size: 1rem;
-            font-weight: 700;
-            background: linear-gradient(90deg, var(--accent), var(--accent-purple));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            font-weight: 600;
             letter-spacing: 0.5px;
             margin: 0;
         }
@@ -947,7 +949,8 @@
                     style="text-align: center; padding: 40px 20px; background: var(--card-glass); border-radius: 16px; border: 1px dashed var(--border); margin-top: 0; backdrop-filter: blur(10px); display: none;">
                     <i class="fas fa-history"
                         style="font-size: 2.5rem; color: var(--text-s); opacity: 0.15; margin-bottom: 12px;"></i>
-                    <p style="color: var(--text-s); font-weight: 600; font-size: 0.95rem;" data-t="dep_empty">No deposits found.</p>
+                    <p style="color: var(--text-s); font-weight: 600; font-size: 0.95rem;" data-t="dep_empty">No
+                        deposits found.</p>
                 </div>
 
                 <!-- Pagination for Deposits -->
@@ -1406,7 +1409,7 @@
                 H = H ? H : 12;
                 const HH = String(H).padStart(2, '0');
                 return `${Y}-${M}-${Day} ${HH}:${Min} ${ampm}`;
-            } catch(e) { return isoStr; }
+            } catch (e) { return isoStr; }
         }
 
         function renderHistory(data) {
