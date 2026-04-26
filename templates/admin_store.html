@@ -2092,12 +2092,15 @@
 
             <!-- ===== Settings Section ===== -->
             <section id="section-settings" class="view-section">
-                <div style="height: 15px;"></div> <!-- Spacing for removed header -->
+                <div class="section-header" id="settings-header" style="display: none; margin-bottom: 25px;">
+                    <h2 id="settings-title" style="font-size: 1.1rem; font-weight: 700; color: var(--text-primary);">Settings</h2>
+                </div>
+                <div id="settings-top-spacer" style="height: 15px;"></div> <!-- Spacing for menu view -->
 
                 <!-- Main Settings Menu -->
                 <div id="settings-main-menu" class="settings-menu active">
                     <!-- Payments & Integration -->
-                    <div class="settings-item" onclick="openSettingSub('payments')">
+                    <div class="settings-item" onclick="openSettingSub('payments', 'Payments & Integration')">
                         <div class="settings-icon-box" style="background: rgba(59, 130, 246, 0.1); color: #3b82f6;">
                             <i class="fas fa-wallet"></i>
                         </div>
@@ -2106,7 +2109,7 @@
                     </div>
 
                     <!-- Subscriptions Channels -->
-                    <div class="settings-item" onclick="openSettingSub('subscriptions')">
+                    <div class="settings-item" onclick="openSettingSub('subscriptions', 'Subscriptions Channels')">
                         <div class="settings-icon-box" style="background: rgba(139, 92, 246, 0.1); color: #8b5cf6;">
                             <i class="fas fa-broadcast-tower"></i>
                         </div>
@@ -2121,14 +2124,8 @@
 
                     <!-- 2. Payments & Integration -->
                     <div id="sub-payments" class="settings-sub-view">
-                        <div class="settings-back-btn" onclick="closeSettingSub()">
-                            <i class="fas fa-arrow-left"></i> Back to Settings
-                        </div>
-                        <div class="card" style="padding: 22px;">
+                        <div class="card" style="padding: 22px; margin-bottom: 20px;">
                             <div style="margin-bottom: 25px;">
-                                <h3 style="font-size: 1rem; margin-bottom: 15px; color: var(--accent);"><i class="fas fa-wallet"
-                                        style="margin-right: 8px;"></i> Binance Integration</h3>
-        
                                 <div class="form-group" style="margin-bottom: 15px;">
                                     <label
                                         style="font-size: 0.85rem; color: var(--text-s); margin-bottom: 8px; display: block;">Binance
@@ -2144,10 +2141,6 @@
                                     <input type="text" id="setting-binance-secret" class="search-input"
                                         style="margin-bottom: 0;" placeholder="Enter Secret Key (Hidden)">
                                 </div>
-        
-                                <hr style="border: none; border-top: 1px solid var(--border); margin: 20px 0;">
-                                <h3 style="font-size: 1rem; margin-bottom: 15px; color: var(--accent);"><i class="fas fa-coins"
-                                        style="margin-right: 8px;"></i> Deposit Addresses</h3>
         
                                 <div class="form-group" style="margin-bottom: 15px;">
                                     <label
@@ -2174,20 +2167,24 @@
                                 </div>
                             </div>
         
-                            <button class="btn-find" onclick="saveStoreSettings()">
-                                <i class="fas fa-save"></i> Save Settings
+                            <button class="primary-btn" style="width: 100%; margin-bottom: 10px;" onclick="saveStoreSettings()">
+                                <i class="fas fa-save" style="margin-right: 8px;"></i> Save Settings
                             </button>
+                        </div>
+
+                        <div class="settings-back-btn" onclick="closeSettingSub()" style="width: 100%; justify-content: center; margin-bottom: 40px;">
+                            <i class="fas fa-arrow-left"></i> Back to Settings
                         </div>
                     </div>
 
                     <!-- 3. Subscriptions -->
                     <div id="sub-subscriptions" class="settings-sub-view">
-                        <div class="settings-back-btn" onclick="closeSettingSub()">
-                            <i class="fas fa-arrow-left"></i> Back to Settings
-                        </div>
-                        <div class="card" style="padding: 22px;">
+                        <div class="card" style="padding: 22px; margin-bottom: 20px;">
                             <h3 style="font-size: 1.1rem; margin-bottom: 20px; color: #8b5cf6;"><i class="fas fa-broadcast-tower" style="margin-right: 8px;"></i> Subscriptions</h3>
                             <p style="color: var(--text-s); font-size: 0.9rem;">Manage your official channels and subscription requirements here.</p>
+                        </div>
+                        <div class="settings-back-btn" onclick="closeSettingSub()" style="width: 100%; justify-content: center; margin-bottom: 40px;">
+                            <i class="fas fa-arrow-left"></i> Back to Settings
                         </div>
                     </div>
 
@@ -3803,14 +3800,24 @@
             } catch (e) { console.error(e); tg.showAlert("Error deleting."); }
         }
 
-        function openSettingSub(subId) {
+        function openSettingSub(subId, title) {
             document.getElementById('settings-main-menu').classList.remove('active');
+            document.getElementById('settings-top-spacer').style.display = 'none';
+
             // Hide all sub views first
             document.querySelectorAll('.settings-sub-view').forEach(v => v.classList.remove('active'));
+            
             // Show target
             document.getElementById('sub-' + subId).classList.add('active');
+
+            // Show header with title
+            const header = document.getElementById('settings-header');
+            if (header) {
+                header.style.display = 'flex';
+                document.getElementById('settings-title').innerText = title;
+            }
+
             // Scroll back to top to simulate page entry
-            window.scrollTo({ top: 0, behavior: 'auto' });
             const scroller = document.getElementById('app-content-scroller');
             if (scroller) scroller.scrollTo({ top: 0, behavior: 'auto' });
         }
@@ -3818,6 +3825,11 @@
         function closeSettingSub() {
             document.querySelectorAll('.settings-sub-view').forEach(v => v.classList.remove('active'));
             document.getElementById('settings-main-menu').classList.add('active');
+            document.getElementById('settings-top-spacer').style.display = 'block';
+
+            // Hide header
+            const header = document.getElementById('settings-header');
+            if (header) header.style.display = 'none';
         }
 
         const savedView = sessionStorage.getItem('last_view_admin_store') || 'home';
