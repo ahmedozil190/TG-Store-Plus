@@ -451,10 +451,10 @@ async def get_store_data(user_id: int = None):
 
             # 2. External Stock
             active_servers = (await session.execute(select(ApiServer).where(ApiServer.is_active == True))).scalars().all()
-            logger.info(f"Active external servers: {len(active_servers)}")
+            logger.info(f"Active external servers: {len(active_servers)} — {[f'{s.name}({s.server_type})' for s in active_servers]}")
             for srv in active_servers:
                 try:
-                    logger.info(f"Processing server: {srv.name} ({srv.url})")
+                    logger.info(f"Processing server: {srv.name} (type={srv.server_type}, url={srv.url})")
                     provider = ExternalProvider(
                         srv.name, srv.url, srv.api_key, srv.profit_margin,
                         server_type=getattr(srv, 'server_type', 'standard'),
@@ -517,7 +517,8 @@ async def get_store_data(user_id: int = None):
                             if isinstance(q_node, dict): spider_counts = q_node
 
                     if spider_prices:
-                        # If we found Spider-specific split data, merge it
+                        # Spider-specific split-data merge path
+                        logger.info(f"[{srv.name}] Using SPIDER path: {len(spider_prices)} prices, {len(spider_counts)} quantities")
                         for code, price in spider_prices.items():
                             try:
                                 countries_list.append({
@@ -526,8 +527,10 @@ async def get_store_data(user_id: int = None):
                                     "count": int(spider_counts.get(code, 999))
                                 })
                             except: continue
+                        logger.info(f"[{srv.name}] Spider path produced {len(countries_list)} entries")
                     else:
                         # Fallback to Super Parser for TG-Lion and others
+                        logger.info(f"[{srv.name}] Using SUPER PARSER path (no 'result' key or no split data)")
                         data_node = find_country_node(srv_countries)
                         if not data_node:
                             data_node = srv_countries
