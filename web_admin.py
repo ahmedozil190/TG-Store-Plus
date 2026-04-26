@@ -487,36 +487,62 @@ async def get_store_data(user_id: int = None):
                                 if res: return res
                         return None
 
-                    data_node = find_country_node(srv_countries)
-                    if not data_node:
-                        # Fallback to standard drill-down if super-parser failed
-                        data_node = srv_countries
-                        for key in ["result", "data", "countries_info", "countries"]:
-                            if isinstance(data_node, dict) and key in data_node:
-                                data_node = data_node[key]
-                                break
+                    # Special handling for Spider Service typo-prone and split structure
+                    # result: { countries: {1: {ISO: price}}, cuantity: {1: {ISO: count}} }
+                    spider_prices = {}
+                    spider_counts = {}
                     
-                    # 2. Process the normalized data node
-                    if isinstance(data_node, dict):
-                        for code, val in data_node.items():
-                            # Skip common non-country keys
-                            if code.lower() in ["status", "message", "error", "ok", "msg", "currency", "success"]: continue
+                    if isinstance(srv_countries, dict) and "result" in srv_countries:
+                        res = srv_countries["result"]
+                        if isinstance(res, dict):
+                            # Try to find prices
+                            p_node = res.get("countries")
+                            if isinstance(p_node, dict) and "1" in p_node: p_node = p_node["1"]
+                            if isinstance(p_node, dict): spider_prices = p_node
                             
-                            if isinstance(val, dict):
-                                entry = val.copy()
-                                entry["country"] = code
-                                countries_list.append(entry)
-                            elif isinstance(val, (int, float, str)):
-                                try:
-                                    price_val = float(val)
-                                    countries_list.append({
-                                        "country": code,
-                                        "count": 999,
-                                        "price": price_val
-                                    })
-                                except: continue
-                    elif isinstance(data_node, list):
-                        countries_list = data_node
+                            # Try to find quantities (handling the 'cuantity' typo)
+                            q_node = res.get("cuantity") or res.get("quantity")
+                            if isinstance(q_node, dict) and "1" in q_node: q_node = q_node["1"]
+                            if isinstance(q_node, dict): spider_counts = q_node
+
+                    if spider_prices:
+                        # If we found Spider-specific split data, merge it
+                        for code, price in spider_prices.items():
+                            try:
+                                countries_list.append({
+                                    "country": code,
+                                    "price": float(price),
+                                    "count": int(spider_counts.get(code, 999))
+                                })
+                            except: continue
+                    else:
+                        # Fallback to Super Parser for TG-Lion and others
+                        data_node = find_country_node(srv_countries)
+                        if not data_node:
+                            data_node = srv_countries
+                            for key in ["result", "data", "countries_info", "countries"]:
+                                if isinstance(data_node, dict) and key in data_node:
+                                    data_node = data_node[key]
+                                    break
+                        
+                        if isinstance(data_node, dict):
+                            for code, val in data_node.items():
+                                if code.lower() in ["status", "message", "error", "ok", "msg", "currency", "success"]: continue
+                                if isinstance(val, dict):
+                                    entry = val.copy()
+                                    entry["country"] = code
+                                    countries_list.append(entry)
+                                elif isinstance(val, (int, float, str)):
+                                    try:
+                                        price_val = float(val)
+                                        countries_list.append({
+                                            "country": code,
+                                            "count": 999,
+                                            "price": price_val
+                                        })
+                                    except: continue
+                        elif isinstance(data_node, list):
+                            countries_list = data_node
                     
                     for c in countries_list:
                         raw_name = c.get("name") or c.get("country")
