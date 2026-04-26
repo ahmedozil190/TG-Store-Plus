@@ -95,8 +95,27 @@ def get_flag_emoji(country_code: str):
         return "🌐"
 
 def resolve_country_info(country_code_str: str, full_phone: str = None):
-    """Resolve ISO code and Country Name. If full_phone is provided, detects specific region."""
+    """Resolve ISO code and Country Name. Handles numeric codes, Alpha-2, and Alpha-3."""
     try:
+        code_str = country_code_str.strip().upper().lstrip('+')
+        if not code_str: return "Unknown", "🌐", "XX"
+
+        # 1. Handle if it's already an ISO code (Alpha-2 or Alpha-3)
+        if not code_str.isdigit() and len(code_str) in [2, 3]:
+            try:
+                country = None
+                if len(code_str) == 2:
+                    country = pycountry.countries.get(alpha_2=code_str)
+                else:
+                    country = pycountry.countries.get(alpha_3=code_str)
+                
+                if country:
+                    name = re.sub(r'\s*\(?[A-Z]{2,3}\)?\s*$', '', country.name).strip()
+                    iso = country.alpha_2
+                    return name, get_flag_emoji(iso), iso
+            except: pass
+
+        # 2. Handle if full_phone is provided
         if full_phone:
             try:
                 parsed = phonenumbers.parse(full_phone if full_phone.startswith('+') else f"+{full_phone}")
@@ -106,27 +125,22 @@ def resolve_country_info(country_code_str: str, full_phone: str = None):
                 return name, get_flag_emoji(iso_code), iso_code
             except: pass
 
-        # Fallback to calling code prefix
-        code = country_code_str.strip().lstrip('+').lstrip('0')
-        if not code: return "Unknown", "🌐", "XX"
+        # 3. Handle numeric calling code prefix
+        if code_str.isdigit():
+            numeric_code = int(code_str)
+            iso_code = phonenumbers.region_code_for_country_code(numeric_code)
+            flag = get_flag_emoji(iso_code)
+            
+            name = f"Country {numeric_code}"
+            try:
+                country = pycountry.countries.get(alpha_2=iso_code)
+                if country:
+                    name = re.sub(r'\s*\(?[A-Z]{2,3}\)?\s*$', '', country.name).strip()
+            except: pass
+            
+            return name, flag, iso_code
         
-        numeric_code = int(code)
-        # For +1, region_code_for_country_code returns 'US'
-        iso_code = phonenumbers.region_code_for_country_code(numeric_code)
-        flag = get_flag_emoji(iso_code)
-        
-        # Resolve name using pycountry for accuracy
-        name = f"Country {numeric_code}"
-        try:
-            country = pycountry.countries.get(alpha_2=iso_code)
-            if country:
-                # pycountry names are clean, but let's ensure no extra codes are appended
-                name = country.name
-                # Remove common suffixes like "EG", "(EG)", etc.
-                name = re.sub(r'\s*\(?[A-Z]{2,3}\)?\s*$', '', name).strip()
-        except: pass
-        
-        return name, flag, iso_code
+        return f"Code {code_str}", "🌐", "XX"
     except Exception as e:
         logger.error(f"Error resolving country {country_code_str}: {e}")
         return f"Code {country_code_str}", "🌐", "XX"
@@ -455,33 +469,50 @@ async def get_store_data(user_id: int = None):
                     # Normalize srv_countries to a list of dicts
                     countries_list = []
                     
-                    # 1. Drill down to the actual data if nested (Common in SMM APIs)
+                    # 1. Intelligent Drill Down for nested data (Max-TG, Spider, Lion)
                     data_node = srv_countries
                     if isinstance(data_node, dict):
-                        if "result" in data_node: data_node = data_node["result"]
-                        if isinstance(data_node, dict) and "countries" in data_node: data_node = data_node["countries"]
-                        # Handle Max-TG specifically: result -> countries -> '1' -> {codes}
-                        if isinstance(data_node, dict) and '1' in data_node: data_node = data_node['1']
+                        # Step 1: Look for standard wrappers
+                        for key in ["result", "data", "countries_info", "countries"]:
+                            if key in data_node and isinstance(data_node[key], (dict, list)):
+                                data_node = data_node[key]
+                                break
+                        
+                        # Step 2: Handle Max-TG/Spider specific nesting (result -> countries -> '1')
+                        if isinstance(data_node, dict) and "countries" in data_node:
+                            data_node = data_node["countries"]
+                        if isinstance(data_node, dict) and '1' in data_node:
+                            data_node = data_node['1']
+                        
+                        # Step 3: Catch-all recursive search for a node that looks like country data
+                        # (A dict where keys are 2-3 chars and values are dicts/floats)
+                        if isinstance(data_node, dict) and not any(k in data_node for k in ["EG", "PS", "SA", "US"]):
+                            # Try to find a sub-node that has these keys
+                            for k, v in data_node.items():
+                                if isinstance(v, dict) and any(subkey in v for subkey in ["price", "count", "rate", "cost"]):
+                                    data_node = data_node
+                                    break # We stay here for now or drill deeper if needed
                     
                     # 2. Process the normalized data node
                     if isinstance(data_node, list):
                         countries_list = data_node
                     elif isinstance(data_node, dict):
                         for code, val in data_node.items():
-                            # Skip metadata keys
-                            if code in ["status", "message", "error", "ok", "msg", "currency"]: continue
+                            # Skip common non-country keys
+                            if code.lower() in ["status", "message", "error", "ok", "msg", "currency", "success"]: continue
                             
                             if isinstance(val, dict):
-                                # It's a dict with count/price
-                                val["country"] = code
-                                countries_list.append(val)
-                            else:
-                                # It's a simple mapping: {"SA": "1.40"}
+                                # Case A: {"EG": {"count": 10, "price": 1.2}}
+                                entry = val.copy()
+                                entry["country"] = code
+                                countries_list.append(entry)
+                            elif isinstance(val, (int, float, str)):
+                                # Case B: {"EG": "1.2"} or {"EG": 1.2}
                                 try:
                                     price_val = float(val)
                                     countries_list.append({
                                         "country": code,
-                                        "count": 999, # Default count for external if not provided
+                                        "count": 999, # Default for price-only APIs
                                         "price": price_val
                                     })
                                 except: continue
