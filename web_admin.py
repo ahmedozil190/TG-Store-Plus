@@ -455,34 +455,30 @@ async def get_store_data(user_id: int = None):
                     # Normalize srv_countries to a list of dicts
                     countries_list = []
                     
-                    # 1. Intelligent Drill Down for nested data (Max-TG, Spider, Lion)
-                    data_node = srv_countries
-                    if isinstance(data_node, dict):
-                        # Step 1: Look for standard wrappers
+                    # 1. Super Parser: Find the node that actually contains country data
+                    def find_country_node(node):
+                        if not isinstance(node, dict): return None
+                        # If this dict has keys like "EG", "SA", "US", "PS", it's likely our data node
+                        if any(k in node for k in ["EG", "PS", "SA", "US", "20", "966", "970"]):
+                            return node
+                        # Otherwise, drill down
+                        for k, v in node.items():
+                            if isinstance(v, dict):
+                                res = find_country_node(v)
+                                if res: return res
+                        return None
+
+                    data_node = find_country_node(srv_countries)
+                    if not data_node:
+                        # Fallback to standard drill-down if super-parser failed
+                        data_node = srv_countries
                         for key in ["result", "data", "countries_info", "countries"]:
-                            if key in data_node and isinstance(data_node[key], (dict, list)):
+                            if isinstance(data_node, dict) and key in data_node:
                                 data_node = data_node[key]
                                 break
-                        
-                        # Step 2: Handle Max-TG/Spider specific nesting (result -> countries -> '1')
-                        if isinstance(data_node, dict) and "countries" in data_node:
-                            data_node = data_node["countries"]
-                        if isinstance(data_node, dict) and '1' in data_node:
-                            data_node = data_node['1']
-                        
-                        # Step 3: Catch-all recursive search for a node that looks like country data
-                        # (A dict where keys are 2-3 chars and values are dicts/floats)
-                        if isinstance(data_node, dict) and not any(k in data_node for k in ["EG", "PS", "SA", "US"]):
-                            # Try to find a sub-node that has these keys
-                            for k, v in data_node.items():
-                                if isinstance(v, dict) and any(subkey in v for subkey in ["price", "count", "rate", "cost"]):
-                                    data_node = v
-                                    break
                     
                     # 2. Process the normalized data node
-                    if isinstance(data_node, list):
-                        countries_list = data_node
-                    elif isinstance(data_node, dict):
+                    if isinstance(data_node, dict):
                         for code, val in data_node.items():
                             # Skip common non-country keys
                             if code.lower() in ["status", "message", "error", "ok", "msg", "currency", "success"]: continue
@@ -498,10 +494,12 @@ async def get_store_data(user_id: int = None):
                                     price_val = float(val)
                                     countries_list.append({
                                         "country": code,
-                                        "count": 999, # Default for price-only APIs
+                                        "count": 999,
                                         "price": price_val
                                     })
                                 except: continue
+                    elif isinstance(data_node, list):
+                        countries_list = data_node
                     
                     for c in countries_list:
                         raw_name = c.get("name") or c.get("country")
