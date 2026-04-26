@@ -392,6 +392,7 @@
             gap: 8px;
             overflow-x: auto;
             padding: 0 0 8px 0;
+            margin-top: 12px;
             scrollbar-width: none;
             -ms-overflow-style: none;
         }
@@ -1422,6 +1423,7 @@
             const bar = document.getElementById('server-filter-bar');
             if (!serversList || serversList.length <= 1) {
                 bar.classList.remove('visible');
+                activeServerFilter = serversList.length === 1 ? serversList[0] : 'all';
                 return;
             }
             bar.classList.add('visible');
@@ -1432,15 +1434,16 @@
                 countMap[c.server_name] = (countMap[c.server_name] || 0) + 1;
             });
 
-            let html = `<div class="server-chip active" onclick="setServerFilter('all', this)">
-                <span class="chip-dot"></span>
-                <span>${currentLang === 'ar' ? 'الكل' : 'All'}</span>
-                <span class="chip-count">${countries.length}</span>
-            </div>`;
+            // Auto-select first server if no filter is active
+            if (activeServerFilter === 'all') {
+                activeServerFilter = serversList[0];
+            }
 
+            let html = '';
             serversList.forEach(name => {
                 const cnt = countMap[name] || 0;
-                html += `<div class="server-chip" onclick="setServerFilter('${name.replace(/'/g, "\\'")}', this)">
+                const isActive = name === activeServerFilter ? 'active' : '';
+                html += `<div class="server-chip ${isActive}" onclick="setServerFilter('${name.replace(/'/g, "\\'")}', this)">
                     <span class="chip-dot"></span>
                     <span>${name}</span>
                     <span class="chip-count">${cnt}</span>
@@ -1448,6 +1451,9 @@
             });
 
             bar.innerHTML = html;
+            // Apply filter immediately for the selected server
+            filterStore();
+            updateStatsForFilter();
         }
 
         function setServerFilter(server, el) {
@@ -1455,6 +1461,21 @@
             document.querySelectorAll('.server-chip').forEach(c => c.classList.remove('active'));
             if (el) el.classList.add('active');
             filterStore();
+            updateStatsForFilter();
+        }
+
+        function updateStatsForFilter() {
+            let filtered = countries;
+            if (activeServerFilter !== 'all') {
+                filtered = filtered.filter(c => c.server_name === activeServerFilter);
+            }
+            const totalNumbers = filtered.reduce((s, c) => s + c.count, 0);
+            const countriesCount = new Set(filtered.map(c => c.name)).size;
+            const lowestPrice = filtered.length ? Math.min(...filtered.map(c => c.buy_price)) : 0;
+
+            document.getElementById('stat-total-numbers').innerHTML = `${totalNumbers} <span>NUMBERS</span>`;
+            document.getElementById('stat-countries').innerHTML = `${countriesCount} <span>COUNTRIES</span>`;
+            document.getElementById('stat-lowest-price').innerHTML = `${lowestPrice.toFixed(2)} <span>USD</span>`;
         }
 
         function openBuyModal(c) {
