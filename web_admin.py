@@ -476,15 +476,26 @@ async def get_store_data(user_id: int = None):
                     
                     # 1. Super Parser: Find the node that actually contains country data
                     def find_country_node(node):
-                        if not isinstance(node, dict): return None
-                        # If this dict has keys like "EG", "SA", "US", "PS", it's likely our data node
-                        if any(k in node for k in ["EG", "PS", "SA", "US", "20", "966", "970"]):
-                            return node
-                        # Otherwise, drill down
-                        for k, v in node.items():
-                            if isinstance(v, dict):
+                        if isinstance(node, dict):
+                            # Case A: Dict with country keys (EG, PS, etc.)
+                            if any(k in node for k in ["EG", "PS", "SA", "US", "20", "966", "970"]):
+                                return node
+                            # Case B: Dict that contains common keys like price/count
+                            if any(k in node for k in ["price", "count", "rate", "cost", "stock"]):
+                                return node
+                            
+                            # Otherwise, drill down
+                            for k, v in node.items():
                                 res = find_country_node(v)
                                 if res: return res
+                        elif isinstance(node, list):
+                            # Case C: List of objects - check first few items
+                            for item in node[:3]:
+                                if isinstance(item, dict):
+                                    if any(k in item for k in ["price", "count", "rate", "cost", "stock"]):
+                                        return node # Return the whole list
+                                    res = find_country_node(item)
+                                    if res: return node # Return the whole list if children are good
                         return None
 
                     # Special handling for Spider Service typo-prone and split structure
@@ -542,7 +553,17 @@ async def get_store_data(user_id: int = None):
                                         })
                                     except: continue
                         elif isinstance(data_node, list):
-                            countries_list = data_node
+                            # Normalize list items to have 'country' key
+                            for item in data_node:
+                                if not isinstance(item, dict): continue
+                                normalized = item.copy()
+                                if "country" not in normalized:
+                                    # Try to find country code in common keys
+                                    for k in ["id", "iso", "code", "name"]:
+                                        if k in normalized:
+                                            normalized["country"] = normalized[k]
+                                            break
+                                countries_list.append(normalized)
                     
                     for c in countries_list:
                         raw_name = c.get("name") or c.get("country")
