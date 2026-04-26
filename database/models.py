@@ -126,6 +126,8 @@ class ApiServer(Base):
     name = Column(String, nullable=False)
     url = Column(String, nullable=False)
     api_key = Column(String, nullable=False)
+    server_type = Column(String, default="standard") # 'standard' (Spider/Max) or 'lion' (TG-Lion)
+    extra_id = Column(String, nullable=True) # For YourID in TG-Lion
     profit_margin = Column(Float, default=20.0)
     is_active = Column(Boolean, default=True)
     created_at = Column(DateTime, default=datetime.utcnow)

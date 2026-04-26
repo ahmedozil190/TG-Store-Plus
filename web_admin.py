@@ -71,6 +71,8 @@ class ApiServerSubmit(BaseModel):
     name: str
     url: str
     api_key: str
+    server_type: str = "standard"
+    extra_id: str | None = None
     profit_margin: float
     is_active: bool
 
@@ -434,7 +436,11 @@ async def get_store_data(user_id: int = None):
             for srv in active_servers:
                 try:
                     logger.info(f"Processing server: {srv.name} ({srv.url})")
-                    provider = ExternalProvider(srv.name, srv.url, srv.api_key, srv.profit_margin)
+                    provider = ExternalProvider(
+                        srv.name, srv.url, srv.api_key, srv.profit_margin,
+                        server_type=getattr(srv, 'server_type', 'standard'),
+                        extra_id=getattr(srv, 'extra_id', None)
+                    )
                     srv_countries = await provider.get_countries()
                     
                     if not srv_countries:
@@ -671,7 +677,11 @@ async def store_buy(data: StoreBuy):
                 # 2. Try External Servers
                 active_servers = (await session.execute(select(ApiServer).where(ApiServer.is_active == True))).scalars().all()
                 for srv in active_servers:
-                    provider = ExternalProvider(srv.name, srv.url, srv.api_key, srv.profit_margin)
+                    provider = ExternalProvider(
+                        srv.name, srv.url, srv.api_key, srv.profit_margin,
+                        server_type=getattr(srv, 'server_type', 'standard'),
+                        extra_id=getattr(srv, 'extra_id', None)
+                    )
                     srv_countries = await provider.get_countries()
                     if isinstance(srv_countries, list):
                         match = next((c for c in srv_countries if (c.get("name") == data.country or c.get("country") == data.country) and int(c.get("count", 0)) > 0), None)
@@ -717,7 +727,11 @@ async def store_buy(data: StoreBuy):
                 return {"status": "success", "phone": account.phone_number, "id": account.id}
             else:
                 # External Purchase Execution
-                provider = ExternalProvider(target_srv.name, target_srv.url, target_srv.api_key, target_srv.profit_margin)
+                provider = ExternalProvider(
+                    target_srv.name, target_srv.url, target_srv.api_key, target_srv.profit_margin,
+                    server_type=getattr(target_srv, 'server_type', 'standard'),
+                    extra_id=getattr(target_srv, 'extra_id', None)
+                )
                 buy_res = await provider.buy_number(external_country_code)
                 if buy_res.get("status") == "success":
                     user.balance_store -= final_price
@@ -775,8 +789,12 @@ async def store_get_code(user_id: int, phone: str):
                 # 1. Fetch from external server
                 srv = await session.get(ApiServer, account.server_id)
                 if not srv: raise HTTPException(status_code=500, detail="Server config missing")
-                provider = ExternalProvider(srv.name, srv.url, srv.api_key, srv.profit_margin)
-                code_res = await provider.get_code(account.hash_code)
+                provider = ExternalProvider(
+                    srv.name, srv.url, srv.api_key, srv.profit_margin,
+                    server_type=getattr(srv, 'server_type', 'standard'),
+                    extra_id=getattr(srv, 'extra_id', None)
+                )
+                code_res = await provider.get_code(account.hash_code, number=account.phone_number)
                 if code_res.get("status") == "success":
                     code = code_res.get("code")
                     account.otp_code = code
@@ -1520,6 +1538,8 @@ async def get_servers():
                 "name": s.name,
                 "url": s.url,
                 "api_key": s.api_key,
+                "server_type": getattr(s, 'server_type', 'standard'),
+                "extra_id": getattr(s, 'extra_id', ''),
                 "profit_margin": s.profit_margin,
                 "is_active": s.is_active
             } for s in servers
@@ -1535,6 +1555,8 @@ async def save_server(data: ApiServerSubmit):
             srv.name = data.name
             srv.url = data.url
             srv.api_key = data.api_key
+            srv.server_type = data.server_type
+            srv.extra_id = data.extra_id
             srv.profit_margin = data.profit_margin
             srv.is_active = data.is_active
         else:
@@ -1542,6 +1564,8 @@ async def save_server(data: ApiServerSubmit):
                 name=data.name,
                 url=data.url,
                 api_key=data.api_key,
+                server_type=data.server_type,
+                extra_id=data.extra_id,
                 profit_margin=data.profit_margin,
                 is_active=data.is_active
             )

@@ -5,19 +5,39 @@ import asyncio
 logger = logging.getLogger(__name__)
 
 class ExternalProvider:
-    def __init__(self, name, url, api_key, profit_margin):
+    def __init__(self, name, url, api_key, profit_margin, server_type="standard", extra_id=None):
         self.name = name
         self.url = url.rstrip('/') + '/'
         self.api_key = api_key
         self.profit_margin = profit_margin
+        self.server_type = server_type
+        self.extra_id = extra_id
+
+    def get_base_params(self, action):
+        """Prepare base parameters for API calls."""
+        if self.server_type == "lion":
+            params = {
+                "action": action,
+                "apiKey": self.api_key,
+                "YourID": self.extra_id
+            }
+        else:
+            # Standard (Spider/Max-TG)
+            params = {
+                "action": action,
+                "apiKay": self.api_key
+            }
+        return params
 
     async def get_countries(self):
         """Fetch available countries and prices from the provider."""
         try:
             async with httpx.AsyncClient() as client:
-                url = f"{self.url}?apiKay={self.api_key}&action=getCountrys"
-                logger.info(f"Fetching countries from {self.name}: {url}")
-                resp = await client.get(url, timeout=10.0)
+                action = "country_info" if self.server_type == "lion" else "getCountrys"
+                params = self.get_base_params(action)
+                
+                logger.info(f"Fetching countries from {self.name}: {self.url} with {params}")
+                resp = await client.get(self.url, params=params, timeout=15.0)
                 if resp.status_code == 200:
                     data = resp.json()
                     logger.info(f"Response from {self.name}: {data}")
@@ -33,26 +53,34 @@ class ExternalProvider:
         """Order a new number from the provider."""
         try:
             async with httpx.AsyncClient() as client:
-                url = f"{self.url}?apiKay={self.api_key}&action=getNumber&country={country_code}"
-                resp = await client.get(url, timeout=15.0)
+                params = self.get_base_params("getNumber")
+                if self.server_type == "lion":
+                    params["country_code"] = country_code
+                else:
+                    params["country"] = country_code
+                
+                resp = await client.get(self.url, params=params, timeout=20.0)
                 if resp.status_code == 200:
                     data = resp.json()
-                    # Expected: {"status": "success", "number": "970...", "hash_code": "..."}
                     return data
                 return {"status": "error", "message": f"HTTP {resp.status_code}"}
         except Exception as e:
             logger.error(f"Error buying number from {self.name}: {e}")
             return {"status": "error", "message": str(e)}
 
-    async def get_code(self, hash_code):
+    async def get_code(self, hash_code, number=None):
         """Fetch the activation code for a purchased number."""
         try:
             async with httpx.AsyncClient() as client:
-                url = f"{self.url}?apiKay={self.api_key}&action=getCode&hash_code={hash_code}"
-                resp = await client.get(url, timeout=10.0)
+                params = self.get_base_params("getCode")
+                if self.server_type == "lion":
+                    params["number"] = number
+                else:
+                    params["hash_code"] = hash_code
+                
+                resp = await client.get(self.url, params=params, timeout=15.0)
                 if resp.status_code == 200:
                     data = resp.json()
-                    # Expected: {"status": "success", "code": "12345"} or {"status": "pending"}
                     return data
                 return {"status": "error", "message": f"HTTP {resp.status_code}"}
         except Exception as e:

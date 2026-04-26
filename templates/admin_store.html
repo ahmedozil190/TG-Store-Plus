@@ -2331,6 +2331,17 @@
                 <input type="number" id="srv-profit" class="input-field" placeholder="20" step="1">
                 <small style="color: var(--text-s); font-size: 0.75rem;">This percentage will be added to the provider's price.</small>
             </div>
+            <div class="form-group">
+                <label>Server Type</label>
+                <select id="srv-type" class="input-field" onchange="toggleExtraId()">
+                    <option value="standard">Standard (Max-TG / Spider)</option>
+                    <option value="lion">TG-Lion (Requires YourID)</option>
+                </select>
+            </div>
+            <div id="extra-id-group" class="form-group" style="display: none;">
+                <label>YourID (For TG-Lion)</label>
+                <input type="text" id="srv-extra-id" class="input-field" placeholder="Enter YourID from TG-Lion">
+            </div>
             <div class="form-group" style="display: flex; align-items: center; gap: 10px; margin-top: 10px;">
                 <input type="checkbox" id="srv-active" checked style="width: 18px; height: 18px;">
                 <label for="srv-active" style="margin-bottom: 0;">Server Active</label>
@@ -3430,10 +3441,17 @@
             document.getElementById('srv-name').value = '';
             document.getElementById('srv-url').value = '';
             document.getElementById('srv-key').value = '';
+            document.getElementById('srv-type').value = 'standard';
+            document.getElementById('srv-extra-id').value = '';
             document.getElementById('srv-profit').value = '20';
             document.getElementById('srv-active').checked = true;
+            toggleExtraId();
             document.getElementById('server-modal-title').innerText = "Add API Server";
             document.getElementById('server-modal').classList.add('active');
+        }
+        function toggleExtraId() {
+            const type = document.getElementById('srv-type').value;
+            document.getElementById('extra-id-group').style.display = type === 'lion' ? 'block' : 'none';
         }
         function closeServerModal(e) {
             if (e && e.target !== e.currentTarget && e.target.classList.contains('modal-overlay')) return;
@@ -3470,7 +3488,7 @@
                                 ${s.is_active ? 'Active' : 'Inactive'}
                             </span>
                         </div>
-                        <div style="font-size: 0.75rem; color: var(--text-s); margin-top: 2px;">Profit: +${s.profit_margin}%</div>
+                        <div style="font-size: 0.75rem; color: var(--text-s); margin-top: 2px;">Type: ${s.server_type || 'standard'} | Profit: +${s.profit_margin}%</div>
                     </div>
                     <div style="display: flex; gap: 8px;">
                         <button class="action-btn-circle" onclick="editServer(${s.id})" title="Edit"><i class="fas fa-edit"></i></button>
@@ -3496,6 +3514,8 @@
                     body: JSON.stringify({
                         id: id ? parseInt(id) : null,
                         name, url, api_key: key,
+                        server_type: document.getElementById('srv-type').value,
+                        extra_id: document.getElementById('srv-extra-id').value,
                         profit_margin: parseFloat(profit) || 20,
                         is_active: active
                     })
@@ -3513,8 +3533,11 @@
             document.getElementById('srv-name').value = s.name;
             document.getElementById('srv-url').value = s.url;
             document.getElementById('srv-key').value = s.api_key;
+            document.getElementById('srv-type').value = s.server_type || 'standard';
+            document.getElementById('srv-extra-id').value = s.extra_id || '';
             document.getElementById('srv-profit').value = s.profit_margin;
             document.getElementById('srv-active').checked = s.is_active;
+            toggleExtraId();
             document.getElementById('server-modal-title').innerText = "Edit API Server";
             document.getElementById('server-modal').classList.add('active');
         }

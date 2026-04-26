@@ -59,6 +59,19 @@ async def init_db():
             if 'hash_code' not in a_cols:
                 await conn.execute(text("ALTER TABLE accounts ADD COLUMN hash_code TEXT"))
                 print("Successfully added hash_code column to accounts")
+
+            # 4. api_servers.server_type & extra_id
+            def check_srv_cols(connection):
+                cursor = connection.execute(text("PRAGMA table_info(api_servers)"))
+                return [row[1] for row in cursor]
+            
+            s_cols = await conn.run_sync(check_srv_cols)
+            if 'server_type' not in s_cols:
+                await conn.execute(text("ALTER TABLE api_servers ADD COLUMN server_type VARCHAR(20) DEFAULT 'standard'"))
+                print("Successfully added server_type column to api_servers")
+            if 'extra_id' not in s_cols:
+                await conn.execute(text("ALTER TABLE api_servers ADD COLUMN extra_id VARCHAR(100)"))
+                print("Successfully added extra_id column to api_servers")
                 
         except Exception as e:
             print(f"Migration check failed: {e}")
