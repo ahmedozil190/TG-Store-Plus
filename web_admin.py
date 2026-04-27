@@ -963,10 +963,10 @@ async def store_buy(data: StoreBuy):
                 # Resolve info to get ISO for matching if possible
                 _, _, res_iso = resolve_country_info(data.country)
                 
-                async with async_session() as session:
+                async with async_session() as inner_session:
                     # Use a separate query to be sure
                     stmt = select(UserStorePrice).where(UserStorePrice.user_id == data.user_id)
-                    user_prices = (await session.execute(stmt)).scalars().all()
+                    user_prices = (await inner_session.execute(stmt)).scalars().all()
                     
                     usp = None
                     # Match by ISO

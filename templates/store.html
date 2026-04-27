@@ -1304,7 +1304,7 @@
                 }
 
                 // 1. FETCH DATA & CHECK MAINTENANCE
-                const resData = await fetch(`/api/store/data?user_id=${userId}`);
+                const resData = await fetch(`/api/store/data?user_id=${userId}&_t=${new Date().getTime()}`);
                 const data = await resData.json();
 
                 if (data.maintenance_mode === true || data.maintenance_mode === "true") {
@@ -1588,7 +1588,7 @@
         async function fetchHistory() {
             const list = document.getElementById('history-list');
             try {
-                const res = await fetch(`/api/store/history?user_id=${userId}&page=${currentHistoryPage}&limit=${HISTORY_LIMIT}`);
+                const res = await fetch(`/api/store/history?user_id=${userId}&page=${currentHistoryPage}&limit=${HISTORY_LIMIT}&_t=${new Date().getTime()}`);
                 const data = await res.json();
                 renderHistory(data);
             } catch (e) { list.innerHTML = '<p style="text-align:center;">Error loading history</p>'; }
@@ -1841,7 +1841,7 @@
             if (list) list.style.opacity = '0.5';
 
             try {
-                const res = await fetch(`/api/store/deposits?user_id=${userId}&page=${currentDepPage}&limit=10`);
+                const res = await fetch(`/api/store/deposits?user_id=${userId}&page=${currentDepPage}&limit=10&_t=${new Date().getTime()}`);
                 const data = await res.json();
                 totalDepPages = data.total_pages || 1;
                 renderDeposits(data);
