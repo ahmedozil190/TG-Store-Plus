@@ -2366,16 +2366,26 @@
             </div>
             <div class="form-group">
                 <label>Profit Margin</label>
-                <input type="number" id="srv-profit" class="input-field" placeholder="Enter Profit Margin Here" step="1">
+                <input type="number" id="srv-profit" class="input-field" placeholder="20" step="1">
             </div>
             <div class="form-group">
                 <label>Server Type</label>
-                <div style="position: relative;">
-                    <select id="srv-type" class="input-field" style="appearance: none; -webkit-appearance: none; padding-right: 40px;" onchange="toggleExtraId()">
-                        <option value="standard">Standard (Max-TG / Spider)</option>
-                        <option value="lion">TG-Lion (Requires YourID)</option>
-                    </select>
-                    <i class="fas fa-chevron-down" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: var(--text-secondary); pointer-events: none;"></i>
+                <div class="custom-select-container" style="position: relative;">
+                    <input type="hidden" id="srv-type" value="standard">
+                    <div id="srv-type-display" class="input-field" style="cursor: pointer; text-align: left; padding: 16px; display: flex; align-items: center; justify-content: space-between;" onclick="toggleCustomSelect()">
+                        <span id="srv-type-text" style="font-weight: 600; font-size: 0.95rem; color: var(--text-p);">Standard (Max-TG / Spider)</span>
+                        <i id="srv-type-arrow" class="fas fa-chevron-down" style="color: var(--text-secondary); transition: transform 0.3s ease;"></i>
+                    </div>
+                    <div id="srv-type-options" style="display: none; position: absolute; top: 100%; left: 0; right: 0; background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 16px; margin-top: 5px; z-index: 10; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
+                        <div class="custom-select-option" data-value="standard" style="padding: 15px; cursor: pointer; border-bottom: 1px solid var(--border); color: var(--text-p); display: flex; justify-content: space-between; align-items: center;" onclick="selectCustomOption('standard', 'Standard (Max-TG / Spider)')">
+                            <span style="font-weight: 600; font-size: 0.95rem;">Standard (Max-TG / Spider)</span>
+                            <i class="fas fa-check" style="color: var(--success); display: none;"></i>
+                        </div>
+                        <div class="custom-select-option" data-value="lion" style="padding: 15px; cursor: pointer; color: var(--text-p); display: flex; justify-content: space-between; align-items: center;" onclick="selectCustomOption('lion', 'TG-Lion (Requires YourID)')">
+                            <span style="font-weight: 600; font-size: 0.95rem;">TG-Lion (Requires YourID)</span>
+                            <i class="fas fa-check" style="color: var(--success); display: none;"></i>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div id="extra-id-group" class="form-group" style="display: none;">
@@ -3500,9 +3510,14 @@
             document.getElementById('srv-name').value = '';
             document.getElementById('srv-url').value = '';
             document.getElementById('srv-key').value = '';
+            
             document.getElementById('srv-type').value = 'standard';
+            const typeText = document.getElementById('srv-type-text');
+            if(typeText) typeText.innerText = 'Standard (Max-TG / Spider)';
+            if(typeof updateCustomSelectChecks === 'function') updateCustomSelectChecks('standard');
+            
             document.getElementById('srv-extra-id').value = '';
-            document.getElementById('srv-profit').value = '20';
+            document.getElementById('srv-profit').value = '';
             document.getElementById('srv-active').checked = true;
             toggleExtraId();
             document.getElementById('server-modal-title').innerText = "Add API Server";
@@ -3627,7 +3642,13 @@
             document.getElementById('srv-name').value = s.name;
             document.getElementById('srv-url').value = s.url;
             document.getElementById('srv-key').value = s.api_key;
-            document.getElementById('srv-type').value = s.server_type || 'standard';
+            
+            const typeVal = s.server_type || 'standard';
+            document.getElementById('srv-type').value = typeVal;
+            const typeText = document.getElementById('srv-type-text');
+            if(typeText) typeText.innerText = typeVal === 'lion' ? 'TG-Lion (Requires YourID)' : 'Standard (Max-TG / Spider)';
+            if(typeof updateCustomSelectChecks === 'function') updateCustomSelectChecks(typeVal);
+            
             document.getElementById('srv-extra-id').value = s.extra_id || '';
             document.getElementById('srv-profit').value = s.profit_margin;
             document.getElementById('srv-active').checked = s.is_active;
@@ -3678,6 +3699,58 @@
                 }
             } catch (e) { console.error(e); }
         }
+
+        // --- Custom Select Logic ---
+        function toggleCustomSelect() {
+            const optionsDiv = document.getElementById('srv-type-options');
+            const arrow = document.getElementById('srv-type-arrow');
+            if (optionsDiv.style.display === 'none' || optionsDiv.style.display === '') {
+                optionsDiv.style.display = 'block';
+                if(arrow) {
+                    arrow.style.transform = 'rotate(180deg)';
+                }
+            } else {
+                closeCustomSelect();
+            }
+        }
+
+        function closeCustomSelect() {
+            const optionsDiv = document.getElementById('srv-type-options');
+            const arrow = document.getElementById('srv-type-arrow');
+            if(optionsDiv) optionsDiv.style.display = 'none';
+            if(arrow) {
+                arrow.style.transform = 'rotate(0deg)';
+            }
+        }
+
+        function selectCustomOption(val, text) {
+            document.getElementById('srv-type').value = val;
+            const textEl = document.getElementById('srv-type-text');
+            if(textEl) textEl.innerText = text;
+            updateCustomSelectChecks(val);
+            toggleExtraId();
+            closeCustomSelect();
+        }
+
+        function updateCustomSelectChecks(val) {
+            document.querySelectorAll('.custom-select-option').forEach(opt => {
+                const icon = opt.querySelector('.fa-check');
+                if (opt.getAttribute('data-value') === val) {
+                    if(icon) icon.style.display = 'inline-block';
+                    opt.style.background = 'var(--tab-bg)';
+                } else {
+                    if(icon) icon.style.display = 'none';
+                    opt.style.background = 'transparent';
+                }
+            });
+        }
+        
+        document.addEventListener('click', function(e) {
+            const container = document.querySelector('.custom-select-container');
+            if (container && !container.contains(e.target)) {
+                closeCustomSelect();
+            }
+        });
 
         applyTheme();
         updateUI();
