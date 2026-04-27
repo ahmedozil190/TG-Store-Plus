@@ -1449,65 +1449,77 @@
         .settings-menu {
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 12px;
         }
         .settings-item {
             display: flex;
             align-items: center;
             gap: 15px;
-            padding: 18px;
+            padding: 20px;
             background: var(--card-glass);
             border: 1px solid var(--border);
-            border-radius: 18px;
+            border-radius: 20px;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .settings-item:hover {
+            border-color: var(--accent);
+            background: rgba(255, 255, 255, 0.04);
+            transform: translateY(-2px);
         }
         .settings-item:active { transform: scale(0.98); }
         .settings-icon-box {
-            width: 44px;
-            height: 44px;
-            border-radius: 14px;
+            width: 48px;
+            height: 48px;
+            border-radius: 16px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.2rem;
+            font-size: 1.3rem;
             flex-shrink: 0;
         }
         .settings-text {
             flex: 1;
             font-size: 1rem;
             font-weight: 700;
-            color: var(--text-p);
+            color: var(--text-primary);
         }
-        .settings-arrow { color: var(--text-s); font-size: 0.85rem; }
+        .settings-arrow { color: var(--text-secondary); font-size: 0.85rem; opacity: 0.5; }
         .settings-back-btn {
-            background: var(--card-glass);
-            border: 1px solid var(--border);
-            color: var(--text-p);
-            padding: 12px 18px;
-            border-radius: 14px;
-            font-size: 0.95rem;
-            font-weight: 700;
+            background: none !important;
+            border: none !important;
+            box-shadow: none !important;
+            padding: 5px 0 !important;
+            color: var(--text-secondary);
+            font-weight: 600;
             cursor: pointer;
             display: flex;
             align-items: center;
-            gap: 10px;
-            transition: all 0.2s;
+            gap: 8px;
+            transition: 0.3s;
+            font-size: 0.95rem;
+            outline: none;
+            margin-bottom: 20px;
+        }
+        .settings-back-btn:hover {
+            color: var(--accent);
+            transform: translateX(-3px);
         }
         /* Custom Switch */
-        .custom-switch { position: relative; display: inline-block; width: 48px; height: 26px; }
+        .custom-switch { position: relative; display: inline-block; width: 50px; height: 28px; }
         .custom-switch input { opacity: 0; width: 0; height: 0; }
         .switch-slider {
             position: absolute; cursor: pointer; inset: 0;
-            background: rgba(255,255,255,0.08); border-radius: 26px;
-            transition: 0.3s;
+            background: rgba(255, 255, 255, 0.1); border-radius: 30px;
+            transition: 0.4s;
         }
         .switch-slider::before {
             content: ''; position: absolute;
-            width: 20px; height: 20px; left: 3px; bottom: 3px;
-            background: white; border-radius: 50%; transition: 0.3s;
+            width: 20px; height: 20px; left: 4px; bottom: 4px;
+            background: white; border-radius: 50%; transition: 0.4s;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
         }
-        .custom-switch input:checked + .switch-slider { background: #0070f3; }
+        .custom-switch input:checked + .switch-slider { background: var(--accent); }
         .custom-switch input:checked + .switch-slider::before { transform: translateX(22px); }
     </style>
 </head>
@@ -2080,6 +2092,15 @@
             <!-- ===== Settings Section ===== -->
             <section id="section-settings" class="view-section">
                 <div id="settings-main-menu" class="settings-menu active">
+                    <!-- General Settings -->
+                    <div class="settings-item" onclick="switchNav('settings-general', null)">
+                        <div class="settings-icon-box" style="background: rgba(88, 101, 242, 0.1); color: var(--accent);">
+                            <i class="fas fa-sliders-h"></i>
+                        </div>
+                        <span class="settings-text">General Settings</span>
+                        <i class="fas fa-chevron-right settings-arrow"></i>
+                    </div>
+
                     <!-- Subscriptions -->
                     <div class="settings-item" onclick="switchNav('settings-subscriptions', null)">
                         <div class="settings-icon-box" style="background: rgba(139, 92, 246, 0.1); color: #8b5cf6;">
@@ -2106,10 +2127,24 @@
                 </div>
             </section>
 
+            <!-- ===== General Settings Page ===== -->
+            <section id="section-settings-general" class="view-section">
+                <button class="settings-back-btn" onclick="switchNav('settings', null)">
+                    <i class="fas fa-arrow-left"></i> Back to Settings
+                </button>
+
+                <div class="card" style="padding: 28px; margin-bottom: 20px;">
+                    <div class="form-group">
+                        <label data-i18n="lbl_bot_name">Bot Name</label>
+                        <input type="text" id="setting-bot-name" class="input-field" placeholder="Sourcing Bot">
+                    </div>
+                    <button class="primary-btn" onclick="saveSettings()" data-i18n="btn_save_settings">Save Settings</button>
+                </div>
+            </section>
+
             <!-- ===== Subscriptions Sub-Section ===== -->
             <section id="section-settings-subscriptions" class="view-section">
-                <button class="settings-back-btn" onclick="switchNav('settings', null)"
-                    style="margin-top: 10px; margin-bottom: 20px;">
+                <button class="settings-back-btn" onclick="switchNav('settings', null)">
                     <i class="fas fa-arrow-left"></i> Back to Settings
                 </button>
 
@@ -3035,7 +3070,8 @@
                 settings: 'nav_settings',
                 withdrawals: 'nav_withdrawals',
                 'user-prices': 'nav_user_prices',
-                'settings-subscriptions': 'nav_settings'
+                'settings-subscriptions': 'nav_settings',
+                'settings-general': 'nav_settings'
             };
             const titleEl = document.getElementById('page-title');
             if (titleEl) {
@@ -3089,7 +3125,11 @@
                 const hctcEl = document.getElementById('home-stat-total-custom-countries');
                 if (hctcEl) hctcEl.innerText = data.stats.total_custom_countries || 0;
 
-                if (data.bot_name) document.getElementById('sideBrandName').textContent = data.bot_name;
+                if (data.bot_name) {
+                    document.getElementById('sideBrandName').textContent = data.bot_name;
+                    const bnInput = document.getElementById('setting-bot-name');
+                    if (bnInput) bnInput.value = data.bot_name;
+                }
                 const uname = tg.initDataUnsafe?.user?.first_name || "AD";
                 const uIEl = document.getElementById('userInitial');
                 if (uIEl) uIEl.textContent = uname.charAt(0).toUpperCase();
@@ -3895,8 +3935,25 @@
             }
         }
 
-        function saveSettings() {
-            alert(currentLang === 'ar' ? 'تم حفظ الإعدادات بنجاح!' : 'Settings saved successfully!');
+        async function saveSettings() {
+            const botName = document.getElementById('setting-bot-name').value;
+            try {
+                const res = await fetch('/api/admin/system/settings', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ bot_name: botName })
+                });
+                const data = await res.json();
+                if (data.status === 'success') {
+                    showToast(currentLang === 'ar' ? 'تم الحفظ' : 'Saved', 
+                              currentLang === 'ar' ? 'تم حفظ الإعدادات بنجاح' : 'Settings saved successfully', 
+                              'success');
+                    if (botName) document.getElementById('sideBrandName').textContent = botName;
+                }
+            } catch (e) {
+                console.error(e);
+                showToast('Error', 'Failed to save settings', 'error');
+            }
         }
 
         async function loadMaintenanceMode() {

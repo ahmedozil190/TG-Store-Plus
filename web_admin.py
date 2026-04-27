@@ -2889,4 +2889,20 @@ async def set_maintenance(enabled: bool):
         await session.commit()
         return {"status": "success", "enabled": enabled}
 
+@app.post("/api/admin/system/settings")
+async def save_system_settings(data: dict):
+    async with async_session() as session:
+        for key, value in data.items():
+            stmt = select(AppSetting).where(AppSetting.key == key)
+            res = await session.execute(stmt)
+            s = res.scalar_one_or_none()
+            
+            if s:
+                s.value = str(value)
+            else:
+                session.add(AppSetting(key=key, value=str(value)))
+        
+        await session.commit()
+        return {"status": "success"}
+
 # --- End of Web Admin SOURCINGPRO ---
