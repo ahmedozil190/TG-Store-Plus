@@ -157,13 +157,17 @@ async def send_purchase_log(user_id: int, country_name: str, price: float, phone
         now_date = datetime.now().strftime("%Y-%m-%d")
         now_time = datetime.now().strftime("%I:%M %p")
         
+        safe_bot_name = bot_name.replace('*', '').replace('_', '').replace('`', '')
+        safe_country = country_name.replace('*', '').replace('_', ' ').replace('`', '')
+        bot_footer = f"🤖 @{bot_username}" if bot_username else f"🤖 {safe_bot_name}"
+        
         message = (
-            f"**{bot_name}** 🩸\n"
-            f"✅ **Purchase report #Successful ( {flag} #{country_name.replace(' ', '_')} )**\n"
+            f"**{safe_bot_name}** 🩸\n"
+            f"✅ **Purchase report #Successful ( {flag} #{safe_country.replace(' ', '')} )**\n"
             f"⏰ **At time:** {now_date} | {now_time}\n"
             f"🔔 **Activation code:** `{code}`\n"
             f"🛍 **Purchase details** 👇\n"
-            f"🤖 @{bot_username}" if bot_username else f"🤖 {bot_name}"
+            f"{bot_footer}"
         )
         
         keyboard = {
@@ -190,8 +194,11 @@ async def send_purchase_log(user_id: int, country_name: str, price: float, phone
         def do_send():
             try:
                 import requests
-                requests.post(url, json=payload, timeout=5)
-            except: pass
+                r = requests.post(url, json=payload, timeout=5)
+                if not r.ok:
+                    logger.error(f"Telegram API Error: {r.text}")
+            except Exception as e:
+                logger.error(f"Requests Error: {e}")
             
         await asyncio.to_thread(do_send)
     except Exception as e:
