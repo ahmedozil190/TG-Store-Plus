@@ -25,7 +25,8 @@ class ExternalProvider:
             # Standard (Spider/Max-TG)
             params = {
                 "action": action,
-                "apiKay": self.api_key
+                "apiKey": self.api_key,
+                "apiKay": self.api_key  # Some panels have this typo
             }
         return params
 
@@ -58,15 +59,33 @@ class ExternalProvider:
                 
                 logger.info(f"Fetching balance from {self.name}: {self.url}")
                 resp = await client.get(self.url, params=params, timeout=15.0)
+                
                 if resp.status_code == 200:
-                    data = resp.json()
-                    # Standard API usually returns balance in data['balance'] or similar.
-                    bal_val = data.get("balance") or data.get("Balance")
-                    if bal_val is not None:
+                    text = resp.text.strip()
+                    logger.info(f"Raw balance response from {self.name}: {text}")
+                    
+                    # 1. Try parsing as JSON
+                    try:
+                        data = resp.json()
+                        if isinstance(data, dict):
+                            # Try common field names
+                            for key in ["balance", "Balance", "money", "credit", "amount"]:
+                                val = data.get(key)
+                                if val is not None:
+                                    return {"status": "success", "balance": float(val)}
+                            
+                            # If no balance field, check for error message
+                            if "message" in data:
+                                return {"status": "error", "message": data["message"]}
+                            if "error" in data:
+                                return {"status": "error", "message": str(data["error"])}
+                    except:
+                        # 2. Try parsing as raw number (some providers return just a string)
                         try:
-                            return {"status": "success", "balance": float(bal_val)}
+                            return {"status": "success", "balance": float(text)}
                         except:
                             pass
+                            
                     return {"status": "error", "message": "Balance field missing or invalid"}
                 else:
                     return {"status": "error", "message": f"HTTP {resp.status_code}"}
