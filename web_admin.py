@@ -600,7 +600,13 @@ async def get_store_data(user_id: int = None):
                         
                         try:
                             # Support all common quantity field names: count, qty, stock, quantity
-                            count = int(c.get("count", c.get("qty", c.get("stock", c.get("quantity", 0)))))
+                            # Default to 999 if missing or 0, to match dictionary parser behavior for "unlimited" or unknown stock
+                            raw_count = c.get("count", c.get("qty", c.get("stock", c.get("quantity"))))
+                            if raw_count is None:
+                                count = 999
+                            else:
+                                try: count = int(raw_count)
+                                except: count = 999
                             
                             # Support multiple price keys: price, rate, cost, amount, value
                             raw_p = c.get("price", c.get("rate", c.get("cost", c.get("amount", c.get("value", 0)))))
@@ -651,40 +657,71 @@ async def get_store_data(user_id: int = None):
 
             for map_key, c_data in countries_map.items():
                 name = c_data["name"]
-                flag = "🌐"
-                price = 1.0
+                flag = c_data.get("flag", "🌐")
+                is_local = (c_data.get("server_id") is None)
                 
-                # 1. Base Price (API Price + Profit Margin)
-                price = c_data.get("calc_price", 1.0)
+                # 1. Determine Base Price
+                if is_local:
+                    # Default local price if not in DB
+                    price = 1.0
+                else:
+                    # External: API Cost + Profit Margin
+                    price = c_data.get("calc_price", 1.0)
                 
-                # 2. Local Overrides (CountryPrice Table)
+                # 2. Apply CountryPrice Overrides
                 # Try match by ISO first (most accurate), then by name
                 cp = cp_iso_map.get(c_data.get("iso")) or cp_name_map.get(name)
                 
                 if cp:
-                    # Always use flag from DB if available
+                    # Always use flag from DB if available (for both local and external)
                     flag = get_flag_emoji(cp.iso_code)
-                    # ONLY override price if DB price is explicitly set (> 0)
-                    if cp.price > 0:
+                    
+                    # Price Override Logic:
+                    if is_local:
+                        # Local stock: ALWAYS use the price from the Selling Prices table
                         price = cp.price
-                elif "flag" in c_data:
-                    flag = c_data["flag"]
+                    # External stock: We IGNORE the Selling Prices table for price overrides,
+                    # as per user request ("this page should control local inventory only").
+                    # It will use the 'price' calculated above (API Cost + Profit Margin).
+                
+                # 3. User-Specific Price Override (highest priority)
+                is_sp = False
+                if is_local and cp:
+                    is_sp = True
 
-                # Override with user-specific price if exists
                 if user_id:
-                    # Check both code and +code
-                    cc_clean = str(c_data.get("country", "")).lstrip('+')
-                    cc_plus = f"+{cc_clean}"
-                    usp = usp_map.get(cc_clean) or usp_map.get(cc_plus)
+                    # Match logic for UserStorePrice:
+                    # 1. By ISO code (most accurate)
+                    # 2. By Name
+                    # 3. By Country Code (if available)
+                    
+                    usp = None
+                    iso_key = c_data.get("iso")
+                    if iso_key and iso_key != 'XX':
+                        # Try to find a USP that has this ISO
+                        usp = next((u for u in all_usp if u.iso_code == iso_key), None)
+                    
+                    if not usp:
+                        # Try matching by name
+                        usp = next((u for u in all_usp if u.country_code == name), None)
+                    
+                    if not usp and is_local:
+                        # For local items, we might have the code from the CP entry
+                        if cp:
+                            cc_clean = cp.country_code.strip().replace('+', '')
+                            usp = next((u for u in all_usp if u.country_code == cc_clean or u.country_code == f"+{cc_clean}"), None)
+
                     if usp:
                         price = usp.sell_price
+                        is_sp = True
 
                 countries.append({
                     "name": name,
                     "flag": flag,
                     "buy_price": price,
                     "count": c_data["count"],
-                    "server_name": c_data.get("server_name", "Server 1")
+                    "server_name": c_data.get("server_name", "Server 1"),
+                    "is_selling_price": is_sp
                 })
             
             countries.sort(key=lambda x: x["name"])
@@ -809,13 +846,20 @@ async def store_buy(data: StoreBuy):
                 ).limit(1)
                 account = (await session.execute(stmt)).scalar_one_or_none()
             
+            # 1. Price determination
             cp = (await session.execute(select(CountryPrice).where(CountryPrice.country_name == data.country))).scalar()
-            final_price = cp.price if cp else 1.0
+            
+            # Initial default
+            final_price = 1.0
 
             target_srv = None
             external_country_code = None
+            is_local = False
             
-            if not account:
+            if account:
+                is_local = True
+                final_price = cp.price if cp else 1.0
+            else:
                 # 2. Try External Servers
                 active_servers = (await session.execute(select(ApiServer).where(ApiServer.is_active == True))).scalars().all()
                 for srv in active_servers:
@@ -826,29 +870,49 @@ async def store_buy(data: StoreBuy):
                     )
                     srv_countries = await provider.get_countries()
                     if isinstance(srv_countries, list):
-                        match = next((c for c in srv_countries if (c.get("name") == data.country or c.get("country") == data.country) and int(c.get("count", 0)) > 0), None)
+                        def get_c(item):
+                            rc = item.get("count", item.get("qty", item.get("stock", item.get("quantity"))))
+                            try: return int(rc) if rc is not None else 999
+                            except: return 999
+
+                        match = next((c for c in srv_countries if (c.get("name") == data.country or c.get("country") == data.country) and get_c(c) > 0), None)
                         if match:
                             target_srv = srv
                             external_country_code = match.get("country")
-                            if not cp: # Use calculated price if no admin price set
-                                final_price = provider.calculate_price(match.get("price", 0))
+                            # For External, we ALWAYS use calculated price (Cost + Profit)
+                            # We ignore cp.price here as per user request.
+                            final_price = provider.calculate_price(match.get("price", 0))
                             break
                 
                 if not target_srv:
                     raise HTTPException(status_code=400, detail="Out of stock")
 
-            # 3. Handle Personalized Pricing
-            if cp:
-                from database.models import UserStorePrice
-                from sqlalchemy import or_
-                cc_clean = cp.country_code.strip().replace('+', '')
-                cc_plus = f"+{cc_clean}"
-                usp = (await session.execute(
-                    select(UserStorePrice).where(
-                        UserStorePrice.user_id == data.user_id,
-                        or_(UserStorePrice.country_code == cc_clean, UserStorePrice.country_code == cc_plus)
-                    )
-                )).scalar()
+            # 3. Handle Personalized Pricing (Applies to both local and external)
+            # We check for UserStorePrice even if cp is missing, for external countries.
+            from database.models import UserStorePrice
+            
+            # Resolve info to get ISO for matching if possible
+            _, _, res_iso = resolve_country_info(data.country)
+            
+            async with async_session() as session:
+                # Use a separate query to be sure
+                stmt = select(UserStorePrice).where(UserStorePrice.user_id == data.user_id)
+                user_prices = (await session.execute(stmt)).scalars().all()
+                
+                usp = None
+                # Match by ISO
+                if res_iso and res_iso != 'XX':
+                    usp = next((u for u in user_prices if u.iso_code == res_iso), None)
+                
+                # Match by Name
+                if not usp:
+                    usp = next((u for u in user_prices if u.country_code == data.country), None)
+                
+                # Match by Phone Code (if cp exists)
+                if not usp and cp:
+                    cc_clean = cp.country_code.strip().replace('+', '')
+                    usp = next((u for u in user_prices if u.country_code == cc_clean or u.country_code == f"+{cc_clean}"), None)
+                
                 if usp:
                     final_price = usp.sell_price
             
