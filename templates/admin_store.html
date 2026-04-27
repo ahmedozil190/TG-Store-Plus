@@ -1418,21 +1418,25 @@
             border-radius: 12px;
             cursor: pointer;
             box-shadow: none;
-            background: rgba(0, 0, 0, 0.05);
-            border: 1px solid rgba(0, 0, 0, 0.1);
-            color: rgba(0, 0, 0, 0.9);
             transition: 0.2s;
-        }
-        .server-action-btn:hover {
-            background: rgba(0, 0, 0, 0.1);
+            color: rgba(0, 0, 0, 0.9);
         }
         .dark-mode .server-action-btn {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
             color: rgba(255, 255, 255, 0.9);
         }
-        .dark-mode .server-action-btn:hover {
-            background: rgba(255, 255, 255, 0.1);
+        .server-action-btn.edit {
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid #3b82f6;
+        }
+        .server-action-btn.edit:hover {
+            background: rgba(59, 130, 246, 0.2);
+        }
+        .server-action-btn.delete {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid #ef4444;
+        }
+        .server-action-btn.delete:hover {
+            background: rgba(239, 68, 68, 0.2);
         }
 
         /* Custom Toggle Switch */
@@ -3624,11 +3628,11 @@
                         
                         <!-- Actions -->
                         <div style="display: flex; gap: 10px; margin-top: 5px;">
-                            <button class="server-action-btn" onclick="editServer(${s.id})">
-                                <span style="opacity: 0.9;"><i class="fas fa-edit"></i> ${currentLang === 'ar' ? 'تعديل' : 'Edit'}</span>
+                            <button class="server-action-btn edit" onclick="editServer(${s.id})">
+                                <span style="opacity: 0.9; font-weight: bold;"><i class="fas fa-edit"></i> ${currentLang === 'ar' ? 'تعديل' : 'Edit'}</span>
                             </button>
-                            <button class="server-action-btn" onclick="deleteServer(${s.id})">
-                                <span style="opacity: 0.9;"><i class="fas fa-trash"></i> ${currentLang === 'ar' ? 'حذف' : 'Delete'}</span>
+                            <button class="server-action-btn delete" onclick="deleteServer(${s.id})">
+                                <span style="opacity: 0.9; font-weight: bold;"><i class="fas fa-trash"></i> ${currentLang === 'ar' ? 'حذف' : 'Delete'}</span>
                             </button>
                         </div>
 
