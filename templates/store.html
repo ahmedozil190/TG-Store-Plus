@@ -1525,8 +1525,10 @@
                     const msg = data.detail || data.message || 'Error';
                     if (msg.includes('رصيدك') || msg.toLowerCase().includes('balance')) {
                         showToast(currentLang === 'ar' ? 'فشل الشراء' : 'Purchase Failed', translations[currentLang].insufficient_bal, 'error');
+                    } else if (msg === 'No numbers available' || msg === 'Out of stock or API balance issue') {
+                        showToast(currentLang === 'ar' ? 'فشل الشراء' : 'Purchase Failed', currentLang === 'ar' ? 'نفدت الأرقام' : 'Out of stock', 'error');
                     } else {
-                        alert(msg);
+                        showToast(currentLang === 'ar' ? 'فشل الشراء' : 'Purchase Failed', msg, 'error');
                     }
                 }
             } catch (e) { alert(e); }
