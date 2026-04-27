@@ -56,7 +56,7 @@ class ExternalProvider:
             async with httpx.AsyncClient() as client:
                 # 1. Determine the correct action
                 if self.server_type == "lion":
-                    action = "balance" # Lion typically uses 'balance' or 'get_balance'
+                    action = "get_balance" # TG-Lion specifically uses 'get_balance'
                 else:
                     action = "getBalance"
                     
