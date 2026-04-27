@@ -69,16 +69,31 @@ class ExternalProvider:
                         data = resp.json()
                         if isinstance(data, dict):
                             # Try common field names
-                            for key in ["balance", "Balance", "money", "credit", "amount"]:
+                            balance_keys = ["balance", "Balance", "money", "credit", "amount", "balans", "sum", "user_balance", "available_balance", "credits"]
+                            for key in balance_keys:
                                 val = data.get(key)
                                 if val is not None:
-                                    return {"status": "success", "balance": float(val)}
+                                    try:
+                                        return {"status": "success", "balance": float(val)}
+                                    except: continue
                             
+                            # Nested search
+                            for sub in ['user', 'info', 'data']:
+                                if sub in data and isinstance(data[sub], dict):
+                                    for key in balance_keys:
+                                        v = data[sub].get(key)
+                                        if v is not None:
+                                            try: return {"status": "success", "balance": float(v)}
+                                            except: continue
+
                             # If no balance field, check for error message
-                            if "message" in data:
-                                return {"status": "error", "message": data["message"]}
-                            if "error" in data:
-                                return {"status": "error", "message": str(data["error"])}
+                            msg = data.get("message") or data.get("error") or data.get("status")
+                            if msg and msg != "success":
+                                keys_found = ", ".join(data.keys())
+                                return {"status": "error", "message": f"{msg} (Keys: {keys_found})"}
+                            
+                            keys_found = ", ".join(data.keys())
+                            return {"status": "error", "message": f"Balance missing. Keys: {keys_found}"}
                     except:
                         # 2. Try parsing as raw number (some providers return just a string)
                         try:
@@ -86,7 +101,7 @@ class ExternalProvider:
                         except:
                             pass
                             
-                    return {"status": "error", "message": "Balance field missing or invalid"}
+                    return {"status": "error", "message": f"Format Error. Text: {text[:50]}"}
                 else:
                     return {"status": "error", "message": f"HTTP {resp.status_code}"}
         except Exception as e:
