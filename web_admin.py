@@ -1665,7 +1665,13 @@ async def get_servers():
                 server_type=getattr(s, 'server_type', 'standard'),
                 extra_id=getattr(s, 'extra_id', None)
             )
-            balance = await provider.get_balance()
+            bal_data = await provider.get_balance()
+            balance_val = "Error"
+            if isinstance(bal_data, dict):
+                if bal_data.get("status") == "success":
+                    balance_val = bal_data.get("balance", 0.0)
+                else:
+                    balance_val = bal_data.get("message", "Error")
             
             server_data.append({
                 "id": s.id,
@@ -1676,7 +1682,7 @@ async def get_servers():
                 "extra_id": getattr(s, 'extra_id', ''),
                 "profit_margin": s.profit_margin,
                 "is_active": s.is_active,
-                "balance": balance
+                "balance": balance_val
             })
             
         # Get Local Server Status

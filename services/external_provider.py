@@ -60,18 +60,19 @@ class ExternalProvider:
                 resp = await client.get(self.url, params=params, timeout=15.0)
                 if resp.status_code == 200:
                     data = resp.json()
-                    # Standard API usually returns balance in data['balance'] or similar. 
-                    # If lion returns something else, we handle it if needed.
-                    if "balance" in data:
-                        return str(data["balance"])
-                    elif "Balance" in data:
-                        return str(data["Balance"])
-                    return "N/A"
+                    # Standard API usually returns balance in data['balance'] or similar.
+                    bal_val = data.get("balance") or data.get("Balance")
+                    if bal_val is not None:
+                        try:
+                            return {"status": "success", "balance": float(bal_val)}
+                        except:
+                            pass
+                    return {"status": "error", "message": "Balance field missing or invalid"}
                 else:
-                    return "Error"
+                    return {"status": "error", "message": f"HTTP {resp.status_code}"}
         except Exception as e:
             logger.error(f"Error fetching balance from {self.name}: {e}")
-            return "Error"
+            return {"status": "error", "message": str(e)}
 
     async def buy_number(self, country_code):
         """Order a new number from the provider."""
