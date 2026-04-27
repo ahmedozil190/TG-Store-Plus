@@ -802,7 +802,7 @@ async def store_buy(data: StoreBuy):
                             break
                 
                 if not target_srv:
-                    raise HTTPException(status_code=400, detail="Out of stock or API balance issue")
+                    raise HTTPException(status_code=400, detail="Out of stock")
 
             # 3. Handle Personalized Pricing
             if cp:
@@ -860,8 +860,12 @@ async def store_buy(data: StoreBuy):
                     await session.commit()
                     return {"status": "success", "phone": new_acc.phone_number, "id": new_acc.id}
                 else:
-                    msg = buy_res.get("message") or "API provider error"
-                    raise HTTPException(status_code=400, detail=msg)
+                    raw_msg = str(buy_res.get("message", "API provider error"))
+                    msg_lower = raw_msg.lower()
+                    if any(word in msg_lower for word in ["balance", "رصيد", "money", "fund", "credit"]):
+                        raise HTTPException(status_code=400, detail="No numbers available")
+                    else:
+                        raise HTTPException(status_code=400, detail=raw_msg)
     except HTTPException as e: raise e
     except Exception as e:
         logger.error(f"Store Buy Error: {e}")
