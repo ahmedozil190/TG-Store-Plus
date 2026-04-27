@@ -2389,8 +2389,8 @@
                 </div>
             </div>
             <div id="extra-id-group" class="form-group" style="display: none;">
-                <label>YourID (For TG-Lion)</label>
-                <input type="text" id="srv-extra-id" class="input-field" placeholder="Enter YourID from TG-Lion">
+                <label>Your ID</label>
+                <input type="text" id="srv-extra-id" class="input-field" placeholder="Enter Your ID Here">
             </div>
             <div class="form-group" style="display: flex; align-items: center; justify-content: space-between; margin-top: 20px; background: var(--bg-elevated); padding: 15px; border-radius: 16px; border: 1px solid var(--border);">
                 <label for="srv-active" style="margin-bottom: 0; font-size: 1rem; color: var(--text-p); font-weight: 600;">Server Active</label>
@@ -3521,6 +3521,7 @@
             document.getElementById('srv-active').checked = true;
             toggleExtraId();
             document.getElementById('server-modal-title').innerText = "Add API Server";
+            document.getElementById('server-modal').scrollTop = 0;
             document.getElementById('server-modal').classList.add('active');
         }
         function toggleExtraId() {
@@ -3654,6 +3655,7 @@
             document.getElementById('srv-active').checked = s.is_active;
             toggleExtraId();
             document.getElementById('server-modal-title').innerText = "Edit API Server";
+            document.getElementById('server-modal').scrollTop = 0;
             document.getElementById('server-modal').classList.add('active');
         }
         let serverToDeleteId = null;
