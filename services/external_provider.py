@@ -54,10 +54,15 @@ class ExternalProvider:
         """Fetch the current balance from the provider."""
         try:
             async with httpx.AsyncClient() as client:
-                action = "getBalance"
+                # 1. Determine the correct action
+                if self.server_type == "lion":
+                    action = "balance" # Lion typically uses 'balance' or 'get_balance'
+                else:
+                    action = "getBalance"
+                    
                 params = self.get_base_params(action)
                 
-                logger.info(f"Fetching balance from {self.name}: {self.url}")
+                logger.info(f"Fetching balance from {self.name}: {self.url} (Action: {action})")
                 resp = await client.get(self.url, params=params, timeout=15.0)
                 
                 if resp.status_code == 200:
@@ -68,26 +73,32 @@ class ExternalProvider:
                     try:
                         data = resp.json()
                         if isinstance(data, dict):
-                            # Try common field names
+                            # Common field names for balance
                             balance_keys = ["balance", "Balance", "money", "credit", "amount", "balans", "sum", "user_balance", "available_balance", "credits"]
+                            
+                            # A. Direct search
                             for key in balance_keys:
-                                val = data.get(key)
-                                if val is not None:
-                                    try:
-                                        return {"status": "success", "balance": float(val)}
+                                if key in data and data[key] is not None:
+                                    try: return {"status": "success", "balance": float(data[key])}
                                     except: continue
                             
-                            # Nested search
-                            for sub in ['user', 'info', 'data']:
-                                if sub in data and isinstance(data[sub], dict):
-                                    for key in balance_keys:
-                                        v = data[sub].get(key)
-                                        if v is not None:
-                                            try: return {"status": "success", "balance": float(v)}
-                                            except: continue
+                            # B. Nested search (Common for Standard panels like Max-TG/Spider)
+                            for sub in ['result', 'user', 'info', 'data']:
+                                if sub in data:
+                                    # If result is a dict
+                                    if isinstance(data[sub], dict):
+                                        for key in balance_keys:
+                                            v = data[sub].get(key)
+                                            if v is not None:
+                                                try: return {"status": "success", "balance": float(v)}
+                                                except: continue
+                                    # If result is a raw value (some panels)
+                                    elif sub == 'result':
+                                        try: return {"status": "success", "balance": float(data[sub])}
+                                        except: continue
 
-                            # If no balance field, check for error message
-                            msg = data.get("message") or data.get("error") or data.get("status")
+                            # C. Handle specific status/ok flags
+                            msg = data.get("message") or data.get("msg") or data.get("error") or data.get("status")
                             if msg and msg != "success":
                                 keys_found = ", ".join(data.keys())
                                 return {"status": "error", "message": f"{msg} (Keys: {keys_found})"}
@@ -95,7 +106,7 @@ class ExternalProvider:
                             keys_found = ", ".join(data.keys())
                             return {"status": "error", "message": f"Balance missing. Keys: {keys_found}"}
                     except:
-                        # 2. Try parsing as raw number (some providers return just a string)
+                        # 2. Try parsing as raw number
                         try:
                             return {"status": "success", "balance": float(text)}
                         except:
@@ -107,6 +118,7 @@ class ExternalProvider:
         except Exception as e:
             logger.error(f"Error fetching balance from {self.name}: {e}")
             return {"status": "error", "message": str(e)}
+
 
     async def buy_number(self, country_code):
         """Order a new number from the provider."""
