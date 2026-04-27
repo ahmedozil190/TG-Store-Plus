@@ -76,20 +76,3 @@ async def init_db():
                 
         except Exception as e:
             print(f"Migration check failed: {e}")
-
-    # Seed Default Servers if empty
-    async with async_session() as session:
-        try:
-            res = await session.execute(select(ApiServer))
-            if not res.scalars().first():
-                defaults = [
-                    ApiServer(name="Max-TG", url="https://www.max-tg.com/sub/api/", api_key="YOUR_KEY_HERE", server_type="standard", is_active=False),
-                    ApiServer(name="Fast Numbers", url="https://www.fast-tg.com/sub/api/", api_key="YOUR_KEY_HERE", server_type="standard", is_active=False),
-                    ApiServer(name="TG-Lion", url="https://TG-Lion.net", api_key="YOUR_KEY_HERE", server_type="lion", is_active=False),
-                    ApiServer(name="Spider-SMS", url="https://api.spider-service.com", api_key="YOUR_KEY_HERE", server_type="standard", is_active=False)
-                ]
-                session.add_all(defaults)
-                await session.commit()
-                print("Seeded default API servers (inactive)")
-        except Exception as e:
-            print(f"Seeding failed: {e}")
