@@ -795,10 +795,13 @@ async def get_store_data(user_id: int = None):
             final_trx = addr_settings.get("TRX_ADDRESS") or ""
             final_usdt_bep20 = addr_settings.get("USDT_BEP20_ADDRESS") or ""
 
-        # Build servers list for frontend filter
-        server_names = sorted(set(c["server_name"] for c in countries))
+        # Fetch Maintenance Mode
+        async with async_session() as session:
+            mnt_obj = (await session.execute(select(AppSetting).where(AppSetting.key == "maintenance_mode"))).scalar_one_or_none()
+            maintenance_mode = (mnt_obj.value.lower() == "true") if mnt_obj else False
 
         return {
+            "maintenance_mode": maintenance_mode,
             "bot_name": bot_name,
             "countries": countries,
             "servers": server_names,
@@ -1335,18 +1338,25 @@ async def get_sourcing_data():
                 })
 
             # Bot-specific user count and balance
+            # Priority: AppSetting > Telegram
             bot_name = "Bot"
             try:
-                from config import SELLER_BOT_TOKEN
-                def fetch_bot_name():
-                    try:
-                        req = urllib.request.Request(f"https://api.telegram.org/bot{SELLER_BOT_TOKEN}/getMe")
-                        with urllib.request.urlopen(req, timeout=2) as r:
-                            res_data = json.loads(r.read().decode())
-                            if res_data.get("ok"):
-                                return res_data["result"].get("first_name", "Bot")
-                    except: return "Bot"
-                bot_name = await asyncio.to_thread(fetch_bot_name)
+                bn_stmt = select(AppSetting).where(AppSetting.key == "bot_name")
+                bn_res = await session.execute(bn_stmt)
+                bn_obj = bn_res.scalar_one_or_none()
+                if bn_obj:
+                    bot_name = bn_obj.value
+                else:
+                    from config import SELLER_BOT_TOKEN
+                    def fetch_bot_name():
+                        try:
+                            req = urllib.request.Request(f"https://api.telegram.org/bot{SELLER_BOT_TOKEN}/getMe")
+                            with urllib.request.urlopen(req, timeout=2) as r:
+                                res_data = json.loads(r.read().decode())
+                                if res_data.get("ok"):
+                                    return res_data["result"].get("first_name", "Bot")
+                        except: return "Bot"
+                    bot_name = await asyncio.to_thread(fetch_bot_name)
             except Exception as b_err:
                 logger.error(f"Error fetching sourcing bot name: {b_err}")
 
@@ -1416,18 +1426,26 @@ async def get_sourcing_data():
 async def get_admin_store_data():
     try:
         async with async_session() as session:
+            # Bot-specific user count and balance
+            # Priority: AppSetting > Telegram
             bot_name = "Bot"
             try:
-                from config import BOT_TOKEN
-                def fetch_bot_name_store():
-                    try:
-                        req = urllib.request.Request(f"https://api.telegram.org/bot{BOT_TOKEN}/getMe")
-                        with urllib.request.urlopen(req, timeout=2) as r:
-                            res_data = json.loads(r.read().decode())
-                            if res_data.get("ok"):
-                                return res_data["result"].get("first_name", "Bot")
-                    except: return "Bot"
-                bot_name = await asyncio.to_thread(fetch_bot_name_store)
+                bn_stmt = select(AppSetting).where(AppSetting.key == "bot_name")
+                bn_res = await session.execute(bn_stmt)
+                bn_obj = bn_res.scalar_one_or_none()
+                if bn_obj:
+                    bot_name = bn_obj.value
+                else:
+                    from config import BOT_TOKEN
+                    def fetch_bot_name_store():
+                        try:
+                            req = urllib.request.Request(f"https://api.telegram.org/bot{BOT_TOKEN}/getMe")
+                            with urllib.request.urlopen(req, timeout=2) as r:
+                                res_data = json.loads(r.read().decode())
+                                if res_data.get("ok"):
+                                    return res_data["result"].get("first_name", "Bot")
+                        except: return "Bot"
+                    bot_name = await asyncio.to_thread(fetch_bot_name_store)
             except Exception as b_err:
                 logger.error(f"Error fetching store bot name: {b_err}")
 
@@ -2259,7 +2277,12 @@ async def get_seller_data(user_id: int):
                         })
                     except: pass
                 
+            # Fetch Maintenance Mode
+            mnt_obj = (await session.execute(select(AppSetting).where(AppSetting.key == "maintenance_mode"))).scalar_one_or_none()
+            maintenance_mode = (mnt_obj.value.lower() == "true") if mnt_obj else False
+            
             return {
+                "maintenance_mode": maintenance_mode,
                 "user": {
                     "id": user.id,
                     "balance": user.balance_sourcing,

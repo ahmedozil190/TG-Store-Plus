@@ -777,6 +777,20 @@
     </div>
     <div class="toast-container" id="toast-container"></div>
 
+    <!-- Maintenance Overlay -->
+    <div id="maintenance-overlay" style="display: none; position: fixed; inset: 0; background: var(--bg); z-index: 10000; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 30px;">
+        <div style="width: 80px; height: 80px; background: rgba(239, 68, 68, 0.1); color: #ef4444; border-radius: 24px; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; margin-bottom: 25px;">
+            <i class="fas fa-tools"></i>
+        </div>
+        <h1 style="font-size: 1.8rem; font-weight: 800; margin-bottom: 12px; color: var(--text-p);">Under Maintenance</h1>
+        <p style="color: var(--text-s); font-size: 1rem; max-width: 300px; line-height: 1.6; margin-bottom: 30px;">
+            We're currently performing some scheduled maintenance to improve your experience. Please check back soon!
+        </p>
+        <div style="padding: 12px 24px; background: var(--card-glass); border: 1px solid var(--border); border-radius: 12px; color: var(--text-s); font-size: 0.85rem; font-weight: 600;">
+            Estimated time: 30-60 mins
+        </div>
+    </div>
+
     <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeNav()"></div>
 
     <div class="sidebar" id="navSidebar">
@@ -1279,7 +1293,8 @@
                 if (userData) {
                     userId = userData.id;
                     const fullName = userData.first_name + (userData.last_name ? ' ' + userData.last_name : '');
-                    document.getElementById('userInitial').innerText = userData.first_name.charAt(0).toUpperCase();
+                    const initialEl = document.getElementById('userInitial');
+                    if (initialEl) initialEl.innerText = userData.first_name.charAt(0).toUpperCase();
 
                     fetch(`/api/admin/user/sync`, {
                         method: 'POST',
@@ -1288,19 +1303,22 @@
                     }).catch(e => console.error("Sync error:", e));
                 }
 
-                // Restore tab AFTER userId is set
-                const savedTab = sessionStorage.getItem('activeTab');
-                if (savedTab && savedTab !== 'home') {
-                    switchNav(savedTab, null);
-                } else {
-                    await fetchDeposits(); // Always fetch for dashboard too if needed
+                // 1. FETCH DATA & CHECK MAINTENANCE
+                const resData = await fetch(`/api/store/data?user_id=${userId}`);
+                const data = await resData.json();
+
+                if (data.maintenance_mode === true || data.maintenance_mode === "true") {
+                    const mnt = document.getElementById('maintenance-overlay');
+                    if (mnt) mnt.style.display = 'flex';
+                    const loader = document.getElementById('loader');
+                    if (loader) loader.classList.add('hide');
+                    return;
                 }
 
-                const res = await fetch(`/api/store/data?user_id=${userId}`);
-                const data = await res.json();
-
+                // 2. Render Data
                 if (data.bot_name) {
-                    document.getElementById('side-bot-name').innerText = data.bot_name;
+                    const sideName = document.getElementById('side-bot-name');
+                    if (sideName) sideName.innerText = data.bot_name;
                 }
 
                 if (data.user) {
@@ -1308,7 +1326,8 @@
                     document.getElementById('dash-total-deposits').innerHTML = `${data.user.total_deposits || 0} <span>DEPOSITS</span>`;
                     document.getElementById('dash-spent').innerHTML = `${parseFloat(data.user.total_spent || 0).toFixed(2)} <span>USD</span>`;
                     const nameForUI = (data.user.full_name && data.user.full_name !== 'Unknown') ? data.user.full_name : (userData?.first_name || "User");
-                    document.getElementById('userInitial').innerText = nameForUI.charAt(0).toUpperCase();
+                    const initialEl = document.getElementById('userInitial');
+                    if (initialEl) initialEl.innerText = nameForUI.charAt(0).toUpperCase();
                 }
 
                 if (data.deposit_methods) {
@@ -1316,20 +1335,30 @@
                     switchDepositMethod('binance_pay', document.querySelector('#section-deposit .tab-btn.active'));
                 }
 
-                countries = data.countries || [];
+                allCountries = data.countries || [];
                 serversList = data.servers || [];
                 renderServerFilters();
-                if (data.stats) {
-                    document.getElementById('dash-completed-orders').innerHTML = `${data.user.completed_orders || 0} <span>ORDERS</span>`;
-                    document.getElementById('dash-active-orders').innerHTML = `${data.user.active_orders || 0} <span>ORDERS</span>`;
-                    document.getElementById('dash-unique-countries').innerHTML = `${data.user.unique_countries || 0} <span>COUNTRIES</span>`;
+
+                if (data.stats && data.user) {
+                    const compOrders = document.getElementById('dash-completed-orders');
+                    if (compOrders) compOrders.innerHTML = `${data.user.completed_orders || 0} <span>ORDERS</span>`;
+                    const activeOrders = document.getElementById('dash-active-orders');
+                    if (activeOrders) activeOrders.innerHTML = `${data.user.active_orders || 0} <span>ORDERS</span>`;
+                    const uniqueCountries = document.getElementById('dash-unique-countries');
+                    if (uniqueCountries) uniqueCountries.innerHTML = `${data.user.unique_countries || 0} <span>COUNTRIES</span>`;
                 }
-                if (document.getElementById('section-store').classList.contains('active')) {
-                    filterStore();
-                    updateStatsForFilter();
+
+                // Restore active tab
+                const savedTab = sessionStorage.getItem('activeTab');
+                if (savedTab && savedTab !== 'home') {
+                    switchNav(savedTab, null);
+                } else {
+                    await fetchDeposits(); 
                 }
-            } catch (e) { console.error("Init Error:", e); }
-            finally {
+            } catch (e) { 
+                console.error("Init Error:", e); 
+            } finally {
+                const loader = document.getElementById('loader');
                 if (loader) loader.classList.add('hide');
             }
         }
