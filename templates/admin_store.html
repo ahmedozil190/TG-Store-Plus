@@ -1406,6 +1406,45 @@
             border-color: var(--accent);
         }
 
+        /* Custom Toggle Switch */
+        .custom-switch {
+            position: relative;
+            display: inline-block;
+            width: 48px;
+            height: 26px;
+        }
+        .custom-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .switch-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: var(--border);
+            transition: .4s;
+            border-radius: 34px;
+        }
+        .switch-slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        .custom-switch input:checked + .switch-slider {
+            background-color: var(--success);
+        }
+        .custom-switch input:checked + .switch-slider:before {
+            transform: translateX(22px);
+        }
+
         .primary-btn {
             width: 100%;
             padding: 14px;
@@ -2315,35 +2354,40 @@
             <h3 id="server-modal-title">Add API Server</h3>
             <div class="form-group">
                 <label>Provider Name</label>
-                <input type="text" id="srv-name" class="input-field" placeholder="e.g. 5Sim, SMS-Activate">
+                <input type="text" id="srv-name" class="input-field" placeholder="Enter Provider Name Here">
             </div>
             <div class="form-group">
-                <label>API Endpoint (Base URL)</label>
-                <input type="text" id="srv-url" class="input-field" placeholder="https://api.example.com/v1">
+                <label>API Endpoint</label>
+                <input type="text" id="srv-url" class="input-field" placeholder="Enter Link Here">
             </div>
             <div class="form-group">
                 <label>API Key</label>
                 <input type="password" id="srv-key" class="input-field" placeholder="Enter API Key">
             </div>
             <div class="form-group">
-                <label>Profit Margin (%)</label>
-                <input type="number" id="srv-profit" class="input-field" placeholder="20" step="1">
-                <small style="color: var(--text-s); font-size: 0.75rem;">This percentage will be added to the provider's price.</small>
+                <label>Profit Margin</label>
+                <input type="number" id="srv-profit" class="input-field" placeholder="Enter Profit Margin Here" step="1">
             </div>
             <div class="form-group">
                 <label>Server Type</label>
-                <select id="srv-type" class="input-field" onchange="toggleExtraId()">
-                    <option value="standard">Standard (Max-TG / Spider)</option>
-                    <option value="lion">TG-Lion (Requires YourID)</option>
-                </select>
+                <div style="position: relative;">
+                    <select id="srv-type" class="input-field" style="appearance: none; -webkit-appearance: none; padding-right: 40px;" onchange="toggleExtraId()">
+                        <option value="standard">Standard (Max-TG / Spider)</option>
+                        <option value="lion">TG-Lion (Requires YourID)</option>
+                    </select>
+                    <i class="fas fa-chevron-down" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: var(--text-secondary); pointer-events: none;"></i>
+                </div>
             </div>
             <div id="extra-id-group" class="form-group" style="display: none;">
                 <label>YourID (For TG-Lion)</label>
                 <input type="text" id="srv-extra-id" class="input-field" placeholder="Enter YourID from TG-Lion">
             </div>
-            <div class="form-group" style="display: flex; align-items: center; gap: 10px; margin-top: 10px;">
-                <input type="checkbox" id="srv-active" checked style="width: 18px; height: 18px;">
-                <label for="srv-active" style="margin-bottom: 0;">Server Active</label>
+            <div class="form-group" style="display: flex; align-items: center; justify-content: space-between; margin-top: 20px; background: var(--bg-elevated); padding: 15px; border-radius: 16px; border: 1px solid var(--border);">
+                <label for="srv-active" style="margin-bottom: 0; font-size: 1rem; color: var(--text-p); font-weight: 600;">Server Active</label>
+                <label class="custom-switch">
+                    <input type="checkbox" id="srv-active" checked>
+                    <span class="switch-slider"></span>
+                </label>
             </div>
             <input type="hidden" id="srv-id">
             
@@ -2361,9 +2405,9 @@
             <h3 style="margin-bottom: 10px; color: var(--text-p);">Confirm Deletion</h3>
             <p style="color: var(--text-s); font-size: 0.95rem; margin-bottom: 25px; line-height: 1.5;">Are you sure you want to permanently delete this provider?</p>
             
-            <div style="display: flex; gap: 10px;">
-                <button class="cancel-btn" style="flex: 1;" onclick="closeDeleteConfirmModal()">Cancel</button>
-                <button class="primary-btn" style="flex: 1; background: #ef4444; border: none; color: white;" onclick="executeDeleteServer()">Yes, Delete</button>
+            <div style="display: flex; gap: 10px; width: 100%;">
+                <button class="cancel-btn" style="flex: 1; padding: 14px 0; display: block; width: 100%; box-sizing: border-box;" onclick="closeDeleteConfirmModal()">Cancel</button>
+                <button class="primary-btn" style="flex: 1; background: #ef4444; border: none; color: white; padding: 14px 0; display: block; width: 100%; box-sizing: border-box;" onclick="executeDeleteServer()">Yes, Delete</button>
             </div>
         </div>
     </div>
