@@ -3550,8 +3550,9 @@
             document.getElementById('srv-active').checked = true;
             toggleExtraId();
             document.getElementById('server-modal-title').innerText = "Add API Server";
-            document.getElementById('server-modal').scrollTop = 0;
-            document.getElementById('server-modal').classList.add('active');
+            const modal = document.getElementById('server-modal');
+            modal.classList.add('active');
+            setTimeout(() => { modal.scrollTop = 0; }, 10);
         }
         function toggleExtraId() {
             const type = document.getElementById('srv-type').value;
@@ -3684,8 +3685,9 @@
             document.getElementById('srv-active').checked = s.is_active;
             toggleExtraId();
             document.getElementById('server-modal-title').innerText = "Edit API Server";
-            document.getElementById('server-modal').scrollTop = 0;
-            document.getElementById('server-modal').classList.add('active');
+            const modal = document.getElementById('server-modal');
+            modal.classList.add('active');
+            setTimeout(() => { modal.scrollTop = 0; }, 10);
         }
         let serverToDeleteId = null;
 
