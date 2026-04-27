@@ -2206,6 +2206,14 @@
             <!-- ===== Settings Main Menu Section ===== -->
             <section id="section-settings" class="view-section">
                 <div id="settings-main-menu" class="settings-menu active">
+                    <!-- General Settings -->
+                    <div class="settings-item" onclick="switchNav('settings-general', null)">
+                        <div class="settings-icon-box" style="background: rgba(59, 130, 246, 0.1); color: #3b82f6;">
+                            <i class="fas fa-sliders-h"></i>
+                        </div>
+                        <span class="settings-text">General Settings</span>
+                        <i class="fas fa-chevron-right settings-arrow"></i>
+                    </div>
                     <!-- Payments & Integration -->
                     <div class="settings-item" onclick="switchNav('settings-payments', null)">
                         <div class="settings-icon-box" style="background: rgba(59, 130, 246, 0.1); color: #3b82f6;">
@@ -2247,6 +2255,28 @@
                             <span class="switch-slider"></span>
                         </label>
                     </div>
+                </div>
+            </section>
+
+            <!-- ===== General Settings Page ===== -->
+            <section id="section-settings-general" class="view-section">
+                <button class="settings-back-btn" onclick="switchNav('settings', null)" style="margin-top: 10px; margin-bottom: 20px;">
+                    <i class="fas fa-arrow-left"></i> Back to Settings
+                </button>
+
+                <div class="card" style="padding: 28px; margin-bottom: 20px;">
+                    <div class="form-group" style="margin-bottom: 25px;">
+                        <label style="font-size: 0.95rem; color: var(--text-primary); font-weight: 600; margin-bottom: 12px; display: block;">Bot Name</label>
+                        <input type="text" id="setting-bot-name" class="search-input" style="margin-bottom: 0; padding: 16px; font-size: 1rem; height: auto;" placeholder="Numbers Store Bot">
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 25px;">
+                        <label style="font-size: 0.95rem; color: var(--text-primary); font-weight: 600; margin-bottom: 12px; display: block;">Purchase Log Channel ID</label>
+                        <input type="text" id="setting-log-channel" class="search-input" style="margin-bottom: 0; padding: 16px; font-size: 1rem; height: auto;" placeholder="e.g. -100123456789">
+                        <span style="font-size: 0.75rem; color: var(--text-s); margin-top: 5px; display: block;">The bot must be an admin in this channel to post logs.</span>
+                    </div>
+
+                    <button class="primary-btn" onclick="saveGeneralSettings()" style="width: 100%; padding: 16px; border-radius: 12px; font-weight: 700;">Save General Settings</button>
                 </div>
             </section>
 
@@ -2892,6 +2922,10 @@
                 if (sac) sac.innerText = allPrices.length;
 
                 renderPrices(allPrices);
+
+                // Populate General Settings
+                if (data.bot_name) document.getElementById('setting-bot-name').value = data.bot_name;
+                if (data.purchase_log_channel_id) document.getElementById('setting-log-channel').value = data.purchase_log_channel_id;
             } catch (e) { console.error(e); }
             finally { document.getElementById('loader').style.display = 'none'; }
             loadServers();
@@ -2923,6 +2957,31 @@
             } catch (e) {
                 console.error('Error toggling maintenance mode', e);
                 showToast(currentLang === 'ar' ? 'خطأ' : 'Error', 'Failed to update', 'error');
+            }
+        }
+
+        async function saveGeneralSettings() {
+            const botName = document.getElementById('setting-bot-name').value;
+            const logChannel = document.getElementById('setting-log-channel').value;
+            
+            try {
+                const res = await fetch('/api/admin/store/general-settings', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        bot_name: botName,
+                        purchase_log_channel_id: logChannel
+                    })
+                });
+                const data = await res.json();
+                if (data.status === 'success') {
+                    showToast(currentLang === 'ar' ? 'تم الحفظ' : 'Saved', currentLang === 'ar' ? 'تم حفظ الإعدادات العامة' : 'General settings saved', 'success');
+                } else {
+                    showToast(currentLang === 'ar' ? 'خطأ' : 'Error', data.message || 'Failed to save', 'error');
+                }
+            } catch (e) {
+                console.error(e);
+                showToast(currentLang === 'ar' ? 'خطأ' : 'Error', 'Connection error', 'error');
             }
         }
 

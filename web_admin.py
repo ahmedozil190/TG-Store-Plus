@@ -68,6 +68,10 @@ class StoreSettingsSubmit(BaseModel):
     trx_address: str
     usdt_bep20_address: str
 
+class GeneralSettingsSubmit(BaseModel):
+    bot_name: str
+    purchase_log_channel_id: str
+
 class ApiServerSubmit(BaseModel):
     id: int | None = None
     name: str
@@ -95,6 +99,56 @@ def get_flag_emoji(country_code: str):
         return "".join(chr(ord(c) + 127397) for c in country_code.upper())
     except:
         return "🌐"
+
+async def send_purchase_log(user_id: int, country_name: str, price: float):
+    """Send a purchase log to the configured Telegram channel."""
+    try:
+        from config import BOT_TOKEN
+        async with async_session() as session:
+            stmt = select(AppSetting).where(AppSetting.key == "purchase_log_channel_id")
+            res = await session.execute(stmt)
+            obj = res.scalar_one_or_none()
+            if not obj or not obj.value:
+                return
+            channel_id = obj.value.strip()
+            
+        flag = "🌐"
+        try:
+            _, _, iso = resolve_country_info(country_name)
+            if iso: flag = get_flag_emoji(iso)
+        except: pass
+        
+        masked_id = str(user_id)
+        if len(masked_id) > 6:
+            masked_id = f"{masked_id[:3]}***{masked_id[-3:]}"
+        else:
+            masked_id = f"{masked_id[:2]}***"
+            
+        message = (
+            "🛍 **New Successful Purchase!**\n\n"
+            f"👤 **User:** `{masked_id}`\n"
+            f"🌍 **Country:** {flag} {country_name}\n"
+            f"💰 **Price:** `${price:.2f}`\n\n"
+            "✅ *The number has been delivered successfully.*"
+        )
+        
+        # Send via Bot API
+        url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
+        payload = {
+            "chat_id": channel_id,
+            "text": message,
+            "parse_mode": "Markdown"
+        }
+        
+        def do_send():
+            try:
+                import requests
+                requests.post(url, json=payload, timeout=5)
+            except: pass
+            
+        await asyncio.to_thread(do_send)
+    except Exception as e:
+        logger.error(f"Error sending purchase log: {e}")
 
 def resolve_country_info(country_code_str: str, full_phone: str = None):
     """Resolve ISO code and Country Name. Handles numeric codes, Alpha-2, and Alpha-3."""
@@ -938,6 +992,7 @@ async def store_buy(data: StoreBuy):
                 txn = Transaction(user_id=user.id, type=TransactionType.BUY, amount=-final_price)
                 session.add(txn)
                 await session.commit()
+                await send_purchase_log(user.id, data.country, final_price)
                 return {"status": "success", "phone": account.phone_number, "id": account.id}
             else:
                 # External Purchase Execution
@@ -963,6 +1018,7 @@ async def store_buy(data: StoreBuy):
                     txn = Transaction(user_id=user.id, type=TransactionType.BUY, amount=-final_price)
                     session.add(txn)
                     await session.commit()
+                    await send_purchase_log(user.id, data.country, final_price)
                     return {"status": "success", "phone": new_acc.phone_number, "id": new_acc.id}
                 else:
                     raw_msg = str(buy_res.get("message", "API provider error"))
@@ -1435,11 +1491,15 @@ async def get_admin_store_data():
             bot_name = "Bot"
             try:
                 bn_stmt = select(AppSetting).where(AppSetting.key == "bot_name")
-                bn_res = await session.execute(bn_stmt)
-                bn_obj = bn_res.scalar_one_or_none()
+                bn_obj = (await session.execute(bn_stmt)).scalar_one_or_none()
                 if bn_obj:
                     bot_name = bn_obj.value
-                else:
+                
+                log_ch_stmt = select(AppSetting).where(AppSetting.key == "purchase_log_channel_id")
+                log_ch_obj = (await session.execute(log_ch_stmt)).scalar_one_or_none()
+                purchase_log_channel_id = log_ch_obj.value if log_ch_obj else ""
+                
+                if not bn_obj:
                     from config import BOT_TOKEN
                     def fetch_bot_name_store():
                         try:
@@ -1550,6 +1610,7 @@ async def get_admin_store_data():
 
         return {
             "bot_name": bot_name,
+            "purchase_log_channel_id": purchase_log_channel_id,
             "stats": {
                 "user_count": user_count,
                 "banned_users": banned_users,
@@ -1586,6 +1647,26 @@ async def cleanup_fake_api(key: str = None):
             return {"status": "success", "message": "Cleanup complete. Fake data removed."}
     except Exception as e:
         logger.error(f"Cleanup API Error: {e}")
+        return {"status": "error", "message": str(e)}
+
+@app.post("/api/admin/store/general-settings")
+async def save_general_settings(req: GeneralSettingsSubmit):
+    try:
+        async with async_session() as session:
+            updates = {
+                "bot_name": req.bot_name.strip(),
+                "purchase_log_channel_id": req.purchase_log_channel_id.strip()
+            }
+            for k, v in updates.items():
+                obj = (await session.execute(select(AppSetting).where(AppSetting.key == k))).scalar_one_or_none()
+                if obj:
+                    obj.value = v
+                else:
+                    session.add(AppSetting(key=k, value=v))
+            await session.commit()
+            return {"status": "success"}
+    except Exception as e:
+        logger.error(f"Save General Settings Error: {e}")
         return {"status": "error", "message": str(e)}
 
 @app.get("/api/admin/store/settings")
