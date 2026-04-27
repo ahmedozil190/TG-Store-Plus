@@ -74,13 +74,32 @@ class ExternalProvider:
                         data = resp.json()
                         if isinstance(data, dict):
                             # Common field names for balance
-                            balance_keys = ["balance", "Balance", "money", "credit", "amount", "balans", "sum", "user_balance", "available_balance", "credits"]
+                            balance_keys = ["wallet", "balance", "Balance", "money", "credit", "amount", "balans", "sum", "user_balance", "available_balance", "credits"]
                             
+                            def parse_numeric(v):
+                                """Helper to extract float from strings like '1.4 USD' or '$5.00'"""
+                                if v is None: return None
+                                if isinstance(v, (int, float)): return float(v)
+                                try:
+                                    # Try direct conversion
+                                    return float(v)
+                                except:
+                                    # Try cleaning the string (remove currency, take first part)
+                                    try:
+                                        # Remove common currency symbols and units
+                                        cleaned = str(v).lower().replace('usd', '').replace('$', '').replace('€', '').replace('₽', '').strip()
+                                        # Take the first word (in case of '1.4 USD')
+                                        first_part = cleaned.split()[0]
+                                        return float(first_part)
+                                    except:
+                                        return None
+
                             # A. Direct search
                             for key in balance_keys:
                                 if key in data and data[key] is not None:
-                                    try: return {"status": "success", "balance": float(data[key])}
-                                    except: continue
+                                    val = parse_numeric(data[key])
+                                    if val is not None:
+                                        return {"status": "success", "balance": val}
                             
                             # B. Nested search (Common for Standard panels like Max-TG/Spider)
                             for sub in ['result', 'user', 'info', 'data']:
@@ -90,27 +109,34 @@ class ExternalProvider:
                                         for key in balance_keys:
                                             v = data[sub].get(key)
                                             if v is not None:
-                                                try: return {"status": "success", "balance": float(v)}
-                                                except: continue
+                                                val = parse_numeric(v)
+                                                if val is not None:
+                                                    return {"status": "success", "balance": val}
                                     # If result is a raw value (some panels)
                                     elif sub == 'result':
-                                        try: return {"status": "success", "balance": float(data[sub])}
-                                        except: continue
+                                        val = parse_numeric(data[sub])
+                                        if val is not None:
+                                            return {"status": "success", "balance": val}
 
                             # C. Handle specific status/ok flags
                             msg = data.get("message") or data.get("msg") or data.get("error") or data.get("status")
-                            if msg and msg != "success":
+                            if msg and msg not in ["success", "ok", True]:
                                 keys_found = ", ".join(data.keys())
                                 return {"status": "error", "message": f"{msg} (Keys: {keys_found})"}
                             
                             keys_found = ", ".join(data.keys())
                             return {"status": "error", "message": f"Balance missing. Keys: {keys_found}"}
+                    except Exception as json_err:
+                        logger.error(f"JSON Parse error in get_balance: {json_err}")
+                    
+                    # 2. Try parsing as raw number from text
+                    try:
+                        # Clean the text before parsing (remove 'USD' etc)
+                        cleaned_text = text.lower().replace('usd', '').replace('$', '').strip()
+                        first_word = cleaned_text.split()[0]
+                        return {"status": "success", "balance": float(first_word)}
                     except:
-                        # 2. Try parsing as raw number
-                        try:
-                            return {"status": "success", "balance": float(text)}
-                        except:
-                            pass
+                        pass
                             
                     return {"status": "error", "message": f"Format Error. Text: {text[:50]}"}
                 else:
