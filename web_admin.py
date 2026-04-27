@@ -518,8 +518,15 @@ async def get_store_data(user_id: int = None):
                     map_key = f"{name}|__local__"
                     countries_map[map_key] = {"name": name, "count": count, "server_id": None, "server_name": "Server 1"}
 
+            server_names = []
+            if local_enabled:
+                server_names.append("Server 1")
+                
             # 2. External Stock
             active_servers = (await session.execute(select(ApiServer).where(ApiServer.is_active == True))).scalars().all()
+            for srv in active_servers:
+                server_names.append(srv.name)
+                
             logger.info(f"Active external servers: {len(active_servers)}")
             for srv in active_servers:
                 try:
