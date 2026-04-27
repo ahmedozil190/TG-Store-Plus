@@ -1,6 +1,6 @@
 from typing import Any, Awaitable, Callable, Dict
 from aiogram import BaseMiddleware
-from aiogram.types import TelegramObject, Message, CallbackQuery
+from aiogram.types import TelegramObject, Message, CallbackQuery, Update
 from database.engine import async_session
 from database.models import AppSetting
 from sqlalchemy import select
@@ -16,39 +16,47 @@ class MaintenanceMiddleware(BaseMiddleware):
         event: TelegramObject,
         data: Dict[str, Any]
     ) -> Any:
-        # Check if user is admin
-        user = data.get("event_from_user")
-        if user and user.id in ADMIN_IDS:
-            return await handler(event, data)
-
         try:
+            user_id = None
+            if isinstance(event, Message):
+                user_id = event.from_user.id
+            elif isinstance(event, CallbackQuery):
+                user_id = event.from_user.id
+            elif isinstance(event, Update):
+                if event.message:
+                    user_id = event.message.from_user.id
+                elif event.callback_query:
+                    user_id = event.callback_query.from_user.id
+                elif event.inline_query:
+                    user_id = event.inline_query.from_user.id
+
+            # Check if user is admin
+            is_admin = user_id and user_id in ADMIN_IDS
+            
             async with async_session() as session:
                 stmt = select(AppSetting).where(AppSetting.key == "maintenance_mode")
                 result = await session.execute(stmt)
                 setting = result.scalar_one_or_none()
-                
-                if setting and setting.value.lower() == "true":
-                    # Determine if we should block this update
-                    from aiogram.types import Update
-                    
-                    target = None
-                    if isinstance(event, Message):
-                        target = event
-                    elif isinstance(event, CallbackQuery):
-                        target = event
-                    elif isinstance(event, Update):
-                        if event.message:
-                            target = event.message
-                        elif event.callback_query:
-                            target = event.callback_query
+                is_maintenance = setting and str(setting.value).lower() == "true"
 
-                    if target:
-                        if isinstance(target, Message):
-                            await target.answer("⚠️ البوت في وضع الصيانة حالياً. يرجى المحاولة لاحقاً.\n\n⚠️ The bot is currently in maintenance mode. Please try again later.")
-                        elif isinstance(target, CallbackQuery):
-                            await target.answer("البوت في وضع الصيانة - Maintenance Mode", show_alert=True)
-                        return
+            if is_maintenance and not is_admin:
+                # BLOCK non-admins
+                target = None
+                if isinstance(event, Message): target = event
+                elif isinstance(event, CallbackQuery): target = event
+                elif isinstance(event, Update):
+                    if event.message: target = event.message
+                    elif event.callback_query: target = event.callback_query
+
+                if target:
+                    msg = "⚠️ البوت في وضع الصيانة حالياً. يرجى المحاولة لاحقاً.\n\n⚠️ The bot is currently in maintenance mode. Please try again later."
+                    if isinstance(target, Message):
+                        await target.answer(msg)
+                    elif isinstance(target, CallbackQuery):
+                        await target.answer("Maintenance Mode ⚠️", show_alert=True)
+                    return # STOP HERE
+
+            return await handler(event, data)
         except Exception as e:
             logger.error(f"MaintenanceMiddleware Error: {e}")
-
-        return await handler(event, data)
+            return await handler(event, data)
