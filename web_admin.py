@@ -100,10 +100,15 @@ def get_flag_emoji(country_code: str):
     except:
         return "🌐"
 
-async def send_purchase_log(user_id: int, country_name: str, price: float):
+_bot_info_cache = {}
+
+async def send_purchase_log(user_id: int, country_name: str, price: float, phone: str, code: str):
     """Send a purchase log to the configured Telegram channel."""
     try:
         from config import BOT_TOKEN
+        import urllib.request
+        import json
+        
         async with async_session() as session:
             stmt = select(AppSetting).where(AppSetting.key == "purchase_log_channel_id")
             res = await session.execute(stmt)
@@ -112,6 +117,27 @@ async def send_purchase_log(user_id: int, country_name: str, price: float):
                 return
             channel_id = obj.value.strip()
             
+            bn_stmt = select(AppSetting).where(AppSetting.key == "bot_name")
+            bn_obj = (await session.execute(bn_stmt)).scalar_one_or_none()
+            custom_bot_name = bn_obj.value if bn_obj else ""
+            
+        if not _bot_info_cache.get("username"):
+            def get_bot_info():
+                try:
+                    req = urllib.request.Request(f"https://api.telegram.org/bot{BOT_TOKEN}/getMe")
+                    with urllib.request.urlopen(req, timeout=2) as r:
+                        data = json.loads(r.read().decode())
+                        if data.get("ok"):
+                            return data["result"].get("first_name", "Bot"), data["result"].get("username", "")
+                except: return "Bot", ""
+                return "Bot", ""
+            b_name, b_user = await asyncio.to_thread(get_bot_info)
+            _bot_info_cache["name"] = b_name
+            _bot_info_cache["username"] = b_user
+            
+        bot_name = custom_bot_name or _bot_info_cache.get("name", "Bot")
+        bot_username = _bot_info_cache.get("username", "")
+        
         flag = "🌐"
         try:
             _, _, iso = resolve_country_info(country_name)
@@ -124,20 +150,41 @@ async def send_purchase_log(user_id: int, country_name: str, price: float):
         else:
             masked_id = f"{masked_id[:2]}***"
             
+        masked_phone = str(phone)
+        if len(masked_phone) > 7:
+            masked_phone = f"{masked_phone[:5]}•••••••"
+            
+        now_date = datetime.now().strftime("%Y-%m-%d")
+        now_time = datetime.now().strftime("%I:%M %p")
+        
         message = (
-            "🛍 **New Successful Purchase!**\n\n"
-            f"👤 **User:** `{masked_id}`\n"
-            f"🌍 **Country:** {flag} {country_name}\n"
-            f"💰 **Price:** `${price:.2f}`\n\n"
-            "✅ *The number has been delivered successfully.*"
+            f"**{bot_name}** 🩸\n"
+            f"✅ **Purchase report #Successful ( {flag} #{country_name.replace(' ', '_')} )**\n"
+            f"⏰ **At time:** {now_date} | {now_time}\n"
+            f"🔔 **Activation code:** `{code}`\n"
+            f"🛍 **Purchase details** 👇\n"
+            f"🤖 @{bot_username}" if bot_username else f"🤖 {bot_name}"
         )
         
-        # Send via Bot API
+        keyboard = {
+            "inline_keyboard": [
+                [{"text": "🌍 Country", "callback_data": "ignore"}, {"text": f"{country_name} {flag}", "callback_data": "ignore"}],
+                [{"text": "📵 Number", "callback_data": "ignore"}, {"text": f"{masked_phone}", "callback_data": "ignore"}],
+                [{"text": "🏷 Price", "callback_data": "ignore"}, {"text": f"{price:.2f}$", "callback_data": "ignore"}],
+                [{"text": "🆔 User ID", "callback_data": "ignore"}, {"text": f"{masked_id}", "callback_data": "ignore"}],
+                [{"text": "✅ Status", "callback_data": "ignore"}, {"text": "Completed", "callback_data": "ignore"}],
+            ]
+        }
+        
+        if bot_username:
+            keyboard["inline_keyboard"].append([{"text": "🛒 Buy Now", "url": f"https://t.me/{bot_username}"}])
+            
         url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
         payload = {
             "chat_id": channel_id,
             "text": message,
-            "parse_mode": "Markdown"
+            "parse_mode": "Markdown",
+            "reply_markup": keyboard
         }
         
         def do_send():
@@ -999,7 +1046,6 @@ async def store_buy(data: StoreBuy):
                 txn = Transaction(user_id=user.id, type=TransactionType.BUY, amount=-final_price)
                 session.add(txn)
                 await session.commit()
-                await send_purchase_log(user.id, data.country, final_price)
                 return {"status": "success", "phone": account.phone_number, "id": account.id}
             else:
                 # External Purchase Execution
@@ -1025,7 +1071,6 @@ async def store_buy(data: StoreBuy):
                     txn = Transaction(user_id=user.id, type=TransactionType.BUY, amount=-final_price)
                     session.add(txn)
                     await session.commit()
-                    await send_purchase_log(user.id, data.country, final_price)
                     return {"status": "success", "phone": new_acc.phone_number, "id": new_acc.id}
                 else:
                     raw_msg = str(buy_res.get("message", "API provider error"))
@@ -1080,6 +1125,7 @@ async def store_get_code(user_id: int, phone: str):
                     code = code_res.get("code")
                     account.otp_code = code
                     await session.commit()
+                    await send_purchase_log(user_id, account.country, account.price, account.phone_number, code)
                     return {"status": "success", "code": code}
                 return {"status": "pending", "message": code_res.get("message", "بانتظار وصول الكود...")}
             else:
@@ -1091,6 +1137,7 @@ async def store_get_code(user_id: int, phone: str):
                 if code:
                     account.otp_code = code
                     await session.commit()
+                    await send_purchase_log(user_id, account.country, account.price, account.phone_number, code)
                     return {"status": "success", "code": code}
                 return {"status": "pending", "message": "Code not found yet"}
     except Exception as e:
