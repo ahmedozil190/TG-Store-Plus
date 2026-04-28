@@ -190,7 +190,7 @@ async def send_purchase_log(user_id: int, country_name: str, price: float, phone
     except Exception as e:
         logger.error(f"Error in send_purchase_log: {e}")
 
-async def send_sourcing_price_log(country_name: str, iso_code: str, country_code: str, buy_price: float, approve_delay: int):
+async def send_sourcing_price_log(country_name: str, iso_code: str, country_code: str, buy_price: float, approve_delay: int, quantity: int = 1000):
     """Send a price update log to the configured Telegram channel."""
     try:
         async with async_session() as session:
@@ -223,9 +223,8 @@ async def send_sourcing_price_log(country_name: str, iso_code: str, country_code
         clean_name = html.escape(c_name.strip())
         
         message = (
-            "<b>TG GET</b>\n"
             f"<b>- {clean_name} - {flag} - ${buy_price:.2f}</b>\n\n"
-            f"<b>- Quantity - 1000 - +{html.escape(str(country_code))} - {html.escape(str(iso_code))}</b>\n\n"
+            f"<b>- Quantity - {quantity} - +{html.escape(str(country_code))} - {html.escape(str(iso_code))}</b>\n\n"
             f"<b>- Confirmation time [ {approve_delay} ] second</b>\n\n"
             "<b>-The bot is always open. I will announce on this channel if the price goes up or down</b>"
         )
@@ -2188,11 +2187,13 @@ async def update_sourcing_price(data: dict):
             session.add(cp)
         await session.commit()
         
-        # Trigger price log in background
-        try:
-            await send_sourcing_price_log(cp.country_name, cp.iso_code, cp.country_code, cp.buy_price, cp.approve_delay)
-        except Exception as log_err:
-            logger.error(f"Failed to send sourcing price log: {log_err}")
+        # Trigger price log in background if enabled
+        if data.get("send_log", True):
+            try:
+                quantity = int(data.get("quantity", 1000))
+                await send_sourcing_price_log(cp.country_name, cp.iso_code, cp.country_code, cp.buy_price, cp.approve_delay, quantity)
+            except Exception as log_err:
+                logger.error(f"Failed to send sourcing price log: {log_err}")
             
     return {"status": "success"}
 
