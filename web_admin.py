@@ -200,20 +200,26 @@ async def send_sourcing_price_log(country_name: str, iso_code: str, country_code
             if not obj or not obj.value:
                 return
             channel_id = obj.value.strip()
-            # Standardize channel ID
-            if channel_id.isdigit() or (channel_id.startswith('-') and channel_id[1:].isdigit()):
-                if not channel_id.startswith('-100') and not channel_id.startswith('-'):
+
+            # Standardize channel ID (more aggressive logic)
+            if channel_id.isdigit() or (channel_id.startswith('-') and not channel_id.startswith('-100')):
+                if not channel_id.startswith('-'):
                     channel_id = f"-100{channel_id}"
+                elif channel_id.startswith('-') and not channel_id.startswith('-100'):
+                    # Handle cases where user might put -12345 instead of -10012345
+                    channel_id = f"-100{channel_id[1:]}"
 
         from config import SELLER_BOT_TOKEN
-        import requests
         import urllib.request
         import json
         
         flag = get_flag_emoji(iso_code)
         
-        # Clean name
-        clean_name = country_name.replace("🇸🇦", "").replace("🇪🇬", "").replace("🇺🇾", "").strip()
+        # Clean name safely
+        c_name = str(country_name or "Unknown")
+        for e in ["🇸🇦", "🇪🇬", "🇺🇾", "🌐"]:
+            c_name = c_name.replace(e, "")
+        clean_name = c_name.strip()
         
         message = (
             "<b>TG GET</b>\n"
@@ -225,8 +231,8 @@ async def send_sourcing_price_log(country_name: str, iso_code: str, country_code
         
         bot_username = ""
         try:
-            req = urllib.request.Request(f"https://api.telegram.org/bot{SELLER_BOT_TOKEN}/getMe")
-            with urllib.request.urlopen(req, timeout=2) as r:
+            req_info = urllib.request.Request(f"https://api.telegram.org/bot{SELLER_BOT_TOKEN}/getMe")
+            with urllib.request.urlopen(req_info, timeout=5) as r:
                 res_data = json.loads(r.read().decode())
                 if res_data.get("ok"):
                     bot_username = res_data["result"].get("username", "")
@@ -243,7 +249,16 @@ async def send_sourcing_price_log(country_name: str, iso_code: str, country_code
                 "inline_keyboard": [[{"text": "🤖 BOT 🤖", "url": f"https://t.me/{bot_username}"}]]
             }
             
-        requests.post(f"https://api.telegram.org/bot{SELLER_BOT_TOKEN}/sendMessage", json=payload)
+        # Send via urllib to be consistent and avoid sync requests issues
+        req = urllib.request.Request(
+            f"https://api.telegram.org/bot{SELLER_BOT_TOKEN}/sendMessage",
+            data=json.dumps(payload).encode('utf-8'),
+            headers={'Content-Type': 'application/json'},
+            method='POST'
+        )
+        with urllib.request.urlopen(req, timeout=10) as response:
+            pass
+            
     except Exception as e:
         logger.error(f"Error sending sourcing price log: {e}")
 
@@ -2179,6 +2194,19 @@ async def update_sourcing_price(data: dict):
             logger.error(f"Failed to send sourcing price log: {log_err}")
             
     return {"status": "success"}
+
+@app.post("/api/admin/sourcing/price/test-log")
+async def test_sourcing_price_log(data: dict):
+    channel_id = data.get("channel_id")
+    if not channel_id:
+        return {"status": "error", "message": "Channel ID is required"}
+    
+    try:
+        # Send a test log with US data
+        await send_sourcing_price_log("Test Country", "US", "1", 0.99, 3600)
+        return {"status": "success"}
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
 
 @app.get("/api/admin/sourcing/user-prices")
 async def get_user_prices():

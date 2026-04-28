@@ -2197,7 +2197,10 @@
                         <input type="text" id="setting-sourcing-log-channel" class="search-input" style="margin-bottom: 0; padding: 16px; font-size: 1rem; height: auto;" placeholder="e.g. -100123456789">
                         <span style="font-size: 0.75rem; color: var(--text-s); margin-top: 5px; display: block;">The bot must be an admin in this channel to post price updates.</span>
                     </div>
-                    <button class="primary-btn" onclick="saveSettings()">Save Price Channel</button>
+                    <div style="display: flex; gap: 10px;">
+                        <button class="primary-btn" onclick="saveSettings()" style="flex: 1;">Save Price Channel</button>
+                        <button class="btn-add" onclick="sendTestPriceLog()" style="padding: 12px 20px; border-radius: 12px; background: rgba(139, 92, 246, 0.1); color: #8b5cf6; border: 1px solid rgba(139, 92, 246, 0.2);">Test</button>
+                    </div>
                 </div>
             </section>
 
@@ -4015,6 +4018,27 @@
             } catch (e) {
                 console.error(e);
                 showToast('Error', 'Failed to save settings', 'error');
+            }
+        }
+
+        async function sendTestPriceLog() {
+            const logChannel = document.getElementById('setting-sourcing-log-channel').value;
+            if (!logChannel) return showToast(currentLang === 'ar' ? 'خطأ' : 'Error', currentLang === 'ar' ? 'يرجى إدخال معرف القناة أولاً' : 'Please enter a channel ID first', 'error');
+            
+            try {
+                const res = await fetch('/api/admin/sourcing/price/test-log', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ channel_id: logChannel })
+                });
+                const data = await res.json();
+                if (data.status === 'success') {
+                    showToast(currentLang === 'ar' ? 'نجاح' : 'Success', currentLang === 'ar' ? 'تم إرسال رسالة تجريبية!' : 'Test message sent!', 'success');
+                } else {
+                    showToast(currentLang === 'ar' ? 'خطأ' : 'Error', data.message || (currentLang === 'ar' ? 'فشل الإرسال' : 'Failed to send'), 'error');
+                }
+            } catch (e) {
+                showToast('Error', 'Connection error', 'error');
             }
         }
 
