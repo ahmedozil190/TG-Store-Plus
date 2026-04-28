@@ -223,10 +223,10 @@ async def send_sourcing_price_log(country_name: str, iso_code: str, country_code
         clean_name = html.escape(c_name.strip())
         
         message = (
-            f"<b>- {clean_name} - {flag} - ${buy_price:.2f}</b>\n\n"
-            f"<b>- Quantity - {quantity} - +{html.escape(str(country_code))} - {html.escape(str(iso_code))}</b>\n\n"
-            f"<b>- Confirmation time [ {approve_delay} ] second</b>\n\n"
-            "<b>-The bot is always open. I will announce on this channel if the price goes up or down</b>"
+            f"- {clean_name} - {flag} - ${buy_price:.2f}\n\n"
+            f"- Quantity - {quantity} - +{html.escape(str(country_code))} - {html.escape(str(iso_code))}\n\n"
+            f"- Confirmation time [ {approve_delay} ] second\n\n"
+            "-The bot is always open. I will announce on this channel if the price goes up or down"
         )
         
         bot_username = ""
