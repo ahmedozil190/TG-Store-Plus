@@ -212,6 +212,7 @@ async def send_sourcing_price_log(country_name: str, iso_code: str, country_code
         from config import SELLER_BOT_TOKEN
         import urllib.request
         import json
+        import html
         
         flag = get_flag_emoji(iso_code)
         
@@ -219,12 +220,12 @@ async def send_sourcing_price_log(country_name: str, iso_code: str, country_code
         c_name = str(country_name or "Unknown")
         for e in ["🇸🇦", "🇪🇬", "🇺🇾", "🌐"]:
             c_name = c_name.replace(e, "")
-        clean_name = c_name.strip()
+        clean_name = html.escape(c_name.strip())
         
         message = (
             "<b>TG GET</b>\n"
             f"<b>- {clean_name} - {flag} - ${buy_price:.2f}</b>\n\n"
-            f"<b>- Quantity - 1000 - +{country_code} - {iso_code}</b>\n\n"
+            f"<b>- Quantity - 1000 - +{html.escape(str(country_code))} - {html.escape(str(iso_code))}</b>\n\n"
             f"<b>- Confirmation time [ {approve_delay} ] second</b>\n\n"
             "<b>-The bot is always open. I will announce on this channel if the price goes up or down</b>"
         )
