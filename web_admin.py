@@ -190,6 +190,59 @@ async def send_purchase_log(user_id: int, country_name: str, price: float, phone
     except Exception as e:
         logger.error(f"Error in send_purchase_log: {e}")
 
+async def send_sourcing_price_log(country_name: str, iso_code: str, country_code: str, buy_price: float, approve_delay: int):
+    """Send a price update log to the configured Telegram channel."""
+    try:
+        async with async_session() as session:
+            stmt = select(AppSetting).where(AppSetting.key == "sourcing_log_channel_id")
+            res = await session.execute(stmt)
+            obj = res.scalar_one_or_none()
+            if not obj or not obj.value:
+                return
+            channel_id = obj.value.strip()
+
+        from config import SELLER_BOT_TOKEN
+        import requests
+        import urllib.request
+        import json
+        
+        flag = get_flag_emoji(iso_code)
+        
+        # Clean name
+        clean_name = country_name.replace("🇸🇦", "").replace("🇪🇬", "").replace("🇺🇾", "").strip()
+        
+        message = (
+            "<b>TG GET</b>\n"
+            f"<b>- {clean_name} - {flag} - ${buy_price:.2f}</b>\n\n"
+            f"<b>- Quantity - 1000 - +{country_code} - {iso_code}</b>\n\n"
+            f"<b>- Confirmation time [ {approve_delay} ] second</b>\n\n"
+            "<b>-The bot is always open. I will announce on this channel if the price goes up or down</b>"
+        )
+        
+        bot_username = ""
+        try:
+            req = urllib.request.Request(f"https://api.telegram.org/bot{SELLER_BOT_TOKEN}/getMe")
+            with urllib.request.urlopen(req, timeout=2) as r:
+                res_data = json.loads(r.read().decode())
+                if res_data.get("ok"):
+                    bot_username = res_data["result"].get("username", "")
+        except: pass
+
+        payload = {
+            "chat_id": channel_id,
+            "text": message,
+            "parse_mode": "HTML"
+        }
+        
+        if bot_username:
+            payload["reply_markup"] = {
+                "inline_keyboard": [[{"text": "🤖 BOT 🤖", "url": f"https://t.me/{bot_username}"}]]
+            }
+            
+        requests.post(f"https://api.telegram.org/bot{SELLER_BOT_TOKEN}/sendMessage", json=payload)
+    except Exception as e:
+        logger.error(f"Error sending sourcing price log: {e}")
+
 def resolve_country_info(country_code_str: str, full_phone: str = None):
     """Resolve ISO code and Country Name. Handles numeric codes, Alpha-2, and Alpha-3."""
     import pycountry
@@ -1499,8 +1552,14 @@ async def get_sourcing_data():
                     "rejected_count": seller_stats[u.id]["rejected"]
                 })
 
+            # Sourcing settings
+            log_ch_stmt = select(AppSetting).where(AppSetting.key == "sourcing_log_channel_id")
+            log_ch_obj = (await session.execute(log_ch_stmt)).scalar_one_or_none()
+            sourcing_log_channel_id = log_ch_obj.value if log_ch_obj else ""
+
             return {
                 "bot_name": bot_name,
+                "sourcing_log_channel_id": sourcing_log_channel_id,
                 "stats": {
                     "total_sourced": total_sourced, 
                     "pending_count": pending_count,
@@ -1572,7 +1631,7 @@ async def get_admin_store_data():
 
             # Deposit stats
             total_deposit_requests = (await session.execute(select(func.count(Deposit.id)))).scalar() or 0
-            total_deposits_amount = (await session.execute(select(func.sum(Deposit.amount)))).scalar() or 0.0
+            total_deposits_amount = (await session.execute(select(func.sum(Deposit.amount))).where(Deposit.id != None)).scalar() or 0.0
 
             # Price stats
             active_countries_count = (await session.execute(select(func.count(CountryPrice.id)).where(CountryPrice.price > 0))).scalar() or 0
@@ -2108,6 +2167,13 @@ async def update_sourcing_price(data: dict):
             )
             session.add(cp)
         await session.commit()
+        
+        # Trigger price log in background
+        try:
+            await send_sourcing_price_log(cp.country_name, cp.iso_code, cp.country_code, cp.buy_price, cp.approve_delay)
+        except Exception as log_err:
+            logger.error(f"Failed to send sourcing price log: {log_err}")
+            
     return {"status": "success"}
 
 @app.get("/api/admin/sourcing/user-prices")

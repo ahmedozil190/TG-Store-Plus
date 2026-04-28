@@ -2165,12 +2165,12 @@
                         </label>
                     </div>
 
-                    <!-- General Settings -->
+                    <!-- Price Channel Settings -->
                     <div class="settings-item" onclick="switchNav('settings-general', null)">
                         <div class="settings-icon-box" style="background: rgba(59, 130, 246, 0.1); color: #3b82f6;">
-                            <i class="fas fa-sliders-h"></i>
+                            <i class="fas fa-bullhorn"></i>
                         </div>
-                        <span class="settings-text">General Settings</span>
+                        <span class="settings-text">Price Channel</span>
                         <i class="fas fa-chevron-right settings-arrow"></i>
                     </div>
 
@@ -2185,19 +2185,19 @@
                 </div>
             </section>
 
-            <!-- ===== General Settings Page ===== -->
+            <!-- ===== Price Channel Page ===== -->
             <section id="section-settings-general" class="view-section">
                 <button class="settings-back-btn" onclick="switchNav('settings', null)">
                     <i class="fas fa-arrow-left"></i> Back to Settings
                 </button>
 
                 <div class="card" style="padding: 28px; margin-bottom: 20px;">
-                    <div class="form-group">
-                        <label data-i18n="lbl_bot_name">Bot Name</label>
-                        <input type="text" id="setting-bot-name" class="input-field" placeholder="Sourcing Bot">
+                    <div class="form-group" style="margin-bottom: 25px;">
+                        <label style="font-size: 0.95rem; color: var(--text-primary); font-weight: 600; margin-bottom: 12px; display: block;">Sourcing Log Channel ID</label>
+                        <input type="text" id="setting-sourcing-log-channel" class="search-input" style="margin-bottom: 0; padding: 16px; font-size: 1rem; height: auto;" placeholder="e.g. -100123456789">
+                        <span style="font-size: 0.75rem; color: var(--text-s); margin-top: 5px; display: block;">The bot must be an admin in this channel to post price updates.</span>
                     </div>
-                    <button class="primary-btn" onclick="saveSettings()" data-i18n="btn_save_settings">Save
-                        Settings</button>
+                    <button class="primary-btn" onclick="saveSettings()">Save Price Channel</button>
                 </div>
             </section>
 
@@ -3232,6 +3232,10 @@
                 if (ucEl) ucEl.innerText = data.stats.user_count || allUsers.length;
                 const bcEl = document.getElementById('banned-count');
                 if (bcEl) bcEl.innerText = allUsers.filter(u => u.banned).length;
+                if (data.sourcing_log_channel_id) {
+                    const slcInput = document.getElementById('setting-sourcing-log-channel');
+                    if (slcInput) slcInput.value = data.sourcing_log_channel_id;
+                }
                 renderUsers(filteredUsers || allUsers);
             } catch (e) { console.error('Init Error:', e); }
             finally {
@@ -3995,19 +3999,18 @@
         }
 
         async function saveSettings() {
-            const botName = document.getElementById('setting-bot-name').value;
+            const logChannel = document.getElementById('setting-sourcing-log-channel').value;
             try {
                 const res = await fetch('/api/admin/system/settings', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ bot_name: botName })
+                    body: JSON.stringify({ sourcing_log_channel_id: logChannel })
                 });
                 const data = await res.json();
                 if (data.status === 'success') {
-                    showToast(currentLang === 'ar' ? 'تم الحفظ' : 'Saved',
-                        currentLang === 'ar' ? 'تم حفظ الإعدادات بنجاح' : 'Settings saved successfully',
-                        'success');
-                    if (botName) document.getElementById('sideBrandName').textContent = botName;
+                    showToast(currentLang === 'ar' ? 'تم الحفظ' : 'Saved', 
+                               currentLang === 'ar' ? 'تم حفظ معرف القناة بنجاح' : 'Channel ID saved successfully', 
+                               'success');
                 }
             } catch (e) {
                 console.error(e);
