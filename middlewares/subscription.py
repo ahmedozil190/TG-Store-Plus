@@ -1,6 +1,6 @@
 from typing import Any, Awaitable, Callable, Dict
 from aiogram import BaseMiddleware, Bot
-from aiogram.types import TelegramObject, Message, CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton
+from aiogram.types import TelegramObject, Message, CallbackQuery, Update, InlineKeyboardMarkup, InlineKeyboardButton
 from database.engine import async_session
 from database.models import SubscriptionChannel
 from sqlalchemy import select
@@ -17,11 +17,26 @@ class SubscriptionMiddleware(BaseMiddleware):
         data: Dict[str, Any]
     ) -> Any:
         try:
-            # Only check for Messages and CallbackQueries
-            if not isinstance(event, (Message, CallbackQuery)):
+            user_id = None
+            target = None
+            
+            if isinstance(event, Message):
+                user_id = event.from_user.id
+                target = event
+            elif isinstance(event, CallbackQuery):
+                user_id = event.from_user.id
+                target = event
+            elif isinstance(event, Update):
+                if event.message:
+                    user_id = event.message.from_user.id
+                    target = event.message
+                elif event.callback_query:
+                    user_id = event.callback_query.from_user.id
+                    target = event.callback_query
+            
+            if not user_id or not target:
                 return await handler(event, data)
 
-            user_id = event.from_user.id
             bot: Bot = data.get("bot")
             
             # Admins bypass subscription check
@@ -65,12 +80,12 @@ class SubscriptionMiddleware(BaseMiddleware):
                     "✅ <b>After joining, send /start</b>"
                 )
                 
-                if isinstance(event, Message):
-                    await event.answer(msg, reply_markup=kb, parse_mode="HTML")
-                elif isinstance(event, CallbackQuery):
+                if isinstance(target, Message):
+                    await target.answer(msg, reply_markup=kb, parse_mode="HTML")
+                elif isinstance(target, CallbackQuery):
                     # For callback queries, we might want to send a new message or alert
-                    await event.message.answer(msg, reply_markup=kb, parse_mode="HTML")
-                    await event.answer()
+                    await target.message.answer(msg, reply_markup=kb, parse_mode="HTML")
+                    await target.answer()
                 
                 return # Block further processing
 
