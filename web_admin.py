@@ -102,7 +102,7 @@ def get_flag_emoji(country_code: str):
 
 _bot_info_cache = {}
 
-async def send_purchase_log(user_id: int, country_name: str, price: float, phone: str, code: str):
+async def send_purchase_log(user_id: int, country_name: str, price: float, phone: str, code: str, password: str = None):
     """Send a purchase log to the configured Telegram channel."""
     try:
         from config import BOT_TOKEN
@@ -120,27 +120,7 @@ async def send_purchase_log(user_id: int, country_name: str, price: float, phone
             if channel_id.isdigit() or (channel_id.startswith('-') and channel_id[1:].isdigit()):
                 if not channel_id.startswith('-100') and not channel_id.startswith('-'):
                     channel_id = f"-100{channel_id}"
-                elif channel_id.startswith('-') and not channel_id.startswith('-100'):
-                    # Handle cases where user might have put - but forgot 100 for a channel
-                    pass 
             
-            bn_stmt = select(AppSetting).where(AppSetting.key == "bot_name")
-            bn_obj = (await session.execute(bn_stmt)).scalar_one_or_none()
-            custom_bot_name = bn_obj.value if bn_obj else ""
-            
-        if not _bot_info_cache.get("username"):
-            try:
-                r = requests.get(f"https://api.telegram.org/bot{BOT_TOKEN}/getMe", timeout=5)
-                if r.ok:
-                    data = r.json()
-                    _bot_info_cache["name"] = data["result"].get("first_name", "Bot")
-                    _bot_info_cache["username"] = data["result"].get("username", "")
-            except Exception as e:
-                logger.error(f"Error fetching bot info: {e}")
-            
-        bot_name = custom_bot_name or _bot_info_cache.get("name", "Bot")
-        bot_username = _bot_info_cache.get("username", "")
-        
         flag = "🌐"
         try:
             _, _, iso = resolve_country_info(country_name)
@@ -149,50 +129,56 @@ async def send_purchase_log(user_id: int, country_name: str, price: float, phone
         
         masked_id = str(user_id)
         if len(masked_id) > 6:
-            masked_id = f"{masked_id[:3]}***{masked_id[-3:]}"
+            masked_id = f"••{masked_id[2:4]}•••••"
         else:
-            masked_id = f"{masked_id[:2]}***"
+            masked_id = f"••{masked_id[:2]}•••"
             
         masked_phone = str(phone)
         if len(masked_phone) > 7:
-            masked_phone = f"{masked_phone[:5]}•••••••"
+            # Mask like +96655890••••
+            # We take the first 9 chars (usually including + and country code and some digits)
+            masked_phone = f"{masked_phone[:9]}••••"
             
-        now_date = datetime.now().strftime("%Y-%m-%d")
-        now_time = datetime.now().strftime("%I:%M %p")
-        
         # HTML escaping
-        safe_bot_name = bot_name.replace('<', '&lt;').replace('>', '&gt;')
         safe_country = country_name.replace('<', '&lt;').replace('>', '&gt;')
-        bot_footer = f"🤖 @{bot_username}" if bot_username else f"🤖 {safe_bot_name}"
+        display_password = password if password else "None"
         
         message = (
-            f"<b>{safe_bot_name}</b> 🩸\n"
-            f"✅ <b>Purchase report #Successful ( {flag} #{safe_country.replace(' ', '')} )</b>\n"
-            f"⏰ <b>At time:</b> {now_date} | {now_time}\n"
-            f"🔔 <b>Activation code:</b> <code>{code}</code>\n"
-            f"🛍 <b>Purchase details</b> 👇\n"
-            f"{bot_footer}"
+            "• account purchased successfully .\n\n"
+            f"• For country :- {safe_country}{flag} \n"
+            "• Application Type :- Telegram .\n\n"
+            f"• Number :- <code>{masked_phone}</code> 📞.\n"
+            f"• Activation code :- <code>{code}</code> 💬.\n\n"
+            f"• Password :- <code>{display_password}</code> 🔑.\n"
+            f"• Price :- <b>${price:.2f}</b> 💵.\n\n"
+            f"• ID buyer :- <code>{masked_id}</code> 👨🏻💻 ."
         )
         
-        keyboard = {
-            "inline_keyboard": [
-                [{"text": "🌍 Country", "callback_data": "ignore"}, {"text": f"{country_name} {flag}", "callback_data": "ignore"}],
-                [{"text": "📵 Number", "callback_data": "ignore"}, {"text": f"{masked_phone}", "callback_data": "ignore"}],
-                [{"text": "🏷 Price", "callback_data": "ignore"}, {"text": f"{price:.2f}$", "callback_data": "ignore"}],
-                [{"text": "🆔 User ID", "callback_data": "ignore"}, {"text": f"{masked_id}", "callback_data": "ignore"}],
-                [{"text": "✅ Status", "callback_data": "ignore"}, {"text": "Completed", "callback_data": "ignore"}],
-            ]
-        }
-        
-        if bot_username:
-            keyboard["inline_keyboard"].append([{"text": "🛒 Buy Now", "url": f"https://t.me/{bot_username}"}])
-            
         payload = {
             "chat_id": channel_id,
             "text": message,
-            "parse_mode": "HTML",
-            "reply_markup": keyboard
+            "parse_mode": "HTML"
         }
+        
+        # Add the keyboard button for "Buy Now" at the bottom as a nice touch, 
+        # though user didn't explicitly ask for it in the text, it was in previous version.
+        # I'll keep it as an optional footer or just skip it if they want EXACTLY that text.
+        # Given they said "انا اريد ان تكون الرسالة هكذا" and gave text, I will stick to text + 
+        # maybe the inline button if I have the username.
+        
+        if not _bot_info_cache.get("username"):
+            try:
+                r = requests.get(f"https://api.telegram.org/bot{BOT_TOKEN}/getMe", timeout=5)
+                if r.ok:
+                    data = r.json()
+                    _bot_info_cache["username"] = data["result"].get("username", "")
+            except: pass
+            
+        bot_username = _bot_info_cache.get("username", "")
+        if bot_username:
+            payload["reply_markup"] = {
+                "inline_keyboard": [[{"text": "🛒 شراء رقم من البوت", "url": f"https://t.me/{bot_username}"}]]
+            }
         
         def do_send():
             try:
@@ -1136,7 +1122,7 @@ async def store_get_code(user_id: int, phone: str):
                     code = code_res.get("code")
                     account.otp_code = code
                     await session.commit()
-                    await send_purchase_log(user_id, account.country, account.price, account.phone_number, code)
+                    await send_purchase_log(user_id, account.country, account.price, account.phone_number, code, password=code_res.get("password"))
                     return {"status": "success", "code": code}
                 return {"status": "pending", "message": code_res.get("message", "بانتظار وصول الكود...")}
             else:
