@@ -261,9 +261,9 @@ async def send_sourcing_price_log(country_name: str, iso_code: str, country_code
             with urllib.request.urlopen(req, timeout=10) as response:
                 pass
         except urllib.error.HTTPError as e:
-            error_msg = e.read().decode()
-            logger.error(f"Telegram API Details: {error_msg}")
-            raise Exception(f"Telegram API Error: {error_msg}")
+            err_data = e.read().decode()
+            logger.error(f"Telegram API Details: {err_data} | Channel: {channel_id}")
+            raise Exception(f"Telegram Error: {err_data} (ID: {channel_id})")
             
     except Exception as e:
         logger.error(f"Error sending sourcing price log: {e}")
