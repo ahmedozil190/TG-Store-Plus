@@ -257,17 +257,11 @@ async def send_sourcing_price_log(country_name: str, iso_code: str, country_code
             headers={'Content-Type': 'application/json'},
             method='POST'
         )
-        try:
-            with urllib.request.urlopen(req, timeout=10) as response:
-                pass
-        except urllib.error.HTTPError as e:
-            err_data = e.read().decode()
-            logger.error(f"Telegram API Details: {err_data} | Channel: {channel_id}")
-            raise Exception(f"Telegram Error: {err_data} (ID: {channel_id})")
+        with urllib.request.urlopen(req, timeout=10) as response:
+            pass
             
     except Exception as e:
         logger.error(f"Error sending sourcing price log: {e}")
-        raise e
 
 def resolve_country_info(country_code_str: str, full_phone: str = None):
     """Resolve ISO code and Country Name. Handles numeric codes, Alpha-2, and Alpha-3."""
@@ -2202,18 +2196,7 @@ async def update_sourcing_price(data: dict):
             
     return {"status": "success"}
 
-@app.post("/api/admin/sourcing/price/test-log")
-async def test_sourcing_price_log(data: dict):
-    channel_id = data.get("channel_id")
-    if not channel_id:
-        return {"status": "error", "message": "Channel ID is required"}
-    
-    try:
-        # Send a test log with US data
-        await send_sourcing_price_log("Test Country", "US", "1", 0.99, 3600)
-        return {"status": "success"}
-    except Exception as e:
-        return {"status": "error", "message": str(e)}
+
 
 @app.get("/api/admin/sourcing/user-prices")
 async def get_user_prices():
