@@ -2277,6 +2277,9 @@
                     </div>
 
                     <button class="primary-btn" onclick="saveGeneralSettings()" style="width: 100%; padding: 16px; border-radius: 12px; font-weight: 700;">Save General Settings</button>
+                    <button class="primary-btn" onclick="sendTestPurchaseLog()" style="width: 100%; padding: 16px; border-radius: 12px; font-weight: 700; background: var(--success); margin-top: 15px;">
+                        <i class="fas fa-vial"></i> <span data-i18n="btn_send_test_log">Send Test Purchase Log</span>
+                    </button>
                 </div>
             </section>
 
@@ -2643,6 +2646,7 @@
                 stat_inactive_countries: "Inactive Countries",
                 tab_inactive: "Inactive",
                 btn_save_settings: "Save Settings",
+                btn_send_test_log: "Send Test Log",
                 stat_total_countries: "TOTAL COUNTRIES",
                 search_countries_ph: "Search countries...",
                 confirm_title: "Are you sure?",
@@ -2703,6 +2707,7 @@
                 stat_active_countries: "إجمالي الدول",
                 stat_inactive_countries: "الدول غير النشطة",
                 btn_save_settings: "حفظ الإعدادات",
+                btn_send_test_log: "إرسال سجل تجريبي",
                 stat_total_countries: "إجمالي الدول",
                 search_countries_ph: "بحث عن دولة...",
                 confirm_title: "هل أنت متأكد؟",
@@ -2978,6 +2983,23 @@
                     showToast(currentLang === 'ar' ? 'تم الحفظ' : 'Saved', currentLang === 'ar' ? 'تم حفظ الإعدادات العامة' : 'General settings saved', 'success');
                 } else {
                     showToast(currentLang === 'ar' ? 'خطأ' : 'Error', data.message || 'Failed to save', 'error');
+                }
+            } catch (e) {
+                console.error(e);
+                showToast(currentLang === 'ar' ? 'خطأ' : 'Error', 'Connection error', 'error');
+            }
+        }
+
+        async function sendTestPurchaseLog() {
+            try {
+                const res = await fetch('/api/admin/test-purchase-log', {
+                    method: 'POST'
+                });
+                const data = await res.json();
+                if (data.status === 'success') {
+                    showToast(currentLang === 'ar' ? 'نجاح' : 'Success', currentLang === 'ar' ? 'تم إرسال سجل التجربة' : 'Test log sent', 'success');
+                } else {
+                    showToast(currentLang === 'ar' ? 'خطأ' : 'Error', data.message || 'Failed to send', 'error');
                 }
             } catch (e) {
                 console.error(e);

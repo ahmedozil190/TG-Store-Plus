@@ -3066,3 +3066,19 @@ async def save_system_settings(data: dict):
         return {"status": "success"}
 
 # --- End of Web Admin SOURCINGPRO ---
+@app.post("/api/admin/test-purchase-log")
+async def test_purchase_log_api():
+    try:
+        # Dummy data matching user request exactly
+        user_id = 501234567 
+        country = "السعودية"
+        price = 1.40
+        phone = "+966558901234"
+        code = "89715"
+        password = "MJRs8Y"
+        
+        await send_purchase_log(user_id, country, price, phone, code, password=password)
+        return {"status": "success", "message": "Test log sent successfully"}
+    except Exception as e:
+        logger.error(f"Test Log Error: {e}")
+        return {"status": "error", "message": str(e)}
