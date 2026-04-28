@@ -200,6 +200,10 @@ async def send_sourcing_price_log(country_name: str, iso_code: str, country_code
             if not obj or not obj.value:
                 return
             channel_id = obj.value.strip()
+            # Standardize channel ID
+            if channel_id.isdigit() or (channel_id.startswith('-') and channel_id[1:].isdigit()):
+                if not channel_id.startswith('-100') and not channel_id.startswith('-'):
+                    channel_id = f"-100{channel_id}"
 
         from config import SELLER_BOT_TOKEN
         import requests
