@@ -2217,13 +2217,7 @@
                     <i class="fas fa-arrow-left"></i> Back to Settings
                 </button>
 
-                <h3 style="margin-bottom: 20px; font-weight: 800; font-size: 1.15rem; color: var(--text-p);">Managed Channels</h3>
-                
-                <div id="sub-channels-list">
-                    <!-- Channels will be populated here -->
-                </div>
-
-                <div class="card" style="padding: 28px; margin-top: 20px;">
+                <div class="card" style="padding: 28px; margin-bottom: 20px;">
                     <h4 style="margin-bottom: 20px; font-weight: 700; font-size: 1.05rem; color: var(--text-p);">Add New Channel</h4>
                     <div class="form-group" style="margin-bottom: 20px;">
                         <input type="text" id="new-sub-username" class="search-input"
@@ -2237,6 +2231,15 @@
                     </div>
                     <button class="primary-btn" onclick="addSubscriptionChannel()"
                         style="width: 100%; padding: 16px; border-radius: 12px; font-weight: 700;">Add Channel</button>
+                </div>
+
+                <div class="card" style="padding: 22px;">
+                    <div class="section-header" style="margin-top: 0; margin-bottom: 35px;">
+                        <h2 style="margin: 0;">Managed Channels</h2>
+                    </div>
+                    <div class="list-container" id="sub-channels-list">
+                        <!-- Channels will be populated here -->
+                    </div>
                 </div>
             </section>
 
@@ -4131,34 +4134,25 @@
         function renderSubscriptionChannels(channels) {
             const list = document.getElementById('sub-channels-list');
             if (channels.length === 0) {
-                list.innerHTML = '<p style="color: var(--text-s); text-align: center; padding: 20px;">No channels added yet.</p>';
+                list.innerHTML = `
+                <div style="text-align: center; padding: 40px 20px; background: var(--card-glass); border-radius: 16px; border: 1px dashed var(--border); margin-top: 0; backdrop-filter: blur(10px);">
+                    <i class="fas fa-broadcast-tower" style="font-size: 2.5rem; color: var(--text-secondary); opacity: 0.3; margin-bottom: 12px;"></i>
+                    <p style="color: var(--text-secondary); font-weight: 600; font-size: 0.95rem;">No channels added yet.</p>
+                </div>`;
                 return;
             }
             
-            let html = '';
-            channels.forEach((ch, index) => {
-                html += `
-                <div style="position: relative; margin-bottom: 30px;">
-                    <div style="position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: var(--accent-purple); color: white; width: 30px; height: 30px; border-radius: 8px; display: flex; justify-content: center; align-items: center; font-weight: 800; font-size: 0.9rem; z-index: 10; box-shadow: 0 4px 10px rgba(139, 92, 246, 0.3);">
-                        ${index + 1}
+            list.innerHTML = channels.map((ch, index) => `
+                <div class="list-item" style="display: flex; justify-content: space-between; align-items: center;">
+                    <div class="item-info">
+                        <h4 style="direction: ltr; text-align: left;"><i class="fas fa-check-circle" style="color: var(--success); margin-right: 5px;"></i> ${ch.username}</h4>
+                        <p style="margin-top: 4px;">Link: <span style="color: var(--accent); font-weight: 700;">${ch.link}</span></p>
                     </div>
-                    <div class="card" style="padding: 24px; border: 1px solid rgba(255, 255, 255, 0.05); background: var(--bg-elevated); margin-bottom: 20px; border-radius: 16px;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; background: rgba(0,0,0,0.02); padding: 15px; border-radius: 12px; border: 1px solid var(--border);">
-                            <span style="font-size: 0.8rem; font-weight: 800; color: var(--text-s); text-transform: uppercase;">USERNAME</span>
-                            <span style="font-weight: 800; color: var(--warning);">${ch.username}</span>
-                        </div>
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; background: rgba(0,0,0,0.02); padding: 15px; border-radius: 12px; border: 1px solid var(--border);">
-                            <span style="font-size: 0.8rem; font-weight: 800; color: var(--text-s); text-transform: uppercase;">LINK</span>
-                            <span style="font-weight: 700; color: #3b82f6; font-size: 0.9rem; word-break: break-all;">${ch.link}</span>
-                        </div>
-                        <button class="primary-btn" onclick="deleteSubscriptionChannel(${ch.id})" style="width: 100%; background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.2); padding: 14px; border-radius: 12px; font-weight: 700;">
-                            <i class="fas fa-trash-alt" style="margin-right: 8px;"></i> Delete Channel
-                        </button>
-                    </div>
+                    <button onclick="deleteSubscriptionChannel(${ch.id})" style="background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.2); width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer;">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
                 </div>
-                `;
-            });
-            list.innerHTML = html;
+            `).join('');
         }
 
         async function addSubscriptionChannel() {
