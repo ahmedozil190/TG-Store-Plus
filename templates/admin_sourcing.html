@@ -2213,10 +2213,12 @@
 
             <!-- ===== Subscriptions Sub-Section ===== -->
             <section id="section-settings-subscriptions" class="view-section">
-                <button class="settings-back-btn" onclick="switchNav('settings', null)"
-                    style="margin-top: 10px; margin-bottom: 20px;">
-                    <i class="fas fa-arrow-left"></i> Back to Settings
-                </button>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px; margin-bottom: 25px;">
+                    <h2 style="margin: 0;">Subscriptions</h2>
+                    <button class="settings-back-btn" onclick="switchNav('settings', null)">
+                        <i class="fas fa-arrow-left"></i> Back to Settings
+                    </button>
+                </div>
 
                 <div class="card" style="padding: 28px; margin-bottom: 20px;">
                     <h4 style="margin-bottom: 20px; font-weight: 700; font-size: 1.05rem; color: var(--text-p);">Add New
@@ -4148,7 +4150,7 @@
             }
 
             list.innerHTML = channels.map((ch, index) => `
-                <div class="list-item" style="display: flex; flex-direction: column; gap: 15px; padding: 20px;">
+                <div class="list-item" style="display: flex; flex-direction: column; gap: 15px; padding: 20px; background: var(--bg-hover, rgba(128,128,128,0.02)); border-radius: 12px; border: 1px solid var(--border); margin-bottom: 12px;">
                     <div style="display: flex; justify-content: space-between; align-items: center; background: transparent; padding: 14px 15px; border-radius: 10px; border: 1px solid var(--border);">
                         <span style="font-size: 0.7rem; font-weight: 800; color: var(--text-s); text-transform: uppercase; min-width: 80px;">USERNAME</span>
                         <span style="flex: 1; text-align: right; margin-left: 15px; word-break: break-all; font-weight: normal; font-size: 0.95rem; color: var(--warning);">${ch.username}</span>
