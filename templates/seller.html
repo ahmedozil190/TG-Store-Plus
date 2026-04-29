@@ -1513,6 +1513,25 @@
             Estimated time: 30-60 mins
         </div>
     </div>
+    
+    <!-- Subscription Required Overlay -->
+    <div id="subscription-overlay" style="display: none; position: fixed; inset: 0; background: var(--bg); z-index: 10000; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 30px;">
+        <div style="width: 80px; height: 80px; background: rgba(88, 101, 242, 0.1); color: var(--accent); border-radius: 24px; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; margin-bottom: 25px;">
+            <i class="fas fa-lock"></i>
+        </div>
+        <h1 id="sub-title" style="font-size: 1.8rem; font-weight: 800; margin-bottom: 12px; color: var(--text-p);">Subscription Required</h1>
+        <p id="sub-desc" style="color: var(--text-s); font-size: 1rem; max-width: 300px; line-height: 1.6; margin-bottom: 30px;">
+            To use the bot and access this panel, you must join our channels first.
+        </p>
+        
+        <div id="sub-channels-list-ui" style="width: 100%; max-width: 300px; margin-bottom: 20px;">
+            <!-- Channels buttons will be injected here -->
+        </div>
+
+        <button id="sub-check-btn" onclick="init()" class="btn-action" style="width: 100%; max-width: 300px;">
+            I have joined, open panel
+        </button>
+    </div>
 
     <script>
         const tg = window.Telegram.WebApp;
@@ -1549,7 +1568,83 @@
 
         const userId = tg.initDataUnsafe?.user?.id || 0;
         const userFirstName = tg.initDataUnsafe?.user?.first_name || "User";
+        const userLang = tg.initDataUnsafe?.user?.language_code || 'en';
         document.getElementById('userInitial').textContent = userFirstName.charAt(0).toUpperCase();
+
+        const subTranslations = {
+            en: {
+                title: "Subscription Required",
+                desc: "To use the bot and access this panel, you must join our channels first.",
+                check: "I have joined, open panel",
+                join: "Join"
+            },
+            ar: {
+                title: "الاشتراك إجباري",
+                desc: "لاستخدام البوت والوصول لهذه اللوحة، يجب عليك الانضمام لقنواتنا أولاً.",
+                check: "لقد اشتركت، افتح اللوحة",
+                join: "انضمام"
+            }
+        };
+
+        async function checkSubscription() {
+            try {
+                const res = await fetch(`/api/check-subscription?user_id=${userId}&bot_type=sourcing`);
+                const data = await res.json();
+                if (!data.ok) {
+                    showSubscriptionOverlay(data.channels);
+                    return false;
+                }
+                hideSubscriptionOverlay();
+                return true;
+            } catch (e) {
+                console.error("Sub check error:", e);
+                return true;
+            }
+        }
+
+        function showSubscriptionOverlay(channels) {
+            const overlay = document.getElementById('subscription-overlay');
+            const list = document.getElementById('sub-channels-list-ui');
+            const lang = userLang === 'ar' ? 'ar' : 'en';
+            if (!overlay || !list) return;
+
+            document.getElementById('sub-title').innerText = subTranslations[lang].title;
+            document.getElementById('sub-desc').innerText = subTranslations[lang].desc;
+            document.getElementById('sub-check-btn').innerText = subTranslations[lang].check;
+
+            list.innerHTML = channels.map(ch => `
+                <a href="${ch.link}" target="_blank" class="btn-secondary" style="margin-bottom: 10px; text-decoration: none; color: var(--accent); border-color: var(--accent);">
+                    <i class="fab fa-telegram"></i> ${subTranslations[lang].join} ${ch.username}
+                </a>
+            `).join('');
+
+            overlay.style.display = 'flex';
+        }
+
+        function hideSubscriptionOverlay() {
+            const overlay = document.getElementById('subscription-overlay');
+            if (overlay) overlay.style.display = 'none';
+        }
+
+        async function init() {
+            const isSubscribed = await checkSubscription();
+            if (!isSubscribed) {
+                const loader = document.getElementById('loader');
+                if (loader) loader.classList.add('hide');
+                return;
+            }
+            fetchSellerData();
+            // Sync identity
+            const userData = tg.initDataUnsafe?.user;
+            if (userData) {
+                const fullName = userData.first_name + (userData.last_name ? ' ' + userData.last_name : '');
+                fetch(`/api/admin/user/sync`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ user_id: userId, full_name: fullName, username: userData.username, bot_type: 'sourcing' })
+                }).catch(e => console.error("Sync error:", e));
+            }
+        }
 
         let currentHash = null;
         let currentPhone = null;
@@ -2171,7 +2266,7 @@
         }
         setInterval(updateAllCountdowns, 1000);
 
-        fetchSellerData();
+        init();
 
         // ─── Startup Logic ───
         window.onload = () => {

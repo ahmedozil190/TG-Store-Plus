@@ -3188,3 +3188,53 @@ async def delete_subscription_channel(channel_id: int):
             await session.delete(channel)
             await session.commit()
         return {"ok": True}
+
+@app.get("/api/check-subscription")
+async def check_subscription(user_id: int, bot_type: str = "store"):
+    from config import BOT_TOKEN, SELLER_BOT_TOKEN, ADMIN_IDS
+    
+    # Admins bypass check
+    if user_id in ADMIN_IDS:
+        return {"ok": True}
+        
+    token = BOT_TOKEN if bot_type == "store" else SELLER_BOT_TOKEN
+    
+    async with async_session() as session:
+        result = await session.execute(select(SubscriptionChannel).where(SubscriptionChannel.bot_type == bot_type))
+        channels = result.scalars().all()
+        
+    if not channels:
+        return {"ok": True}
+        
+    not_subscribed = []
+    for ch in channels:
+        try:
+            # Telegram API check
+            chat_id = ch.username
+            api_url = f"https://api.telegram.org/bot{token}/getChatMember?chat_id={chat_id}&user_id={user_id}"
+            
+            def do_check():
+                try:
+                    r = requests.get(api_url, timeout=5)
+                    return r.json()
+                except: return None
+                
+            data = await asyncio.to_thread(do_check)
+            
+            if not data or not data.get("ok"):
+                # If bot is not admin or channel not found, we might want to skip or block. 
+                # To be safe and avoid locking out everyone on misconfig, we skip errors for now.
+                # But if data.ok is false, it usually means the bot can't see the member.
+                continue
+                
+            status = data["result"]["status"]
+            if status in ["left", "kicked"]:
+                not_subscribed.append({"username": ch.username, "link": ch.link})
+        except Exception as e:
+            logger.error(f"Error checking sub for {ch.username}: {e}")
+            continue
+            
+    if not_subscribed:
+        return {"ok": False, "channels": not_subscribed}
+        
+    return {"ok": True}

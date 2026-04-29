@@ -790,6 +790,25 @@
             Estimated time: 30-60 mins
         </div>
     </div>
+    
+    <!-- Subscription Required Overlay -->
+    <div id="subscription-overlay" style="display: none; position: fixed; inset: 0; background: var(--bg); z-index: 10000; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 30px;">
+        <div style="width: 80px; height: 80px; background: rgba(88, 101, 242, 0.1); color: var(--accent); border-radius: 24px; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; margin-bottom: 25px;">
+            <i class="fas fa-lock"></i>
+        </div>
+        <h1 id="sub-title" style="font-size: 1.8rem; font-weight: 800; margin-bottom: 12px; color: var(--text-p);">Subscription Required</h1>
+        <p id="sub-desc" style="color: var(--text-s); font-size: 1rem; max-width: 300px; line-height: 1.6; margin-bottom: 30px;">
+            To use the bot and access the store, you must join our channels first.
+        </p>
+        
+        <div id="sub-channels-list-ui" style="width: 100%; max-width: 300px; margin-bottom: 20px;">
+            <!-- Channels buttons will be injected here -->
+        </div>
+
+        <button id="sub-check-btn" onclick="init()" class="primary-btn" style="width: 100%; max-width: 300px;">
+            I have joined, open store
+        </button>
+    </div>
 
     <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeNav()"></div>
 
@@ -1225,7 +1244,11 @@
                 completed_orders: "Completed Orders", active_orders: "Active Orders", unique_countries: "Unique Countries",
                 dep_title: "Deposit History", dep_empty: "No deposits found.",
                 hist_title: "Orders History", hist_empty: "No orders history found.",
-                insufficient_bal: "Insufficient balance"
+                insufficient_bal: "Insufficient balance",
+                sub_required: "Subscription Required",
+                sub_desc: "To use the bot and access the store, you must join our channels first.",
+                sub_check: "I have joined, open store",
+                join: "Join"
             },
             ar: {
                 loading: "جاري تجهيز المتجر...", nav_home: "الرئيسية", nav_store: "شراء رقم", nav_deposit: "إيداع", nav_history: "سجل الطلبات", nav_support: "الدعم",
@@ -1236,7 +1259,11 @@
                 total_numbers: "إجمالي الأرقام", countries: "إجمالي الدول", lowest_price: "أقل سعر",
                 hist_title: "سجل الطلبات", hist_empty: "لا توجد طلبات.",
                 dep_title: "سجل الإيداعات", dep_empty: "لا توجد سجلات إيداع.",
-                insufficient_bal: "رصيدك غير كافٍ"
+                insufficient_bal: "رصيدك غير كافٍ",
+                sub_required: "الاشتراك إجباري",
+                sub_desc: "لاستخدام البوت والوصول للمتجر، يجب عليك الانضمام لقنواتنا أولاً.",
+                sub_check: "لقد اشتركت، افتح المتجر",
+                join: "انضمام"
             }
         };
 
@@ -1284,6 +1311,45 @@
             }
         };
 
+        async function checkSubscription() {
+            try {
+                const res = await fetch(`/api/check-subscription?user_id=${userId}&bot_type=store`);
+                const data = await res.json();
+                if (!data.ok) {
+                    showSubscriptionOverlay(data.channels);
+                    return false;
+                }
+                hideSubscriptionOverlay();
+                return true;
+            } catch (e) {
+                console.error("Sub check error:", e);
+                return true; // Bypass on error to not lock out users if API fails
+            }
+        }
+
+        function showSubscriptionOverlay(channels) {
+            const overlay = document.getElementById('subscription-overlay');
+            const list = document.getElementById('sub-channels-list-ui');
+            if (!overlay || !list) return;
+
+            document.getElementById('sub-title').innerText = translations[currentLang].sub_required;
+            document.getElementById('sub-desc').innerText = translations[currentLang].sub_desc;
+            document.getElementById('sub-check-btn').innerText = translations[currentLang].sub_check;
+
+            list.innerHTML = channels.map(ch => `
+                <a href="${ch.link}" target="_blank" class="primary-btn" style="background: rgba(88, 101, 242, 0.1); color: var(--accent); border: 1px solid var(--accent); box-shadow: none; margin-bottom: 10px; text-decoration: none;">
+                    <i class="fab fa-telegram"></i> ${translations[currentLang].join} ${ch.username}
+                </a>
+            `).join('');
+
+            overlay.style.display = 'flex';
+        }
+
+        function hideSubscriptionOverlay() {
+            const overlay = document.getElementById('subscription-overlay');
+            if (overlay) overlay.style.display = 'none';
+        }
+
         async function init() {
             try {
                 updateTranslations();
@@ -1301,6 +1367,14 @@
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ user_id: userId, full_name: fullName, username: userData.username, bot_type: 'store' })
                     }).catch(e => console.error("Sync error:", e));
+                }
+
+                // CHECK SUBSCRIPTION
+                const isSubscribed = await checkSubscription();
+                if (!isSubscribed) {
+                    const loader = document.getElementById('loader');
+                    if (loader) loader.classList.add('hide');
+                    return;
                 }
 
                 // 1. FETCH DATA & CHECK MAINTENANCE
