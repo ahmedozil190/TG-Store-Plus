@@ -4465,7 +4465,7 @@
                         <td style="padding: 12px 8px; font-size: 0.75rem;">${acc.country}</td>
                         <td style="padding: 12px 8px; color: #10b981; font-weight: 800;">$${acc.price}</td>
                         <td style="padding: 12px 8px;">
-                            <span class="status-badge" style="background: rgba(88, 101, 242, 0.1); color: #8b5cf6; padding: 4px 8px; border-radius: 6px; font-size: 0.7rem;">${acc.status}</span>
+                            <span class="status-badge" style="background: rgba(88, 101, 242, 0.1); color: #8b5cf6; padding: 4px 8px; border-radius: 6px; font-size: 0.7rem; text-transform: capitalize;">${acc.status}</span>
                         </td>
                         <td style="padding: 12px 8px; text-align: right;">
                             <button class="pg-btn" onclick="checkOneAuditNumber(${acc.id}, this)" style="padding: 6px 12px; font-size: 0.7rem; background: var(--bg-elevated);">
@@ -4501,9 +4501,9 @@
                 const statusCell = row.querySelectorAll('td')[3];
                 
                 if (data.status === 'alive') {
-                    statusCell.innerHTML = '<span class="status-badge" style="background: rgba(16, 185, 129, 0.1); color: #10b981; padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 700; white-space: nowrap;">ALIVE ✅</span>';
+                    statusCell.innerHTML = '<span class="status-badge" style="background: rgba(16, 185, 129, 0.1); color: #10b981; padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 700; white-space: nowrap;">ALIVE</span>';
                 } else {
-                    statusCell.innerHTML = '<span class="status-badge" style="background: rgba(239, 68, 68, 0.1); color: #ef4444; padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 700; white-space: nowrap;">DEAD ❌</span>';
+                    statusCell.innerHTML = '<span class="status-badge" style="background: rgba(239, 68, 68, 0.1); color: #ef4444; padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 700; white-space: nowrap;">DEAD</span>';
                 }
             } catch (e) {
                 console.error(e);
