@@ -1613,9 +1613,9 @@
             document.getElementById('sub-check-btn').innerText = subTranslations[lang].check;
 
             list.innerHTML = channels.map(ch => `
-                <a href="${ch.link}" target="_blank" class="btn-secondary" style="margin-bottom: 10px; text-decoration: none; color: var(--accent); border-color: var(--accent);">
+                <div onclick="window.Telegram.WebApp.openTelegramLink('${ch.link}')" class="btn-secondary" style="margin-bottom: 10px; cursor: pointer; color: var(--accent); border-color: var(--accent); justify-content: center;">
                     <i class="fab fa-telegram"></i> ${subTranslations[lang].join} ${ch.username}
-                </a>
+                </div>
             `).join('');
 
             overlay.style.display = 'flex';
