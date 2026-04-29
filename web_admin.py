@@ -2742,7 +2742,13 @@ async def seller_submit_otp(data: SellerOTPSubmit):
         if isinstance(e, HTTPException): raise e
         logger.error(f"Seller OTP Submit Error: {e}")
         err_msg = str(e)
-        if any(msg in err_msg.lower() for msg in ["restricted", "frozen", "security check"]):
+        err_msg_lower = err_msg.lower()
+        
+        # Custom 2FA Handling
+        if "password" in err_msg_lower or "two-step" in err_msg_lower:
+            raise HTTPException(status_code=400, detail="عذراً، هذا الحساب محمي بـ 'التحقق بخطوتين'. يرجى تعطيله من الإعدادات ثم المحاولة مجدداً.")
+            
+        if any(msg in err_msg_lower for msg in ["restricted", "frozen", "security check"]):
             raise HTTPException(status_code=400, detail=err_msg)
         raise HTTPException(status_code=500, detail=str(e))
 
