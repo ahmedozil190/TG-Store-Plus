@@ -2959,6 +2959,72 @@ async def admin_withdrawal_action(data: WithdrawAction):
                 
         return {"ok": True, "status": "success", "message": f"Withdrawal {data.action}ed successfully"}
 
+@app.get("/api/admin/withdrawal/{request_id}/audit")
+async def get_withdrawal_audit(request_id: int):
+    async with async_session() as session:
+        # 1. Get current withdrawal request
+        req = await session.get(WithdrawalRequest, request_id)
+        if not req:
+            raise HTTPException(status_code=404, detail="Request not found")
+            
+        # 2. Find date of the last APPROVED withdrawal for this user
+        prev_stmt = select(WithdrawalRequest).where(
+            WithdrawalRequest.user_id == req.user_id,
+            WithdrawalRequest.status == WithdrawalStatus.APPROVED,
+            WithdrawalRequest.created_at < req.created_at
+        ).order_by(WithdrawalRequest.created_at.desc()).limit(1)
+        
+        prev_req = (await session.execute(prev_stmt)).scalar()
+        
+        # If no previous approved withdrawal, look from the beginning
+        # Using a very old date as minimum
+        start_date = prev_req.created_at if prev_req else datetime(2020, 1, 1)
+        
+        # 3. Fetch accounts sold between start_date and current req date
+        acc_stmt = select(Account).where(
+            Account.seller_id == req.user_id,
+            Account.created_at > start_date,
+            Account.created_at <= req.created_at,
+            or_(Account.status == AccountStatus.AVAILABLE, Account.status == AccountStatus.SOLD)
+        ).order_by(Account.created_at.desc())
+        
+        accounts = (await session.execute(acc_stmt)).scalars().all()
+        
+        return {
+            "accounts": [
+                {
+                    "id": a.id,
+                    "phone": a.phone_number,
+                    "country": a.country,
+                    "price": a.price,
+                    "status": a.status.value,
+                    "date": a.created_at.isoformat()
+                } for a in accounts
+            ],
+            "start_date": start_date.isoformat(),
+            "total_count": len(accounts),
+            "total_audit_value": sum(a.price for a in accounts)
+        }
+
+@app.post("/api/admin/accounts/check-alive")
+async def admin_check_account_alive(data: dict):
+    from services.session_manager import create_client
+    acc_id = data.get("account_id")
+    async with async_session() as session:
+        acc = await session.get(Account, acc_id)
+        if not acc: return {"status": "error", "message": "Not found"}
+        
+        try:
+            client = await create_client(acc.session_string)
+            await client.connect()
+            await client.get_me()
+            await client.disconnect()
+            return {"status": "alive"}
+        except Exception as e:
+            return {"status": "dead", "error": str(e)}
+
+
+
 
 @app.get("/api/admin/countries-for-code/{code}")
 async def get_countries_for_code(code: str):
