@@ -4205,12 +4205,13 @@
                 if (data.ok) {
                     document.getElementById('new-sub-username').value = '';
                     document.getElementById('new-sub-link').value = '';
+                    // Immediately fetch updated list and render
+                    const getRes = await fetch(`/api/admin/subscription-channels?bot_type=sourcing&t=${Date.now()}`);
+                    if (getRes.ok) {
+                        const channels = await getRes.json();
+                        renderSubscriptionChannels(channels);
+                    }
                     showToast('Success', 'Channel added successfully!', 'success');
-                    // Optimistic UI: append new card directly
-                    const list = document.getElementById('sub-channels-list');
-                    const emptyDiv = list.querySelector('div[style*="dashed"]');
-                    if (emptyDiv) list.innerHTML = '';
-                    list.appendChild(buildChannelCard({ id: data.id, username, link }));
                 } else {
                     showToast('Error', data.error || 'Failed to add channel', 'error');
                 }
