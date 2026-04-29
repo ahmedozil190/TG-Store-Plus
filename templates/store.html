@@ -813,7 +813,7 @@
             <!-- Channels buttons will be injected here -->
         </div>
 
-        <button id="sub-check-btn" onclick="init()" class="primary-btn" style="width: 100%; max-width: 300px;">
+        <button id="sub-check-btn" onclick="init(true)" class="primary-btn" style="width: 100%; max-width: 300px;">
             I have joined, open store
         </button>
     </div>
@@ -1231,7 +1231,7 @@
         tg.onEvent('themeChanged', applyTheme);
         applyTheme();
 
-        let currentLang = 'en';
+        let currentLang = tg.initDataUnsafe?.user?.language_code === 'ar' ? 'ar' : 'en';
         let countries = [];
         let serversList = [];
         let activeServerFilter = 'all';
@@ -1256,7 +1256,10 @@
                 sub_required: "Subscription Required",
                 sub_desc: "To use the bot and access the store, you must join our channels first.",
                 sub_check: "I have joined, open store",
-                join: "Join"
+                join: "Join",
+                sub_error_title: "Subscription Required",
+                sub_error_desc: "You must join all channels first before accessing the store.",
+                checking: "Checking..."
             },
             ar: {
                 loading: "جاري تجهيز المتجر...", nav_home: "الرئيسية", nav_store: "شراء رقم", nav_deposit: "إيداع", nav_history: "سجل الطلبات", nav_support: "الدعم",
@@ -1271,7 +1274,10 @@
                 sub_required: "الاشتراك إجباري",
                 sub_desc: "لاستخدام البوت والوصول للمتجر، يجب عليك الانضمام لقنواتنا أولاً.",
                 sub_check: "لقد اشتركت، افتح المتجر",
-                join: "انضمام"
+                join: "انضمام",
+                sub_error_title: "الاشتراك مطلوب",
+                sub_error_desc: "يجب عليك الانضمام لجميع القنوات أولاً قبل الدخول للمتجر.",
+                checking: "جاري التحقق..."
             }
         };
 
@@ -1319,19 +1325,22 @@
             }
         };
 
-        async function checkSubscription() {
+        async function checkSubscription(isManual = false) {
             try {
                 const res = await fetch(`/api/check-subscription?user_id=${userId}&bot_type=store`);
                 const data = await res.json();
                 if (!data.ok) {
                     showSubscriptionOverlay(data.channels);
+                    if (isManual) {
+                        showToast(translations[currentLang].sub_error_title, translations[currentLang].sub_error_desc, 'error');
+                    }
                     return false;
                 }
                 hideSubscriptionOverlay();
                 return true;
             } catch (e) {
                 console.error("Sub check error:", e);
-                return true; // Bypass on error to not lock out users if API fails
+                return true; 
             }
         }
 
@@ -1358,9 +1367,17 @@
             if (overlay) overlay.style.display = 'none';
         }
 
-        async function init() {
+        async function init(isManual = false) {
             try {
                 updateTranslations();
+
+                const subBtn = document.getElementById('sub-check-btn');
+                const originalText = subBtn ? subBtn.innerText : '';
+
+                if (isManual && subBtn) {
+                    subBtn.disabled = true;
+                    subBtn.innerHTML = `<i class="fas fa-circle-notch fa-spin"></i> ${translations[currentLang].checking}`;
+                }
 
                 // Identity Sync First
                 const userData = tg.initDataUnsafe?.user;
@@ -1378,7 +1395,13 @@
                 }
 
                 // CHECK SUBSCRIPTION
-                const isSubscribed = await checkSubscription();
+                const isSubscribed = await checkSubscription(isManual);
+                
+                if (isManual && subBtn) {
+                    subBtn.disabled = false;
+                    subBtn.innerText = originalText;
+                }
+
                 if (!isSubscribed) {
                     const loader = document.getElementById('loader');
                     if (loader) loader.classList.add('hide');
