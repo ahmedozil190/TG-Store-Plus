@@ -1038,6 +1038,12 @@
             color: white;
         }
 
+        .step-node.rejected {
+            background: var(--error);
+            border-color: var(--error);
+            color: white;
+        }
+
         .detection-badge {
             display: flex;
             align-items: center;
@@ -1301,9 +1307,7 @@
                 <p class="w-desc" id="rejectionDesc">This account is restricted or frozen and cannot be accepted.</p>
                 <div style="display:flex; gap:10px; margin-top:20px">
                     <button class="btn-secondary" style="flex:1" onclick="resetSubmission()">Try Another Number</button>
-                    <button class="btn-action"
-                        style="flex:1; background:var(--bg-elevated); color:var(--text-p); border:1px solid var(--border)"
-                        onclick="changeView('dashboard')">Home</button>
+                    <button class="btn-secondary" style="flex:1" onclick="changeView('dashboard')">Home</button>
                 </div>
             </div>
 
@@ -2138,8 +2142,9 @@
                         document.getElementById('step-rejected').style.display = 'block';
 
                         // Stepper failure look
-                        document.getElementById('node-2').className = 'step-node completed'; // Finished trying entry
-                        document.getElementById('node-2').style.borderColor = 'var(--error)';
+                        document.getElementById('node-2').className = 'step-node completed'; 
+                        document.getElementById('node-3').className = 'step-node rejected';
+                        document.getElementById('node-3').innerHTML = '<i class="fas fa-times"></i>';
                     } else {
                         // Just a wrong code, let them stay and try again
                         showToast(`<i class="fas fa-exclamation-circle" style="color:var(--error)"></i> ${errMsg}`);
@@ -2167,6 +2172,7 @@
             document.getElementById('node-2').className = 'step-node';
             document.getElementById('node-2').style.borderColor = '';
             document.getElementById('node-3').className = 'step-node';
+            document.getElementById('node-3').innerHTML = '<i class="fas fa-check"></i>';
         }
 
         let currentSourcingPage = 1;
