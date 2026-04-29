@@ -2377,8 +2377,11 @@
                 </div>
 
                 <div class="card" style="padding: 22px;">
-                    <div class="section-header" style="margin-top: 0; margin-bottom: 35px;">
+                    <div class="section-header" style="margin-top: 0; margin-bottom: 35px; display: flex; justify-content: space-between; align-items: center;">
                         <h2 style="margin: 0;">Managed Channels</h2>
+                        <button onclick="fetchSubscriptionChannels()" style="background: transparent; border: none; color: var(--accent); cursor: pointer; padding: 8px;">
+                            <i class="fas fa-sync-alt"></i>
+                        </button>
                     </div>
                     <div class="list-container" id="sub-channels-list">
                         <!-- Channels will be populated here -->
@@ -2826,6 +2829,7 @@
             if (id === 'settings-servers') fetchServers();
             if (id === 'deposits') fetchDeposits();
             if (id === 'store-user-prices') fetchStoreUserPrices();
+            if (id === 'settings-subscriptions') fetchSubscriptionChannels();
 
             // 5. Reset scroll BEFORE showing the section
             const scroller = document.getElementById('app-content-scroller');
@@ -3012,16 +3016,20 @@
         }
 
         async function fetchSubscriptionChannels() {
+            console.log('Fetching subscription channels...');
             const list = document.getElementById('sub-channels-list');
             if (list) list.innerHTML = '<div style="text-align: center; padding: 20px; opacity: 0.5;"><i class="fas fa-spinner fa-spin"></i> Loading...</div>';
             try {
                 const res = await fetch(`/api/admin/subscription-channels?bot_type=store&t=${Date.now()}`);
                 if (res.ok) {
                     const channels = await res.json();
+                    console.log('Channels received:', channels);
                     renderSubscriptionChannels(channels);
+                } else {
+                    console.error('Fetch failed:', res.status);
                 }
             } catch (e) {
-                console.error(e);
+                console.error('Fetch error:', e);
             }
         }
 
