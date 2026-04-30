@@ -2213,6 +2213,15 @@
                         <i class="fas fa-chevron-right settings-arrow"></i>
                     </div>
 
+                    <!-- Withdrawal Settings -->
+                    <div class="settings-item" onclick="switchNav('settings-withdrawal', null)">
+                        <div class="settings-icon-box" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">
+                            <i class="fas fa-wallet"></i>
+                        </div>
+                        <span class="settings-text">Withdrawal Settings</span>
+                        <i class="fas fa-chevron-right settings-arrow"></i>
+                    </div>
+
                     <!-- Subscriptions Channels -->
                     <div class="settings-item" onclick="switchNav('settings-subscriptions', null)">
                         <div class="settings-icon-box" style="background: rgba(139, 92, 246, 0.1); color: #8b5cf6;">
@@ -2240,6 +2249,19 @@
                             placeholder="e.g. -100123456789">
                         <span style="font-size: 0.75rem; color: var(--text-s); margin-top: 5px; display: block;">The bot
                             must be an admin in this channel to post price updates.</span>
+                    </div>
+                    <div style="display: flex; gap: 10px;">
+                        <button class="primary-btn" onclick="saveSettings()" style="flex: 1;">Save Settings</button>
+                    </div>
+                </div>
+            </section>
+
+            <section id="section-settings-withdrawal" class="view-section">
+                <button class="settings-back-btn" onclick="switchNav('settings', null)">
+                    <i class="fas fa-arrow-left"></i> Back to Settings
+                </button>
+
+                <div class="card" style="padding: 28px; margin-bottom: 20px;">
                     <div class="form-group" style="margin-bottom: 25px;">
                         <label style="font-size: 0.95rem; color: var(--text-primary); font-weight: 600; margin-bottom: 12px; display: block;">Withdrawal Minimum (TRX)</label>
                         <input type="number" id="setting-min-withdraw-trx" class="search-input"
@@ -2253,7 +2275,7 @@
                             placeholder="e.g. 10.0">
                     </div>
                     <div style="display: flex; gap: 10px;">
-                        <button class="primary-btn" onclick="saveSettings()" style="flex: 1;">Save Settings</button>
+                        <button class="primary-btn" onclick="saveSettings()" style="flex: 1;">Save Withdrawal Settings</button>
                     </div>
                 </div>
             </section>
@@ -3238,7 +3260,8 @@
                 withdrawals: 'nav_withdrawals',
                 'user-prices': 'nav_user_prices',
                 'settings-subscriptions': 'Subscriptions',
-                'settings-general': 'General Settings'
+                'settings-general': 'Price Channel',
+                'settings-withdrawal': 'Withdrawal Settings'
             };
             const titleEl = document.getElementById('page-title');
             if (titleEl) {
