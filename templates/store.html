@@ -1284,7 +1284,7 @@
 
         const translations = {
             en: {
-                loading: "Optimizing Store...", nav_home: "Dashboard", nav_store: "Buy Number", nav_deposit: "Deposit", nav_history: "Orders History", nav_support: "Support",
+                loading: "Optimizing Store...", nav_home: "Dashboard", nav_store: "Buy Number", nav_deposit: "Deposit", nav_history: "Orders History", nav_support: "Support", nav_referrals: "Referrals",
                 balance: "Current Balance", total_spent: "TOTAL SPENT", total_deposits: "TOTAL DEPOSITS", quick_buy: "Quick Access", btn_start_shopping: "Browse Numbers",
                 confirm_title: "Confirmation", lbl_country: "Country", lbl_price: "Price", btn_confirm_pay: "Buy Now",
                 success_title: "Payment Success!", success_desc: "Wait for the code in your bot chat.", btn_close: "Dismiss",
@@ -1301,7 +1301,7 @@
                 checking: "Checking..."
             },
             ar: {
-                loading: "جاري تجهيز المتجر...", nav_home: "الرئيسية", nav_store: "شراء رقم", nav_deposit: "إيداع", nav_history: "سجل الطلبات", nav_support: "الدعم",
+                loading: "جاري تجهيز المتجر...", nav_home: "الرئيسية", nav_store: "شراء رقم", nav_deposit: "إيداع", nav_history: "سجل الطلبات", nav_support: "الدعم", nav_referrals: "نظام الإحالة",
                 balance: "الرصيد الحالي", total_spent: "إجمالي المدفوعات", total_orders: "إجمالي المشتريات", quick_buy: "وصول سريع", btn_start_shopping: "تصفح الأرقام",
                 confirm_title: "تأكيد الشراء", lbl_country: "الدولة", lbl_price: "السعر", btn_confirm_pay: "إتمام الشراء",
                 success_title: "تم بنجاح!", success_desc: "انتظر وصول الكود في البوت.", btn_close: "إغلاق",
@@ -1486,7 +1486,7 @@
                         refCountEl.innerText = data.user.referral_count || 0;
                         document.getElementById('ref-total-earnings').innerText = `$${parseFloat(data.user.referral_earnings || 0).toFixed(3)}`;
                         const botUsername = data.bot_username || "YourBot";
-                        document.getElementById('ref-link-val').innerText = `https://t.me/${botUsername}?start=${userId}`;
+                        document.getElementById('ref-link-val').innerText = `https://t.me/${botUsername}?start=REF${userId}`;
                     }
                 }
 

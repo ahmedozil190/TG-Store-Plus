@@ -30,10 +30,17 @@ async def cmd_start(message: Message, bot: Bot = None):
     args = message.text.split()
     referral_id = None
     if len(args) > 1:
-        try:
-            referral_id = int(args[1])
-        except ValueError:
-            pass
+        start_param = args[1]
+        if start_param.startswith("REF"):
+            try:
+                referral_id = int(start_param.replace("REF", ""))
+            except ValueError:
+                pass
+        else:
+            try:
+                referral_id = int(start_param)
+            except ValueError:
+                pass
     
     async with async_session() as session:
         stmt = select(User).where(User.id == user_id)
@@ -79,7 +86,7 @@ async def cq_my_referral(call: CallbackQuery, bot: Bot):
         refs_count = (await session.execute(select(func.count(User.id)).where(User.referred_by == user.id))).scalar() or 0
         
     bot_info = await bot.get_me()
-    ref_link = f"https://t.me/{bot_info.username}?start={user.id}"
+    ref_link = f"https://t.me/{bot_info.username}?start=REF{user.id}"
     
     text = (
         "Share your referral link with your friends or channels and earn rewards:\n"
