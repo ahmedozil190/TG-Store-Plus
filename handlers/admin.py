@@ -34,7 +34,7 @@ async def cmd_admin(message: Message, state: FSMContext):
         [InlineKeyboardButton(text="Open", web_app=WebAppInfo(url=f"{web_url}/admin/store"))]
     ])
     
-    text = "Store Admin Dashboard 🚀\nClick the button below to open."
+    text = "Welcome to the Admin Panel 📊\nClick the button below to open."
     await message.answer(text, reply_markup=keyboard, parse_mode="HTML")
 
 @router.callback_query(F.data == "admin_main")
