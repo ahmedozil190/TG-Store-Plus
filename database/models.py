@@ -21,6 +21,7 @@ class TransactionType(enum.Enum):
     BUY = "buy"
     SELL = "sell"
     WITHDRAW = "withdraw"
+    REFERRAL = "referral"
 
 class User(Base):
     __tablename__ = 'users'
@@ -37,6 +38,10 @@ class User(Base):
     is_active_sourcing = Column(Boolean, default=False)
     is_banned_store = Column(Boolean, default=False)
     is_banned_sourcing = Column(Boolean, default=False)
+    
+    # Referral System
+    referred_by = Column(BigInteger, ForeignKey('users.id'), nullable=True)
+    referral_earnings = Column(Float, default=0.0)
 
 class Account(Base):
     __tablename__ = 'accounts'

@@ -1,7 +1,8 @@
 from aiogram import Router, Bot
 from aiogram.filters import CommandStart
-from aiogram.types import Message, BotCommand, BotCommandScopeChat, WebAppInfo, MenuButtonWebApp
+from aiogram.types import Message, BotCommand, BotCommandScopeChat, WebAppInfo, MenuButtonWebApp, CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton
 from sqlalchemy.future import select
+from sqlalchemy import func
 from database.models import User
 from database.engine import async_session
 from keyboards.client import main_keyboard
@@ -25,6 +26,15 @@ async def cmd_start(message: Message, bot: Bot = None):
 
     user_id = message.from_user.id
     
+    # Extract referral ID
+    args = message.text.split()
+    referral_id = None
+    if len(args) > 1:
+        try:
+            referral_id = int(args[1])
+        except ValueError:
+            pass
+    
     async with async_session() as session:
         stmt = select(User).where(User.id == user_id)
         result = await session.execute(stmt)
@@ -32,10 +42,61 @@ async def cmd_start(message: Message, bot: Bot = None):
         
         if not user:
             user = User(id=user_id)
+            if referral_id and referral_id != user_id:
+                referrer = (await session.execute(select(User).where(User.id == referral_id))).scalar_one_or_none()
+                if referrer:
+                    user.referred_by = referral_id
+                    referrer.balance_store += 0.005
+                    referrer.referral_earnings = (referrer.referral_earnings or 0.0) + 0.005
+                    
+                    from database.models import Transaction, TransactionType
+                    txn = Transaction(user_id=referral_id, type=TransactionType.REFERRAL, amount=0.005)
+                    session.add(txn)
+                    
+                    # Notify referrer if possible
+                    if bot:
+                        try:
+                            await bot.send_message(referral_id, "🎉 New referral joined! You received $0.005.")
+                        except:
+                            pass
+            
             session.add(user)
             await session.commit()
             
     await message.answer(
+        "Welcome to the Store! 🛒\nClick the button below to open.",
+        reply_markup=main_keyboard(),
+        parse_mode="HTML"
+    )
+
+@router.callback_query(lambda c: c.data == "my_referral")
+async def cq_my_referral(call: CallbackQuery, bot: Bot):
+    async with async_session() as session:
+        user = (await session.execute(select(User).where(User.id == call.from_user.id))).scalar_one_or_none()
+        if not user:
+            return
+            
+        refs_count = (await session.execute(select(func.count(User.id)).where(User.referred_by == user.id))).scalar() or 0
+        
+    bot_info = await bot.get_me()
+    ref_link = f"https://t.me/{bot_info.username}?start={user.id}"
+    
+    text = (
+        "Share your referral link with your friends or channels, and get <b>$0.005 free</b> for each person who joins through your link.\n\n"
+        f"🔗 <b>Your Link:</b>\n<code>{ref_link}</code>\n\n"
+        f"👥 <b>Total Referrals:</b> {refs_count}\n"
+        f"💰 <b>Total Earnings:</b> ${user.referral_earnings or 0.0:.3f}"
+    )
+    
+    markup = InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text="Back 🔙", callback_data="back_main")]
+    ])
+    
+    await call.message.edit_text(text, parse_mode="HTML", reply_markup=markup)
+
+@router.callback_query(lambda c: c.data == "back_main")
+async def cq_back_main(call: CallbackQuery):
+    await call.message.edit_text(
         "Welcome to the Store! 🛒\nClick the button below to open.",
         reply_markup=main_keyboard(),
         parse_mode="HTML"
