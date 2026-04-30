@@ -73,7 +73,7 @@ async def admin_dashboard_cmd(message: Message):
         [InlineKeyboardButton(text="Open", web_app=WebAppInfo(url=f"{web_url}/admin/sourcing"))]
     ])
     
-    text = "Sourcing Admin Dashboard 📊\nClick the button below to open."
+    text = "Welcome to the Admin Panel 📊\nClick the button below to open."
     await message.answer(text, reply_markup=keyboard, parse_mode="HTML")
 
 @router.message(Command("manage_countries"))

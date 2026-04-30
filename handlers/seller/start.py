@@ -50,7 +50,7 @@ async def seller_start_cmd(message: Message, bot: Bot = None):
             await message.answer("🚫 عذراً، لقد تم حظرك من استخدام بوت التوريد.")
             return
         
-    welcome_text = "Welcome to the Sourcing Panel! 🚀\nClick the button below to open."
+    welcome_text = "Welcome to the Panel! 🚀\nClick the button below to open."
     markup = InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(text="Open", web_app=WebAppInfo(url=SELLER_URL))]
     ])
