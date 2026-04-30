@@ -1708,7 +1708,7 @@
 
             if (viewId === 'withdraw') {
                 document.getElementById('withdrawAmount').value = userBalance.toFixed(2);
-                validateWithdraw();
+                setWithdrawMethod('TRX - TRC20', 4);
             }
 
             // Update URL Hash for persistence
@@ -1775,6 +1775,7 @@
                 const withdrawInput = document.getElementById('withdrawAmount');
                 if (withdrawInput) {
                     withdrawInput.value = userBalance.toFixed(2);
+                    setWithdrawMethod('TRX - TRC20', 4); // Trigger default selection and validation
                 }
                 document.getElementById('pendBal').innerHTML = `${data.user.pending_balance.toFixed(2)} <span>USD</span>`;
                 document.getElementById('totalWith').innerHTML = `${data.user.total_withdrawn.toFixed(2)} <span>USD</span>`;
