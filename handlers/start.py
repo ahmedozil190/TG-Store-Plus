@@ -82,7 +82,9 @@ async def cq_my_referral(call: CallbackQuery, bot: Bot):
     ref_link = f"https://t.me/{bot_info.username}?start={user.id}"
     
     text = (
-        "Share your referral link with your friends or channels, and get <b>$0.005 free</b> for each person who joins through your link.\n\n"
+        "Share your referral link with your friends or channels and earn rewards:\n"
+        "• <b>$0.005</b> for each person who joins.\n"
+        "• <b>1% commission</b> on all their deposits!\n\n"
         f"🔗 <b>Your Link:</b>\n<code>{ref_link}</code>\n\n"
         f"👥 <b>Total Referrals:</b> {refs_count}\n"
         f"💰 <b>Total Earnings:</b> ${user.referral_earnings or 0.0:.3f}"

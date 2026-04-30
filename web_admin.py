@@ -1455,9 +1455,28 @@ async def store_deposit_verify(req: DepositSubmit):
             new_deposit = Deposit(user_id=user.id, amount=amount, txid=txid, method=req.method)
             session.add(new_deposit)
             
-            # Also log as a Transaction (optional, but good for history)
+            # Also log as a Transaction
             tx = Transaction(user_id=user.id, type=TransactionType.DEPOSIT, amount=amount)
             session.add(tx)
+            
+            # Referral 1% Bonus
+            if user.referred_by:
+                referrer = (await session.execute(select(User).where(User.id == user.referred_by))).scalar_one_or_none()
+                if referrer:
+                    bonus = amount * 0.01
+                    referrer.balance_store += bonus
+                    referrer.referral_earnings = (referrer.referral_earnings or 0.0) + bonus
+                    tx_ref = Transaction(user_id=referrer.id, type=TransactionType.REFERRAL, amount=bonus)
+                    session.add(tx_ref)
+                    
+                    try:
+                        from config import BOT_TOKEN
+                        from aiogram import Bot
+                        notify_bot = Bot(token=BOT_TOKEN)
+                        await notify_bot.send_message(referrer.id, f"🎉 You received a referral bonus of ${bonus:.3f} from a user's deposit!")
+                        await notify_bot.session.close()
+                    except Exception:
+                        pass
             
             await session.commit()
             

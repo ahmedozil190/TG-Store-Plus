@@ -126,6 +126,26 @@ async def process_add_balance(message: Message, state: FSMContext):
             user.balance_store += amount
             txn = Transaction(user_id=target_id, type=TransactionType.DEPOSIT, amount=amount)
             session.add(txn)
+            
+            # Referral 1% Bonus
+            if user.referred_by:
+                referrer = (await session.execute(select(User).where(User.id == user.referred_by))).scalar_one_or_none()
+                if referrer:
+                    bonus = amount * 0.01
+                    referrer.balance_store += bonus
+                    referrer.referral_earnings = (referrer.referral_earnings or 0.0) + bonus
+                    tx_ref = Transaction(user_id=referrer.id, type=TransactionType.REFERRAL, amount=bonus)
+                    session.add(tx_ref)
+                    
+                    try:
+                        from config import BOT_TOKEN
+                        from aiogram import Bot
+                        notify_bot = Bot(token=BOT_TOKEN)
+                        await notify_bot.send_message(referrer.id, f"🎉 You received a referral bonus of ${bonus:.3f} from a user's deposit!")
+                        await notify_bot.session.close()
+                    except Exception:
+                        pass
+            
             await session.commit()
             await message.answer(f"✅ تم إضافة ${amount:.2f} لرصيد المتجر الخاص بالمستخدم بنجاح.\nالرصيد الجديد: ${user.balance_store:.2f}", reply_markup=admin_back_keyboard())
         else:
