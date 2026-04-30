@@ -433,6 +433,13 @@ async def run_migrations():
             try:
                 await conn.execute(sqlalchemy.text("ALTER TABLE users ADD COLUMN is_banned_sourcing BOOLEAN DEFAULT 0"))
             except: pass
+            # Add referral columns to users if missing
+            try:
+                await conn.execute(sqlalchemy.text("ALTER TABLE users ADD COLUMN referred_by INTEGER"))
+            except: pass
+            try:
+                await conn.execute(sqlalchemy.text("ALTER TABLE users ADD COLUMN referral_earnings FLOAT DEFAULT 0.0"))
+            except: pass
             
             # One-time migration: set existing users active in both if they weren't before
             # This ensures they appear in dashboards immediately after migration
