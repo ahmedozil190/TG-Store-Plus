@@ -952,6 +952,8 @@ async def get_store_data(user_id: int = None):
             completed_orders = 0
             active_orders = 0
             unique_countries = 0
+            referral_count = 0
+            referral_earnings = 0.0
             if user_id:
                 user = await session.get(User, user_id)
                 if user:
