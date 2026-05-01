@@ -1892,7 +1892,8 @@ async def get_store_settings():
         async with async_session() as session:
             keys = [
                 "BINANCE_API_KEY", "BINANCE_API_SECRET", 
-                "BINANCE_PAY_ID", "TRX_ADDRESS", "USDT_BEP20_ADDRESS"
+                "BINANCE_PAY_ID", "TRX_ADDRESS", "USDT_BEP20_ADDRESS",
+                "referral_join_bonus", "referral_commission_percent"
             ]
             settings = {}
             for k in keys:
@@ -1911,7 +1912,9 @@ async def get_store_settings():
                 "binance_api_secret_masked": masked_secret,
                 "binance_pay_id": settings.get("BINANCE_PAY_ID") or DEPOSIT_ADDRESS,
                 "trx_address": settings.get("TRX_ADDRESS") or "",
-                "usdt_bep20_address": settings.get("USDT_BEP20_ADDRESS") or ""
+                "usdt_bep20_address": settings.get("USDT_BEP20_ADDRESS") or "",
+                "referral_join_bonus": settings.get("referral_join_bonus") or "0",
+                "referral_commission_percent": settings.get("referral_commission_percent") or "0"
             }
     except Exception as e:
         logger.error(f"Get Store Settings Error: {e}")
