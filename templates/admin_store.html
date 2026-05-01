@@ -3516,7 +3516,7 @@
             document.getElementById('manage-name').innerText = (u.full_name || 'N/A').toUpperCase();
             const displayId = (u.username || u.id).toString();
             document.getElementById('manage-id').innerText = displayId.startsWith('@') ? displayId : '@' + displayId;
-            document.getElementById('manage-balance').innerText = `$${Number(u.balance_store).toFixed(2)}`;
+            document.getElementById('manage-balance').innerText = `$${formatMoney(u.balance_store)}`;
             document.getElementById('adjust-amount').value = '';
 
             const banBtn = document.getElementById('manage-ban-btn');
@@ -3573,7 +3573,7 @@
 
             if (res.ok) {
                 currentUser.balance_store = newBalance;
-                document.getElementById('manage-balance').innerText = `$${newBalance.toFixed(2)}`;
+                document.getElementById('manage-balance').innerText = `$${formatMoney(newBalance)}`;
                 input.value = '';
                 init(); // Refresh data in background
             }
@@ -3687,7 +3687,7 @@
                         <!-- Price -->
                         <div style="background: transparent; border: 1px solid var(--border); padding: 14px 18px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center;">
                             <span style="color: var(--text-secondary); font-size: 0.8rem; font-weight: 700; text-transform: uppercase;">${currentLang === 'ar' ? 'السعر' : 'Price'}</span>
-                            <span style="color: var(--accent); font-weight: 900; font-size: 1.1rem;">$${Number(p.price).toFixed(2)}</span>
+                            <span style="color: var(--accent); font-weight: 900; font-size: 1.1rem;">$${formatMoney(p.price)}</span>
                         </div>
                     </div>
                     <!-- Action Buttons -->
@@ -4107,7 +4107,7 @@
                         <div style="${rowS}; background: rgba(16, 185, 129, 0.05); border: 1px solid rgba(16, 185, 129, 0.1);">
                             <span style="${lblS}; color: #10b981;">${currentLang === 'ar' ? 'الرصيد' : 'BALANCE'}</span>
                             <span style="color: #10b981; font-weight: 900; font-size: 1.1rem; letter-spacing: 0.5px;">
-                                ${s.balance ? (typeof s.balance === 'number' ? '$' + s.balance.toFixed(2) : s.balance) : '$0.00'}
+                                ${s.balance ? (typeof s.balance === 'number' ? '$' + formatMoney(s.balance) : s.balance) : '$0'}
                             </span>
                         </div>
                         

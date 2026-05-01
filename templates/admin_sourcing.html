@@ -3468,7 +3468,7 @@
                 const wtp = document.getElementById('stat-withdraw-total-paid');
                 if (wp) wp.innerText = ws.withdraw_pending || 0;
                 if (wa) wa.innerText = ws.withdraw_approved || 0;
-                if (wtp) wtp.innerText = parseFloat(ws.total_paid_amount || 0).toFixed(2);
+                if (wtp) wtp.innerText = formatMoney(ws.total_paid_amount || 0);
 
                 renderRecent(data.recent);
                 fetchAdminHistory(currentAdminHistoryPage);
@@ -3520,7 +3520,7 @@
                 const wtp = document.getElementById('stat-withdraw-total-paid');
                 if (wp) wp.innerText = ws.withdraw_pending || 0;
                 if (wa) wa.innerText = ws.withdraw_approved || 0;
-                if (wtp) wtp.innerText = parseFloat(ws.total_paid_amount || 0).toFixed(2);
+                if (wtp) wtp.innerText = formatMoney(ws.total_paid_amount || 0);
 
                 document.getElementById('stat-history-pending').innerText = ws.pending_count;
                 document.getElementById('stat-history-accepted').innerText = ws.accepted_sourced;
@@ -3967,7 +3967,7 @@
                         <!-- Price -->
                         <div style="background: transparent; border: 1px solid var(--border); padding: 14px 18px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center;">
                             <span style="color: var(--text-secondary); font-size: 0.8rem; font-weight: 700; text-transform: uppercase;">${currentLang === 'ar' ? 'السعر' : 'Price'}</span>
-                            <span style="color: var(--accent); font-weight: 900; font-size: 1.1rem;">$${Number(p.buy_price).toFixed(2)}</span>
+                            <span style="color: var(--accent); font-weight: 900; font-size: 1.1rem;">$${formatMoney(p.buy_price)}</span>
                         </div>
                         <!-- Delay -->
                         <div style="background: transparent; border: 1px solid var(--border); padding: 14px 18px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center;">

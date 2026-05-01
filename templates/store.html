@@ -1645,7 +1645,7 @@
                         <span class="c-flag">${c.flag}</span>
                         <div><div class="c-name">${c.name}</div><div class="c-stock">${c.count} ${translations[currentLang].available}</div></div>
                     </div>
-                    <div class="c-price">${c.buy_price.toFixed(2)} USD</div>
+                    <div class="c-price">${formatMoney(c.buy_price)} USD</div>
                 </div>
             `).join('');
         }
@@ -1719,13 +1719,13 @@
 
             document.getElementById('stat-total-numbers').innerHTML = `${totalNumbers} <span>NUMBERS</span>`;
             document.getElementById('stat-countries').innerHTML = `${countriesCount} <span>COUNTRIES</span>`;
-            document.getElementById('stat-lowest-price').innerHTML = `${lowestPrice.toFixed(2)} <span>USD</span>`;
+            document.getElementById('stat-lowest-price').innerHTML = `${formatMoney(lowestPrice)} <span>USD</span>`;
         }
 
         function openBuyModal(c) {
             selectedCountry = c;
             document.getElementById('buy-country-name').innerText = c.name;
-            document.getElementById('buy-price-val').innerText = `${c.buy_price.toFixed(2)} USD`;
+            document.getElementById('buy-price-val').innerText = `${formatMoney(c.buy_price)} USD`;
             document.getElementById('buy-modal').style.display = 'flex';
         }
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
@@ -1851,7 +1851,7 @@
                     </div>
                     <div style="${rowS}">
                         <span style="${lblS}">PRICE</span>
-                        <span style="color: #3b82f6; font-weight: 900; font-size: 1.2rem; text-align: right;">$${h.price.toFixed(2)}</span>
+                        <span style="color: #3b82f6; font-weight: 900; font-size: 1.2rem; text-align: right;">$${formatMoney(h.price)}</span>
                     </div>
                     <div style="${rowS}">
                         <span style="${lblS}">DATE</span>
@@ -2073,7 +2073,7 @@
                         </div>
                         <div style="${rowS}">
                             <span style="${lblS}">AMOUNT</span>
-                            <span style="color: #10b981; font-weight: 800; font-size: 0.95rem; text-align: right;">$${parseFloat(d.amount).toFixed(2)}</span>
+                            <span style="color: #10b981; font-weight: 800; font-size: 0.95rem; text-align: right;">$${formatMoney(d.amount)}</span>
                         </div>
                         <div style="${rowS}">
                             <span style="${lblS}">METHOD</span>

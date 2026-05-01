@@ -1557,6 +1557,13 @@
         }
         tg.onEvent('themeChanged', applyTheme);
 
+        function formatMoney(val) {
+            let num = parseFloat(val || 0);
+            if (num === 0) return "0";
+            let s = num.toFixed(3);
+            return s.replace(/0+$/, '').replace(/\.$/, '.0');
+        }
+
         function formatDateTime(isoStr) {
             if (!isoStr) return "N/A";
             try {
@@ -1707,7 +1714,7 @@
             if (targetBtn) targetBtn.classList.add('active');
 
             if (viewId === 'withdraw') {
-                document.getElementById('withdrawAmount').value = userBalance.toFixed(2);
+                document.getElementById('withdrawAmount').value = formatMoney(userBalance);
                 setWithdrawMethod('TRX - TRC20', minWithdrawTrx);
             }
 
@@ -1771,23 +1778,23 @@
                 }
 
                 userBalance = data.user.balance;
-                document.getElementById('currBal').innerHTML = `${userBalance.toFixed(2)} <span>USD</span>`;
+                document.getElementById('currBal').innerHTML = `${formatMoney(userBalance)} <span>USD</span>`;
                 
                 if (data.settings) {
                     minWithdrawTrx = data.settings.min_withdraw_trx || 4.0;
                     minWithdrawUsdt = data.settings.min_withdraw_usdt || 10.0;
-                    document.getElementById('min-trx-val').textContent = minWithdrawTrx.toFixed(2);
-                    document.getElementById('min-usdt-val').textContent = minWithdrawUsdt.toFixed(2);
+                    document.getElementById('min-trx-val').textContent = formatMoney(minWithdrawTrx);
+                    document.getElementById('min-usdt-val').textContent = formatMoney(minWithdrawUsdt);
                 }
 
                 // Also update the input if we are on the withdraw page
                 const withdrawInput = document.getElementById('withdrawAmount');
                 if (withdrawInput) {
-                    withdrawInput.value = userBalance.toFixed(2);
+                    withdrawInput.value = formatMoney(userBalance);
                     setWithdrawMethod('TRX - TRC20', minWithdrawTrx); // Trigger default selection and validation
                 }
-                document.getElementById('pendBal').innerHTML = `${data.user.pending_balance.toFixed(2)} <span>USD</span>`;
-                document.getElementById('totalWith').innerHTML = `${data.user.total_withdrawn.toFixed(2)} <span>USD</span>`;
+                document.getElementById('pendBal').innerHTML = `${formatMoney(data.user.pending_balance)} <span>USD</span>`;
+                document.getElementById('totalWith').innerHTML = `${formatMoney(data.user.total_withdrawn)} <span>USD</span>`;
 
                 // Update Branding
                 if (data.bot_name) {
@@ -1843,7 +1850,7 @@
                             <div class="c-code">+${p.code}</div>
                         </div>
                     </div>
-                    <div class="c-price">$${p.price.toFixed(2)}</div>
+                    <div class="c-price">$${formatMoney(p.price)}</div>
                 </div>
             `).join('');
         }
@@ -1877,7 +1884,7 @@
             const warning = document.getElementById('minWarning');
             if (amt > 0 && amt < currentMin) {
                 warning.style.display = 'block';
-                warning.textContent = `Minimum for ${currentMethod} is $${currentMin.toFixed(2)}`;
+                warning.textContent = `Minimum for ${currentMethod} is $${formatMoney(currentMin)}`;
             } else {
                 warning.style.display = 'none';
             }
@@ -1892,8 +1899,8 @@
 
             // Open Confirm Modal
             const net = amt - 0.20;
-            document.getElementById('confAmt').textContent = `$${amt.toFixed(2)}`;
-            document.getElementById('confTotal').textContent = `$${net.toFixed(2)}`;
+            document.getElementById('confAmt').textContent = `$${formatMoney(amt)}`;
+            document.getElementById('confTotal').textContent = `$${formatMoney(net)}`;
             document.getElementById('confMethod').textContent = currentMethod;
             document.getElementById('confAddr').textContent = addr;
             document.getElementById('confirmModal').classList.add('show');
@@ -2010,7 +2017,7 @@
                             </div>
                             <div style="${rowS}">
                                 <span style="${lblS}">DETAILS</span>
-                                <span style="color: #10b981; font-weight: 800; font-size: 0.95rem; text-align: right;">$${h.amount.toFixed(2)} - ${simpleMethod}</span>
+                                <span style="color: #10b981; font-weight: 800; font-size: 0.95rem; text-align: right;">$${formatMoney(h.amount)} - ${simpleMethod}</span>
                             </div>
                             <div style="${rowS}">
                                 <span style="${lblS}">ID</span>
@@ -2061,7 +2068,7 @@
                         lastDetectedCountry = data.name;
                         document.getElementById('detFlag').textContent = data.flag;
                         document.getElementById('detName').textContent = data.name;
-                        document.getElementById('detPrice').textContent = `$${data.price.toFixed(2)}`;
+                        document.getElementById('detPrice').textContent = `$${formatMoney(data.price)}`;
                         document.getElementById('detName').style.color = 'var(--text-p)';
                         area.style.display = 'block';
                         btn.disabled = false;
@@ -2265,7 +2272,7 @@
 
                             <div style="${rowS}">
                                 <span style="${lblS}">PRICE</span>
-                                <span style="color: #3b82f6; font-weight: 900; font-size: 1.2rem; text-align: right;">$${Number(acc.buy_price).toFixed(2)}</span>
+                                <span style="color: #3b82f6; font-weight: 900; font-size: 1.2rem; text-align: right;">$${formatMoney(acc.buy_price)}</span>
                             </div>
                             <div style="${rowS}">
                                 <span style="${lblS}">DATE</span>
