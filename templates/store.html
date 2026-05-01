@@ -1176,7 +1176,7 @@
         <div class="info-card" style="margin-bottom: 25px;">
             <div class="info-card-l">
                 <span class="info-card-lbl">Total Earnings</span>
-                <div class="info-card-val" id="ref-total-earnings">0.0 USD</div>
+                <div class="info-card-val" id="ref-total-earnings">0.0 <span>USD</span></div>
             </div>
             <div class="info-card-icon" style="background: rgba(16, 185, 129, 0.1); color: var(--success);">
                 <i class="fas fa-hand-holding-dollar"></i>
@@ -1500,7 +1500,7 @@
                     const refCountEl = document.getElementById('ref-total-count');
                     if (refCountEl) {
                         refCountEl.innerHTML = `${data.user.referral_count || 0} <span>USERS</span>`;
-                        document.getElementById('ref-total-earnings').innerText = `${parseFloat(data.user.referral_earnings || 0).toFixed(1)} USD`;
+                        document.getElementById('ref-total-earnings').innerHTML = `${parseFloat(data.user.referral_earnings || 0).toFixed(1)} <span>USD</span>`;
                         const botUsername = data.bot_username || "YourBot";
                         document.getElementById('ref-link-val').innerText = `https://t.me/${botUsername}?start=REF${userId}`;
                     }
