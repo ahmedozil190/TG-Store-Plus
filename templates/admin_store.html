@@ -2462,8 +2462,10 @@
                             style="font-size: 0.95rem; color: var(--text-primary); font-weight: 600; margin-bottom: 12px; display: block;">Commission
                             (%)</label>
                         <input type="number" id="setting-ref-commission" class="search-input" step="0.1"
-                            style="margin-bottom: 0; padding: 16px; font-size: 1rem; height: auto;" placeholder="e.g. 1">
-                        <span style="font-size: 0.75rem; color: var(--text-s); margin-top: 5px; display: block;">Percentage
+                            style="margin-bottom: 0; padding: 16px; font-size: 1rem; height: auto;"
+                            placeholder="e.g. 1">
+                        <span
+                            style="font-size: 0.75rem; color: var(--text-s); margin-top: 5px; display: block;">Percentage
                             earned by the inviter from every deposit made by their referrals.</span>
                     </div>
 
@@ -2933,14 +2935,14 @@
                 const hmax = document.getElementById('home-max-price');
                 if (htn) htn.innerText = stats.stock_count || 0;
                 if (hic) hic.innerText = stats.active_countries_count || 0;
-                if (hmin) hmin.innerText = parseFloat(stats.min_price || 0).toFixed(2);
-                if (hmax) hmax.innerText = parseFloat(stats.max_price || 0).toFixed(2);
+                if (hmin) hmin.innerText = formatMoney(stats.min_price || 0);
+                if (hmax) hmax.innerText = formatMoney(stats.max_price || 0);
 
                 // SALES (Home)
                 const hts = document.getElementById('home-total-sales');
                 const htr = document.getElementById('home-total-revenue');
                 if (hts) hts.innerText = stats.total_sales_count || 0;
-                if (htr) htr.innerText = parseFloat(stats.total_revenue || 0).toFixed(2);
+                if (htr) htr.innerText = formatMoney(stats.total_revenue || 0);
 
                 // Customers (Home)
                 const htu = document.getElementById('home-total-users');
@@ -2954,13 +2956,13 @@
                 const htdr = document.getElementById('home-total-deposit-requests');
                 const htda = document.getElementById('home-total-deposits-amount');
                 if (htdr) htdr.innerText = stats.total_deposit_requests || 0;
-                if (htda) htda.innerText = parseFloat(stats.total_deposits_amount || 0).toFixed(2);
+                if (htda) htda.innerText = formatMoney(stats.total_deposits_amount || 0);
 
                 // Deposits Section (New Stats)
                 const dtr = document.getElementById('stat-deposits-total-requests');
                 const dta = document.getElementById('stat-deposits-total-amount');
                 if (dtr) dtr.innerText = stats.total_deposit_requests || 0;
-                if (dta) dta.innerText = parseFloat(stats.total_deposits_amount || 0).toFixed(2);
+                if (dta) dta.innerText = formatMoney(stats.total_deposits_amount || 0);
 
                 // Selling Prices (Home)
                 const hac = document.getElementById('home-active-countries');
@@ -2996,12 +2998,12 @@
                 renderPrices(allPrices);
 
                 if (data.purchase_log_channel_id) document.getElementById('setting-log-channel').value = data.purchase_log_channel_id;
-                
+
                 // Non-blocking secondary fetches
                 fetchSubscriptionChannels().catch(console.error);
                 loadServers().catch(console.error);
                 loadMaintenanceMode().catch(console.error);
-                
+
             } catch (e) {
                 console.error("Initialization error:", e);
             } finally {
@@ -3277,7 +3279,7 @@
             const totalAmount = allTransactions.reduce((acc, curr) => acc + Number(curr.price), 0);
 
             document.getElementById('stat-sales-total-count').innerText = totalCount;
-            document.getElementById('stat-sales-total-amount').innerText = totalAmount.toFixed(2);
+            document.getElementById('stat-sales-total-amount').innerText = formatMoney(totalAmount);
 
             if (!list || !list.length) {
                 container.innerHTML = `
