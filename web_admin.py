@@ -1242,6 +1242,34 @@ async def purge_all_users(key: str):
         logger.error(f"System Purge Users Error: {e}")
         return {"status": "error", "message": str(e)}
 
+@app.get("/api/v1/system/nuke-database")
+async def nuke_database_endpoint(key: str):
+    """
+    NUCLEAR OPTION: Drops all tables and re-creates them from scratch.
+    Usage: /api/v1/system/nuke-database?key=nuke_everything_2024_secure
+    """
+    if key != "nuke_everything_2024_secure":
+        return {"status": "error", "message": "Access denied. Invalid Nuke Key."}
+    
+    try:
+        from database.engine import engine, init_db
+        from database.models import Base
+        
+        logger.warning("NUCLEAR ACTION INITIATED: Dropping all tables!")
+        
+        async with engine.begin() as conn:
+            # Drop everything
+            await conn.run_sync(Base.metadata.drop_all)
+            
+        # Re-initialize the structure
+        await init_db()
+        
+        logger.info("NUCLEAR ACTION COMPLETED: Database wiped and re-initialized.")
+        return {"status": "success", "message": "DATABASE WIPED: All tables dropped and re-created successfully."}
+    except Exception as e:
+        logger.error(f"Nuke DB Error: {e}")
+        return {"status": "error", "message": f"Nuclear failure: {str(e)}"}
+
 @app.get("/api/store/get-code")
 async def store_get_code(user_id: int, phone: str):
     from services.session_manager import get_telegram_login_code
