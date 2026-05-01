@@ -34,16 +34,24 @@ class UserUpdateMiddleware(BaseMiddleware):
                     user = result.scalar_one_or_none()
                     
                     if not user:
-                        # Auto-create if not exists (helpful for background sync)
-                        user = User(
-                            id=user_id, 
-                            full_name=full_name, 
-                            username=username,
-                            is_active_store=(self.bot_type == "store"),
-                            is_active_sourcing=(self.bot_type == "sourcing")
-                        )
-                        session.add(user)
-                        logger.info(f"Middleware: Created new user {user_id} for {self.bot_type}")
+                        # SECURITY: Check if this is a /start command with referral (to avoid race condition with handlers/start.py)
+                        is_referral_start = False
+                        from aiogram.types import Message
+                        if isinstance(event, Message) and event.text and event.text.startswith('/start') and len(event.text.split()) > 1:
+                            is_referral_start = True
+                            logger.info(f"Middleware: Detected referral start for {user_id}, skipping auto-creation to allow handler to process.")
+                        
+                        if not is_referral_start:
+                            # Auto-create if not exists (helpful for background sync)
+                            user = User(
+                                id=user_id, 
+                                full_name=full_name, 
+                                username=username,
+                                is_active_store=(self.bot_type == "store"),
+                                is_active_sourcing=(self.bot_type == "sourcing")
+                            )
+                            session.add(user)
+                            logger.info(f"Middleware: Created new user {user_id} for {self.bot_type}")
                     else:
                         # Update if changed
                         changed = False
