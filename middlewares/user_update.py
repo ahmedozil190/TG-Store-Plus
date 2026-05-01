@@ -45,9 +45,15 @@ class UserUpdateMiddleware(BaseMiddleware):
                         elif isinstance(event, Update) and event.message:
                             msg = event.message
                             
-                        if msg and msg.text and msg.text.startswith('/start') and len(msg.text.split()) > 1:
-                            is_referral_start = True
-                            logger.info(f"Middleware: Detected referral start for {user_id}, skipping auto-creation to allow handler to process.")
+                        if msg and msg.text:
+                            logger.info(f"Middleware Debug: Message text is '{msg.text}'")
+                            if msg.text.startswith('/start') and len(msg.text.split()) > 1:
+                                is_referral_start = True
+                                logger.info(f"Middleware: Detected referral start for {user_id}, skipping auto-creation to allow handler to process.")
+                            else:
+                                logger.info(f"Middleware Debug: Not a referral start. split len: {len(msg.text.split())}")
+                        else:
+                            logger.info(f"Middleware Debug: No message text found.")
                         
                         if not is_referral_start:
                             # Auto-create if not exists (helpful for background sync)
