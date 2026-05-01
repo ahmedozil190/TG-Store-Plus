@@ -47,6 +47,10 @@ class SubscriptionMiddleware(BaseMiddleware):
             if user_id in ADMIN_IDS:
                 return await handler(event, data)
 
+            # Bypass check for /start command to allow referral counting
+            if isinstance(target, Message) and target.text and target.text.startswith('/start'):
+                return await handler(event, data)
+
             async with async_session() as session:
                 result = await session.execute(select(SubscriptionChannel).where(SubscriptionChannel.bot_type == self.bot_type))
                 channels = result.scalars().all()

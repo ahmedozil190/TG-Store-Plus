@@ -1421,6 +1421,13 @@
             if (overlay) overlay.style.display = 'none';
         }
 
+        function formatMoney(val) {
+            let num = parseFloat(val || 0);
+            if (num === 0) return "0.0";
+            let s = num.toFixed(3);
+            return s.replace(/0+$/, '').replace(/\.$/, '.0');
+        }
+
         async function init(isManual = false) {
             try {
                 // Determine language
@@ -1496,7 +1503,7 @@
                 if (data.user) {
                     updateBalanceUI(data.user.balance || 0);
                     document.getElementById('dash-total-deposits').innerHTML = `${data.user.total_deposits || 0} <span>DEPOSITS</span>`;
-                    document.getElementById('dash-spent').innerHTML = `${parseFloat(data.user.total_spent || 0).toFixed(3)} <span>USD</span>`;
+                    document.getElementById('dash-spent').innerHTML = `${formatMoney(data.user.total_spent)} <span>USD</span>`;
                     const nameForUI = (data.user.full_name && data.user.full_name !== 'Unknown') ? data.user.full_name : (userData?.first_name || "User");
                     const initialEl = document.getElementById('userInitial');
                     if (initialEl) initialEl.innerText = nameForUI.charAt(0).toUpperCase();
@@ -1504,7 +1511,7 @@
                     const refCountEl = document.getElementById('ref-total-count');
                     if (refCountEl) {
                         refCountEl.innerHTML = `${data.user.referral_count || 0} <span>USERS</span>`;
-                        document.getElementById('ref-total-earnings').innerHTML = `${parseFloat(data.user.referral_earnings || 0).toFixed(3)} <span>USD</span>`;
+                        document.getElementById('ref-total-earnings').innerHTML = `${formatMoney(data.user.referral_earnings)} <span>USD</span>`;
                         const botUsername = data.bot_username || "YourBot";
                         document.getElementById('ref-link-val').innerText = `https://t.me/${botUsername}?start=REF${userId}`;
                     }
@@ -1514,7 +1521,7 @@
                 const refBonusValEl = document.getElementById('ref-join-bonus-val');
                 const refCommValEl = document.getElementById('ref-commission-val');
                 if (refBonusValEl && data.referral_join_bonus !== undefined) {
-                    refBonusValEl.innerText = `$${parseFloat(data.referral_join_bonus).toFixed(3)}`;
+                    refBonusValEl.innerText = `$${formatMoney(data.referral_join_bonus)}`;
                 }
                 if (refCommValEl && data.referral_commission_percent !== undefined) {
                     refCommValEl.innerText = `${data.referral_commission_percent}%`;
@@ -1607,7 +1614,7 @@
         }
 
         function updateBalanceUI(val) {
-            const fval = parseFloat(val).toFixed(3);
+            const fval = formatMoney(val);
             document.getElementById('dash-balance').innerHTML = `${fval} <span style="font-size: 0.85rem; color: var(--text-s); font-weight: 600;">USD</span>`;
             const topBal = document.getElementById('top-balance');
             if (topBal) topBal.innerText = `${fval} USD`;
