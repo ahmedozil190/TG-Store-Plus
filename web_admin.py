@@ -1954,8 +1954,8 @@ async def get_store_settings():
                 "binance_pay_id": settings.get("BINANCE_PAY_ID") or DEPOSIT_ADDRESS,
                 "trx_address": settings.get("TRX_ADDRESS") or "",
                 "usdt_bep20_address": settings.get("USDT_BEP20_ADDRESS") or "",
-                "referral_join_bonus": settings.get("referral_join_bonus") or "0",
-                "referral_commission_percent": settings.get("referral_commission_percent") or "0"
+                "referral_join_bonus": settings.get("referral_join_bonus") or "0.005",
+                "referral_commission_percent": settings.get("referral_commission_percent") or "1"
             }
     except Exception as e:
         logger.error(f"Get Store Settings Error: {e}")
