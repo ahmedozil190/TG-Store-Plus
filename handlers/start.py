@@ -68,7 +68,7 @@ async def cmd_start(message: Message, bot: Bot = None):
                     # Notify referrer
                     if bot:
                         try:
-                            await bot.send_message(referral_id, f"🆓 You earned ${bonus_val} From a referral")
+                            await bot.send_message(referral_id, f"🎁 You earned ${bonus_val} From a referral")
                         except:
                             pass
             
