@@ -47,31 +47,10 @@ async def cmd_start(message: Message, bot: Bot = None):
         result = await session.execute(stmt)
         user = result.scalar_one_or_none()
         
+        # User creation is now handled by UserUpdateMiddleware
         if not user:
+            # Fallback if middleware skipped it somehow
             user = User(id=user_id)
-            if referral_id and referral_id != user_id:
-                referrer = (await session.execute(select(User).where(User.id == referral_id))).scalar_one_or_none()
-                if referrer:
-                    # Fetch Dynamic Join Bonus
-                    from database.models import AppSetting
-                    bonus_obj = (await session.execute(select(AppSetting).where(AppSetting.key == "referral_join_bonus"))).scalar_one_or_none()
-                    bonus_val = float(bonus_obj.value) if bonus_obj and bonus_obj.value else 0.005
-                    
-                    user.referred_by = referral_id
-                    referrer.balance_store += bonus_val
-                    referrer.referral_earnings = (referrer.referral_earnings or 0.0) + bonus_val
-                    
-                    from database.models import Transaction, TransactionType
-                    txn = Transaction(user_id=referral_id, type=TransactionType.REFERRAL, amount=bonus_val)
-                    session.add(txn)
-                    
-                    # Notify referrer
-                    if bot:
-                        try:
-                            await bot.send_message(referral_id, f"🎁 You earned ${bonus_val} From a referral")
-                        except:
-                            pass
-            
             session.add(user)
             await session.commit()
             
