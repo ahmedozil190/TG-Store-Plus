@@ -51,6 +51,7 @@ class SubscriptionMiddleware(BaseMiddleware):
                 result = await session.execute(select(SubscriptionChannel).where(SubscriptionChannel.bot_type == self.bot_type))
                 channels = result.scalars().all()
 
+            logger.info(f"Sub-Check: Found {len(channels)} channels for {self.bot_type}")
             if not channels:
                 return await handler(event, data)
 
@@ -59,7 +60,9 @@ class SubscriptionMiddleware(BaseMiddleware):
                 try:
                     # Use username (which should be @channel or channel_id)
                     chat_id = channel.username
+                    logger.info(f"Sub-Check: Checking {user_id} in {chat_id}")
                     member = await bot.get_chat_member(chat_id=chat_id, user_id=user_id)
+                    logger.info(f"Sub-Check: Status in {chat_id} is {member.status}")
                     if member.status in ["left", "kicked"]:
                         not_subscribed.append(channel)
                 except Exception as e:
@@ -69,6 +72,7 @@ class SubscriptionMiddleware(BaseMiddleware):
                     continue
 
             if not_subscribed:
+                logger.info(f"Sub-Check: Blocking {user_id} (Not subscribed to {len(not_subscribed)} channels)")
                 # User is not subscribed to one or more channels
                 buttons = []
                 for ch in not_subscribed:
