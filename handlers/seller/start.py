@@ -47,23 +47,6 @@ async def seller_start_cmd(message: Message, bot: Bot = None):
             await session.commit()
         
         if user.is_banned_sourcing:
-            from database.models import AppSetting
-            support_obj = (await session.execute(select(AppSetting).where(AppSetting.key == "SUPPORT_USERNAME"))).scalar_one_or_none()
-            support_username = support_obj.value if support_obj else None
-            
-            markup = None
-            if support_username:
-                markup = InlineKeyboardMarkup(inline_keyboard=[
-                    [InlineKeyboardButton(text="Contact Support 🎧", url=f"https://t.me/{support_username}")]
-                ])
-            
-            ban_text = (
-                "<b>🚫 Access Denied</b>\n\n"
-                "Your account has been <b>suspended</b> from using our services.\n"
-                "If you believe this is a mistake, please contact our support team.\n\n"
-                f"<b>Your ID:</b> <code>{message.from_user.id}</code>"
-            )
-            await message.answer(ban_text, parse_mode="HTML", reply_markup=markup)
             return
         
     welcome_text = "Welcome to the Panel! 🚀\nClick the button below to open."
@@ -72,3 +55,4 @@ async def seller_start_cmd(message: Message, bot: Bot = None):
     ])
     
     await message.answer(welcome_text, reply_markup=markup)
+
