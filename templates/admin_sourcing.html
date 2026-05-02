@@ -763,6 +763,16 @@
             background: var(--border);
         }
 
+        .filter-btn.active {
+            background: var(--accent) !important;
+            color: #fff !important;
+            box-shadow: 0 4px 12px rgba(0, 242, 255, 0.2);
+        }
+        .filter-btn:hover:not(.active) {
+            background: rgba(255,255,255,0.08) !important;
+            color: #fff !important;
+        }
+
         .pg-btn:disabled {
             opacity: 0.3;
             cursor: not-allowed;
@@ -2262,8 +2272,15 @@
                     </div>
                 </div>
                 <div class="card" id="history-section-card" style="padding: 22px;">
-                    <div class="section-header" style="margin-top: 0; margin-bottom: 35px;">
+                    <div class="section-header" style="margin-top: 0; margin-bottom: 25px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
                         <h2 data-i18n="nav_history" style="margin: 0; font-size: 1rem;">Accounts History</h2>
+                        <div class="filter-group" id="history-filter-group" style="display: flex; gap: 8px; background: rgba(255,255,255,0.03); padding: 5px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
+                            <button class="filter-btn active" onclick="setHistoryFilter('ALL')" style="padding: 6px 12px; border-radius: 8px; border: none; background: transparent; color: var(--text-secondary); cursor: pointer; font-size: 0.8rem; font-weight: 600; transition: all 0.2s;">ALL</button>
+                            <button class="filter-btn" onclick="setHistoryFilter('PENDING')" style="padding: 6px 12px; border-radius: 8px; border: none; background: transparent; color: var(--text-secondary); cursor: pointer; font-size: 0.8rem; font-weight: 600; transition: all 0.2s;">PENDING</button>
+                            <button class="filter-btn" onclick="setHistoryFilter('ACCEPTED')" style="padding: 6px 12px; border-radius: 8px; border: none; background: transparent; color: var(--text-secondary); cursor: pointer; font-size: 0.8rem; font-weight: 600; transition: all 0.2s;">ACCEPTED</button>
+                            <button class="filter-btn" onclick="setHistoryFilter('FROZEN')" style="padding: 6px 12px; border-radius: 8px; border: none; background: transparent; color: var(--text-secondary); cursor: pointer; font-size: 0.8rem; font-weight: 600; transition: all 0.2s;">FROZEN</button>
+                            <button class="filter-btn" onclick="setHistoryFilter('SPAM')" style="padding: 6px 12px; border-radius: 8px; border: none; background: transparent; color: var(--text-secondary); cursor: pointer; font-size: 0.8rem; font-weight: 600; transition: all 0.2s;">SPAM</button>
+                        </div>
                     </div>
                     <div class="list-container" id="history-list"></div>
                     <!-- Pagination -->
@@ -3872,9 +3889,24 @@
         const ADMIN_HISTORY_LIMIT = 10;
         window.serverTimeOffset = 0;
 
+        let currentHistoryFilter = 'ALL';
+
+        function setHistoryFilter(f) {
+            currentHistoryFilter = f;
+            currentAdminHistoryPage = 1;
+            
+            // Update active state
+            document.querySelectorAll('#history-filter-group .filter-btn').forEach(btn => {
+                if(btn.innerText === f) btn.classList.add('active');
+                else btn.classList.remove('active');
+            });
+
+            fetchAdminHistory(1);
+        }
+
         async function fetchAdminHistory(page) {
             try {
-                const res = await fetch(`/api/admin/sourcing/history?page=${page}&limit=${ADMIN_HISTORY_LIMIT}`);
+                const res = await fetch(`/api/admin/sourcing/history?page=${page}&limit=${ADMIN_HISTORY_LIMIT}&filter=${currentHistoryFilter}`);
                 const data = await res.json();
                 
                 if (data.server_now) {

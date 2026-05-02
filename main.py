@@ -108,7 +108,7 @@ async def auto_approve_task(bot_seller: Bot):
                                         try:
                                             await bot_seller.send_message(
                                                 seller.id,
-                                                f"<b>⏳ Pending <code>{acc.phone_number}</code> Sessions Found. Wait 24h.</b>",
+                                                f"<b>⏳ Pending <code>{acc.phone_number}</code> Sessions found — wait 24h</b>",
                                                 parse_mode="HTML"
                                             )
                                         except Exception as n_err:

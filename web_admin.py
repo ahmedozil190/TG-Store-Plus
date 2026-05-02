@@ -3431,16 +3431,29 @@ async def get_seller_accounts(user_id: int, page: int = 1, limit: int = 10):
         }
 
 @app.get("/api/admin/sourcing/history")
-async def get_admin_sourcing_history(page: int = 1, limit: int = 10):
+async def get_admin_sourcing_history(page: int = 1, limit: int = 10, filter: str = "ALL"):
     async with async_session() as session:
         offset = (page - 1) * limit
         
+        base_stmt = select(Account)
+        
+        if filter == "PENDING":
+            base_stmt = base_stmt.where(Account.status == AccountStatus.PENDING)
+        elif filter == "ACCEPTED":
+            base_stmt = base_stmt.where(Account.status.in_([AccountStatus.AVAILABLE, AccountStatus.SOLD]))
+        elif filter == "FROZEN":
+            base_stmt = base_stmt.where(Account.status == AccountStatus.REJECTED, Account.reject_reason.ilike("%frozen%"))
+        elif filter == "SPAM":
+            # Anything rejected that isn't frozen is usually spam or other issues, 
+            # but let's be specific if possible or just assume other rejections are spam for this view
+            base_stmt = base_stmt.where(Account.status == AccountStatus.REJECTED, Account.reject_reason.ilike("%spam%"))
+        
         total_count = (await session.execute(
-            select(func.count(Account.id))
+            select(func.count()).select_from(base_stmt.subquery())
         )).scalar() or 0
         total_pages = math.ceil(total_count / limit) if total_count > 0 else 1
         
-        stmt = select(Account).order_by(Account.id.desc()).offset(offset).limit(limit)
+        stmt = base_stmt.order_by(Account.id.desc()).offset(offset).limit(limit)
         results = (await session.execute(stmt)).scalars().all()
         
         history = []
