@@ -3104,14 +3104,14 @@ async def admin_withdrawal_action(data: WithdrawAction):
                 
                 if lang == "ar":
                     if data.action == 'approve':
-                        msg = f"🎉 Congrats `{req.transaction_id}` withdrawal {req.amount}$"
+                        msg = f"🎉 Congrats <code>{req.transaction_id}</code> withdrawal {req.amount}$"
                     else:
-                        msg = f"❌ Rejected `{req.transaction_id}` withdrawal {req.amount}$"
+                        msg = f"❌ Rejected <code>{req.transaction_id}</code> withdrawal {req.amount}$"
                 else:
                     if data.action == 'approve':
-                        msg = f"🎉 Congrats `{req.transaction_id}` withdrawal {req.amount}$"
+                        msg = f"🎉 Congrats <code>{req.transaction_id}</code> withdrawal {req.amount}$"
                     else:
-                        msg = f"❌ Rejected `{req.transaction_id}` withdrawal {req.amount}$"
+                        msg = f"❌ Rejected <code>{req.transaction_id}</code> withdrawal {req.amount}$"
                 
                 await bot.send_message(req.user_id, msg, parse_mode="HTML")
             except Exception as e:
