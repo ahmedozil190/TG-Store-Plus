@@ -3449,6 +3449,8 @@ async def get_admin_sourcing_history(
                 base_stmt = base_stmt.where(Account.status == AccountStatus.PENDING)
             elif filter == "ACCEPTED":
                 base_stmt = base_stmt.where(Account.status.in_([AccountStatus.AVAILABLE, AccountStatus.SOLD]))
+            elif filter == "REJECTED":
+                base_stmt = base_stmt.where(Account.status == AccountStatus.REJECTED)
             elif filter == "FROZEN":
                 base_stmt = base_stmt.where(Account.status == AccountStatus.REJECTED, Account.reject_reason.ilike("%frozen%"))
             elif filter == "SPAM":

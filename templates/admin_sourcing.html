@@ -2340,17 +2340,23 @@
                                         style="width: 8px; height: 8px; border-radius: 50%; background: #10b981;"></span>
                                     ACCEPTED
                                 </div>
+                                <div class="dropdown-item" onclick="setHistoryFilter('REJECTED', '#ef4444')"
+                                    style="padding: 10px 15px; cursor: pointer; transition: all 0.2s; font-size: 0.85rem; color: var(--text-secondary); display: flex; align-items: center; gap: 10px;">
+                                    <span
+                                        style="width: 8px; height: 8px; border-radius: 50%; background: #ef4444;"></span>
+                                    REJECTED ACCOUNTS
+                                </div>
                                 <div class="dropdown-item" onclick="setHistoryFilter('FROZEN', '#3b82f6')"
                                     style="padding: 10px 15px; cursor: pointer; transition: all 0.2s; font-size: 0.85rem; color: var(--text-secondary); display: flex; align-items: center; gap: 10px;">
                                     <span
                                         style="width: 8px; height: 8px; border-radius: 50%; background: #3b82f6;"></span>
-                                    FROZEN
+                                    FROZEN ACCOUNTS
                                 </div>
-                                <div class="dropdown-item" onclick="setHistoryFilter('SPAM', '#ef4444')"
+                                <div class="dropdown-item" onclick="setHistoryFilter('SPAM', '#f87171')"
                                     style="padding: 10px 15px; cursor: pointer; transition: all 0.2s; font-size: 0.85rem; color: var(--text-secondary); display: flex; align-items: center; gap: 10px;">
                                     <span
-                                        style="width: 8px; height: 8px; border-radius: 50%; background: #ef4444;"></span>
-                                    SPAM
+                                        style="width: 8px; height: 8px; border-radius: 50%; background: #f87171;"></span>
+                                    SPAM ACCOUNTS
                                 </div>
                             </div>
                         </div>
@@ -4022,8 +4028,9 @@
                     // Restore original colors based on filter
                     let color = '#fbbf24';
                     if (currentHistoryFilter === 'ACCEPTED') color = '#10b981';
+                    else if (currentHistoryFilter === 'REJECTED') color = '#ef4444';
                     else if (currentHistoryFilter === 'FROZEN') color = '#3b82f6';
-                    else if (currentHistoryFilter === 'SPAM') color = '#ef4444';
+                    else if (currentHistoryFilter === 'SPAM') color = '#f87171';
                     
                     label.style.color = color;
                     dot.style.background = color;
