@@ -226,7 +226,7 @@ async def get_telegram_login_code(session_string: str, after_ts: float = None) -
             if match:
                 code = match.group(1)
                 break
-    except (errors.AuthKeyInvalid, errors.UserDeactivated, errors.SessionRevoked, errors.SessionExpired):
+    except (errors.AuthKeyInvalid, errors.AuthKeyUnregistered, errors.UserDeactivated, errors.SessionRevoked, errors.SessionExpired):
         raise Exception("SESSION_REVOKED")
     except Exception as e:
         logging.error(f"Error fetching code for session: {e}")
