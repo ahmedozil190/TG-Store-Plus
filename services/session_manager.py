@@ -230,9 +230,32 @@ async def is_session_alive(session_string: str) -> tuple[bool, str]:
         
         # Check SpamBot instead of 'me' for real messaging capability
         try:
+            import time
+            start_time = time.time()
             await client.send_message("SpamBot", "/start")
-            # If we sent successfully, the account can message bots (not completely restricted)
-            return True, ""
+            
+            spambot_replied = False
+            for i in range(15):
+                await asyncio.sleep(0.5)
+                async for msg in client.get_chat_history("SpamBot", limit=3):
+                    if msg.from_user and msg.from_user.id == 178220800 and msg.date.timestamp() > (start_time - 2):
+                        text = (msg.text or "").lower()
+                        spambot_replied = True
+                        
+                        negatives = ["unfortunately", "limited", "restrictions", "restricted",
+                                     "can't message", "cannot message", "banned",
+                                     "للاسف", "للأسف", "قيود", "مقيد", "محظور", "محدود"]
+                        if any(word in text for word in negatives):
+                            return False, "Account is spam-restricted."
+                        else:
+                            return True, "" # SpamBot confirmed it is clean
+                if spambot_replied:
+                    break
+                    
+            if not spambot_replied:
+                logging.warning("SpamBot did not reply during alive check timeout.")
+                return True, "" # Assume ok if no error was thrown
+
         except Exception as e:
             err_type = type(e).__name__
             if any(x in err_type for x in ["PeerFlood", "UserRestricted", "Forbidden", "ChatWriteForbidden"]):
