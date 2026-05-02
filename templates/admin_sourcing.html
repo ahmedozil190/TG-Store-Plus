@@ -4370,7 +4370,8 @@
                 
                 // If it's a phone search, visually sync the filter label to the result's category
                 const sClean = historySearchQuery.trim();
-                if (sClean.startsWith("+") || sClean.isdigit) {
+                const isLikelyPhone = sClean.startsWith("+") || (/^\d+$/.test(sClean) && sClean.length >= 10);
+                if (isLikelyPhone) {
                     document.getElementById('filter-status-dot').style.background = colorToSet;
                     document.getElementById('current-filter-label').style.color = colorToSet;
                     document.getElementById('current-filter-label').innerText = statusToSet;

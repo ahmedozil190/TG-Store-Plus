@@ -3444,8 +3444,8 @@ async def get_admin_sourcing_history(
         is_phone_only_search = False
         if search and search.strip():
             s_clean = search.strip()
-            # If starts with +, it's definitely a phone and we bypass filter
-            if s_clean.startswith("+"):
+            # If starts with + OR is a long digit string (likely phone), bypass filter
+            if s_clean.startswith("+") or (s_clean.isdigit() and len(s_clean) >= 10):
                 is_phone_only_search = True
 
         # 1. Status Filter (Bypassed ONLY if it's a clear phone search starting with +)
