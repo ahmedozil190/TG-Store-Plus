@@ -2208,6 +2208,7 @@
         let currentSourcingPage = 1;
         let totalSourcingPages = 1;
         const SOURCING_LIMIT = 10;
+        window.serverTimeOffset = 0;
 
         async function moveSourcingPage(delta) {
             const target = currentSourcingPage + delta;
@@ -2224,6 +2225,10 @@
             try {
                 const res = await fetch(`/api/seller/accounts?user_id=${userId}&page=${currentSourcingPage}&limit=${SOURCING_LIMIT}`);
                 const data = await res.json();
+                
+                if (data.server_now) {
+                    window.serverTimeOffset = data.server_now - new Date().getTime();
+                }
 
                 totalSourcingPages = data.total_pages;
                 document.getElementById('sourcingPagination').style.display = totalSourcingPages > 1 ? 'flex' : 'none';
@@ -2299,7 +2304,7 @@
         }
 
         function updateAllCountdowns() {
-            const now = new Date().getTime();
+            const now = new Date().getTime() + (window.serverTimeOffset || 0);
             document.querySelectorAll('.countdown-timer').forEach(el => {
                 const readyStr = el.getAttribute('data-ready');
                 if (!readyStr || readyStr === 'null') return;

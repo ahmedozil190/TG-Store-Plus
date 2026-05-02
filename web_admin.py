@@ -3287,7 +3287,8 @@ async def get_seller_accounts(user_id: int, page: int = 1, limit: int = 10):
         return {
             "accounts": accounts_data,
             "total_pages": total_pages,
-            "current_page": page
+            "current_page": page,
+            "server_now": int(datetime.utcnow().timestamp() * 1000)
         }
 
 @app.get("/api/admin/sourcing/history")
@@ -3336,7 +3337,8 @@ async def get_admin_sourcing_history(page: int = 1, limit: int = 10):
         return {
             "history": history,
             "total_pages": total_pages,
-            "current_page": page
+            "current_page": page,
+            "server_now": int(datetime.utcnow().timestamp() * 1000)
         }
 
 @app.post("/api/admin/user/sync")

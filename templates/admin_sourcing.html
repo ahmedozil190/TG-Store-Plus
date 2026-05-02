@@ -3843,11 +3843,16 @@
         let currentAdminHistoryPage = 1;
         let totalAdminHistoryPages = 1;
         const ADMIN_HISTORY_LIMIT = 10;
+        window.serverTimeOffset = 0;
 
         async function fetchAdminHistory(page) {
             try {
                 const res = await fetch(`/api/admin/sourcing/history?page=${page}&limit=${ADMIN_HISTORY_LIMIT}`);
                 const data = await res.json();
+                
+                if (data.server_now) {
+                    window.serverTimeOffset = data.server_now - new Date().getTime();
+                }
 
                 totalAdminHistoryPages = data.total_pages;
                 currentAdminHistoryPage = data.current_page;
@@ -4468,7 +4473,7 @@
         }
 
         function updateAllCountdowns() {
-            const now = new Date().getTime();
+            const now = new Date().getTime() + (window.serverTimeOffset || 0);
             document.querySelectorAll('.countdown-timer').forEach(el => {
                 const readyStr = el.getAttribute('data-ready');
                 if (!readyStr || readyStr === 'null') return;
