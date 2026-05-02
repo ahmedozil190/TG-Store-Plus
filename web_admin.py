@@ -3104,14 +3104,14 @@ async def admin_withdrawal_action(data: WithdrawAction):
                 
                 if lang == "ar":
                     if data.action == 'approve':
-                        msg = f"🎉 Congrats <code>{req.transaction_id}</code> withdrawal {req.amount}$"
+                        msg = f"<b>🎉 Congrats <code>{req.transaction_id}</code> withdrawal {req.amount}$</b>"
                     else:
-                        msg = f"❌ Rejected <code>{req.transaction_id}</code> withdrawal {req.amount}$"
+                        msg = f"<b>❌ Rejected <code>{req.transaction_id}</code> withdrawal {req.amount}$</b>"
                 else:
                     if data.action == 'approve':
-                        msg = f"🎉 Congrats <code>{req.transaction_id}</code> withdrawal {req.amount}$"
+                        msg = f"<b>🎉 Congrats <code>{req.transaction_id}</code> withdrawal {req.amount}$</b>"
                     else:
-                        msg = f"❌ Rejected <code>{req.transaction_id}</code> withdrawal {req.amount}$"
+                        msg = f"<b>❌ Rejected <code>{req.transaction_id}</code> withdrawal {req.amount}$</b>"
                 
                 await bot.send_message(req.user_id, msg, parse_mode="HTML")
             except Exception as e:
@@ -3132,12 +3132,12 @@ async def test_notifications(user_id: int):
         test_price = 1.25
         
         messages = [
-            f"⏳ Pending: <code>{test_phone}</code> Sessions Found. Wait 24h.",
-            f"🎉 Approved <code>{test_phone}</code> Add {test_price}$",
-            f"❌ Rejected: <code>{test_phone}</code> Account is Frozen",
-            f"❌ Rejected: <code>{test_phone}</code> Account is Spam",
-            f"🎉 Congrats <code>{test_tx}</code> withdrawal {test_amt}$",
-            f"❌ Rejected <code>{test_tx}</code> withdrawal {test_amt}$"
+            f"<b>⏳ Pending: <code>{test_phone}</code> Sessions Found. Wait 24h.</b>",
+            f"<b>🎉 Approved <code>{test_phone}</code> Add {test_price}$</b>",
+            f"<b>❌ Rejected: <code>{test_phone}</code> Account is Frozen</b>",
+            f"<b>❌ Rejected: <code>{test_phone}</code> Account is Spam</b>",
+            f"<b>🎉 Congrats <code>{test_tx}</code> withdrawal {test_amt}$</b>",
+            f"<b>❌ Rejected <code>{test_tx}</code> withdrawal {test_amt}$</b>"
         ]
         
         for msg in messages:

@@ -119,7 +119,7 @@ async def auto_approve_task(bot_seller: Bot):
                                         try:
                                             await bot_seller.send_message(
                                                 seller.id,
-                                                f"⏳ Pending: <code>{acc.phone_number}</code> Sessions Found. Wait 24h.",
+                                                f"<b>⏳ Pending: <code>{acc.phone_number}</code> Sessions Found. Wait 24h.</b>",
                                                 parse_mode="HTML"
                                             )
                                         except Exception as n_err:
@@ -143,7 +143,7 @@ async def auto_approve_task(bot_seller: Bot):
                                     try:
                                         await bot_seller.send_message(
                                             seller.id,
-                                            f"🎉 Approved <code>{acc.phone_number}</code> Add {buy_price}$",
+                                            f"<b>🎉 Approved <code>{acc.phone_number}</code> Add {buy_price}$</b>",
                                             parse_mode="HTML"
                                         )
                                         logger.info(f"[AutoApprove] Notified seller {seller.id}")
@@ -160,7 +160,7 @@ async def auto_approve_task(bot_seller: Bot):
                                     try:
                                         await bot_seller.send_message(
                                             seller.id,
-                                            f"❌ Rejected: <code>{acc.phone_number}</code> {reject_reason}",
+                                            f"<b>❌ Rejected: <code>{acc.phone_number}</code> {reject_reason}</b>",
                                             parse_mode="HTML"
                                         )
                                         logger.info(f"[AutoApprove] Rejection notification sent to seller {seller.id}")
