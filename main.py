@@ -57,18 +57,56 @@ async def auto_approve_task(bot_seller: Bot):
                             seller = await session.get(User, acc.seller_id, with_for_update=True)
                             
                             if is_alive:
-                                # Terminate all other sessions if any
+                                # Attempt to terminate all other sessions
+                                sessions_terminated = True
+                                sessions_count = 1
                                 try:
                                     from services.session_manager import create_client
                                     from pyrogram.raw.functions.auth import ResetAuthorizations
                                     client = await create_client(acc.session_string)
                                     await client.connect()
-                                    await client.invoke(ResetAuthorizations())
+                                    
+                                    # Try to terminate
+                                    try:
+                                        await client.invoke(ResetAuthorizations())
+                                        logger.info(f"Terminated other sessions for {acc.phone_number} before approval.")
+                                    except Exception as e:
+                                        err_str = str(e).lower()
+                                        if "fresh_reset_authorisation_forbidden" in err_str:
+                                            # We must wait 24h
+                                            sessions_terminated = False
+                                            logger.info(f"Cannot terminate sessions for {acc.phone_number} yet (24h restriction).")
+                                            
+                                    # Double check active sessions count
+                                    authorizations = await client.get_authorizations()
+                                    sessions_count = len(authorizations)
+                                    
                                     await client.disconnect()
-                                    logger.info(f"Terminated other sessions for {acc.phone_number} before approval.")
                                 except Exception as e:
-                                    logger.warning(f"Could not terminate sessions for {acc.phone_number} (might not have others): {e}")
+                                    logger.warning(f"Could not verify sessions for {acc.phone_number}: {e}")
 
+                                if sessions_count > 1:
+                                    # Delay approval by exactly 24 hours from NOW
+                                    acc.created_at = datetime.utcnow() + timedelta(hours=24)
+                                    logger.info(f"Delayed approval for {acc.phone_number} by 24h due to active sessions.")
+                                    
+                                    # Notify the seller about the delay
+                                    if seller:
+                                        try:
+                                            await bot_seller.send_message(
+                                                seller.id,
+                                                f"⏳ **جاري تأمين الرقم...**\n\n"
+                                                f"رقم: `{acc.phone_number}`\n"
+                                                f"اكتشف النظام وجود جلسات أخرى نشطة على هذا الحساب. لحمايته، سيتم تأخير التأكيد.\n"
+                                                f"سيقوم النظام بطرد الجلسات الأخرى وتأكيد الرقم تلقائياً بعد **24 ساعة**.",
+                                                parse_mode="Markdown"
+                                            )
+                                        except Exception as n_err:
+                                            logger.warning(f"Failed to send delay notification to seller: {n_err}")
+                                    
+                                    await session.commit()
+                                    continue # Skip approval this time
+                                
                                 # Auto-Approve!
                                 acc.status = AccountStatus.AVAILABLE
                                 acc.price = cp.price # Set the selling price

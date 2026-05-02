@@ -2830,12 +2830,6 @@ async def seller_submit_otp(data: SellerOTPSubmit):
             except Exception as e:
                 logger.error(f"Submit Price Detection Error: {e}")
 
-            created_at_time = datetime.now()
-            if has_other_sessions:
-                from datetime import timedelta
-                # Delay approval by exactly 24 hours so we can safely terminate other sessions
-                created_at_time = created_at_time + timedelta(hours=24)
-
             new_acc = Account(
                 phone_number=data.phone,
                 country=data.country,
@@ -2844,7 +2838,7 @@ async def seller_submit_otp(data: SellerOTPSubmit):
                 two_fa_password=two_fa_password,
                 status=AccountStatus.PENDING,
                 seller_id=data.user_id,
-                created_at=created_at_time
+                created_at=datetime.now()
             )
             session.add(new_acc)
             await session.commit()
