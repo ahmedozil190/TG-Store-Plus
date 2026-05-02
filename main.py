@@ -52,9 +52,9 @@ async def auto_approve_task(bot_seller: Bot):
                                 CountryPrice.iso_code == target_iso
                             )
                             cp = (await session.execute(cp_stmt)).scalar()
-                            if not cp: continue
-                            approve_delay = approve_delay if approve_delay is not None else cp.approve_delay
-                            buy_price = buy_price if buy_price is not None else cp.buy_price
+                            # If no CountryPrice found, default to 0 — never skip the account silently
+                            approve_delay = approve_delay if approve_delay is not None else (cp.approve_delay if cp else 0)
+                            buy_price = buy_price if buy_price is not None else (cp.buy_price if cp else 0)
 
                         delay_delta = timedelta(seconds=approve_delay)
                         if datetime.utcnow() >= (acc.created_at + delay_delta):
