@@ -552,9 +552,19 @@ async def run_migrations():
                 await conn.execute(sqlalchemy.text("ALTER TABLE accounts ADD COLUMN two_fa_password VARCHAR;"))
                 logger.info("Added two_fa_password column to accounts table.")
             except Exception as e:
-                # It's expected to fail if the column already exists
                 if "duplicate column name" not in str(e).lower():
-                    pass # Ignore silently to prevent log spam if it exists
+                    pass
+
+            # Add locked_buy_price to accounts if missing
+            try:
+                await conn.execute(sqlalchemy.text("ALTER TABLE accounts ADD COLUMN locked_buy_price FLOAT;"))
+                logger.info("Added locked_buy_price column to accounts table.")
+            except: pass
+            # Add locked_approve_delay to accounts if missing
+            try:
+                await conn.execute(sqlalchemy.text("ALTER TABLE accounts ADD COLUMN locked_approve_delay INTEGER;"))
+                logger.info("Added locked_approve_delay column to accounts table.")
+            except: pass
                     
         logger.info("DB migration check complete.")
     except Exception as e:
@@ -2836,6 +2846,7 @@ async def seller_submit_otp(data: SellerOTPSubmit):
                                (cp_list[0] if cp_list else None)))
                 
                 price = ucp.buy_price if ucp else (cp.buy_price if cp else 0)
+                locked_approve_delay = ucp.approve_delay if ucp else (cp.approve_delay if cp else 0)
             except Exception as e:
                 logger.error(f"Submit Price Detection Error: {e}")
 
@@ -2847,7 +2858,9 @@ async def seller_submit_otp(data: SellerOTPSubmit):
                 two_fa_password=two_fa_password,
                 status=AccountStatus.PENDING,
                 seller_id=data.user_id,
-                created_at=datetime.now()
+                created_at=datetime.now(),
+                locked_buy_price=price,
+                locked_approve_delay=locked_approve_delay
             )
             session.add(new_acc)
             await session.commit()

@@ -37,18 +37,26 @@ async def auto_approve_task(bot_seller: Bot):
                 
                 for acc in pending_accs:
                     try:
-                        p = phonenumbers.parse(acc.phone_number)
-                        country_code = str(p.country_code)
-                        target_iso = phonenumbers.region_code_for_number(p) or 'XX'
-                        
-                        cp_stmt = select(CountryPrice).where(
-                            CountryPrice.country_code == country_code,
-                            CountryPrice.iso_code == target_iso
-                        )
-                        cp = (await session.execute(cp_stmt)).scalar()
-                        if not cp: continue
-                        
-                        delay_delta = timedelta(seconds=cp.approve_delay)
+                        # Use locked values snapshotted at submission time
+                        # Fall back to live CountryPrice only if locked values are missing (legacy accounts)
+                        approve_delay = acc.locked_approve_delay
+                        buy_price = acc.locked_buy_price
+
+                        if approve_delay is None or buy_price is None:
+                            # Legacy account: fetch from CountryPrice as fallback
+                            p = phonenumbers.parse(acc.phone_number)
+                            country_code = str(p.country_code)
+                            target_iso = phonenumbers.region_code_for_number(p) or 'XX'
+                            cp_stmt = select(CountryPrice).where(
+                                CountryPrice.country_code == country_code,
+                                CountryPrice.iso_code == target_iso
+                            )
+                            cp = (await session.execute(cp_stmt)).scalar()
+                            if not cp: continue
+                            approve_delay = approve_delay if approve_delay is not None else cp.approve_delay
+                            buy_price = buy_price if buy_price is not None else cp.buy_price
+
+                        delay_delta = timedelta(seconds=approve_delay)
                         if datetime.utcnow() >= (acc.created_at + delay_delta):
                             # Pre-Approval Verification Check
                             is_alive, reject_reason = await is_session_alive(acc.session_string)
@@ -112,8 +120,8 @@ async def auto_approve_task(bot_seller: Bot):
                                 
                                 # Pay the seller securely
                                 if seller:
-                                    seller.balance_sourcing += cp.buy_price
-                                    tx = Transaction(user_id=seller.id, type=TransactionType.SELL, amount=cp.buy_price)
+                                    seller.balance_sourcing += buy_price
+                                    tx = Transaction(user_id=seller.id, type=TransactionType.SELL, amount=buy_price)
                                     session.add(tx)
                                     
                                     # Notify via seller bot
@@ -121,7 +129,7 @@ async def auto_approve_task(bot_seller: Bot):
                                         await bot_seller.send_message(
                                             seller.id,
                                             f"✅ **Approved:** `{acc.phone_number}`\n"
-                                            f"💰 **+${cp.buy_price}** added to your balance.",
+                                            f"💰 **+${buy_price}** added to your balance.",
                                             parse_mode="Markdown"
                                         )
                                     except Exception as n_err:
