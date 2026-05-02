@@ -55,11 +55,8 @@ class MaintenanceMiddleware(BaseMiddleware):
                     elif event.callback_query: target = event.callback_query
 
                 if target:
-                    msg = "⚠️ The bot is currently under maintenance. Please check back later."
-                    if isinstance(target, Message):
-                        await target.answer(msg)
-                    elif isinstance(target, CallbackQuery):
-                        await target.answer("Maintenance Mode ⚠️", show_alert=True)
+                    if isinstance(target, CallbackQuery):
+                        await target.answer()
                     return # STOP HERE
 
             return await handler(event, data)
