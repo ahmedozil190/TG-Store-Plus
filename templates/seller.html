@@ -1847,7 +1847,9 @@
                 if (data.support_username) {
                     const msgBtn = document.getElementById('btn-message-support');
                     if (msgBtn) {
-                        msgBtn.setAttribute('onclick', `tg.openTelegramLink('https://t.me/${data.support_username}')`);
+                        msgBtn.onclick = function() {
+                            window.Telegram.WebApp.openTelegramLink(`https://t.me/${data.support_username}`);
+                        };
                     }
                 }
 

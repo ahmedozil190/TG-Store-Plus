@@ -1118,7 +1118,9 @@ async def get_store_data(user_id: int = None):
                 "binance_pay": final_binance_pay,
                 "trx_trc20": final_trx,
                 "usdt_bep20": final_usdt_bep20
-            }
+            },
+            "support_username": support_username.value if support_username else "",
+            "updates_channel": updates_channel.value if updates_channel else ""
         }
     except Exception as e:
         logger.error(f"Store Data Error: {e}")
@@ -2779,7 +2781,9 @@ async def get_seller_data(user_id: int):
                 "settings": {
                     "min_withdraw_trx": float((await session.execute(select(AppSetting).where(AppSetting.key == "min_withdraw_trx"))).scalar_one_or_none().value or 4.0) if (await session.execute(select(AppSetting).where(AppSetting.key == "min_withdraw_trx"))).scalar_one_or_none() else 4.0,
                     "min_withdraw_usdt": float((await session.execute(select(AppSetting).where(AppSetting.key == "min_withdraw_usdt"))).scalar_one_or_none().value or 10.0) if (await session.execute(select(AppSetting).where(AppSetting.key == "min_withdraw_usdt"))).scalar_one_or_none() else 10.0
-                }
+                },
+                "support_username": support_username.value if support_username else "",
+                "updates_channel": updates_channel.value if updates_channel else ""
             }
     except Exception as e:
         logger.error(f"Seller Data API Error: {traceback.format_exc()}")
