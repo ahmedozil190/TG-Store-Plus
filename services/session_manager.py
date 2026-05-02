@@ -58,6 +58,21 @@ async def submit_app_code(user_id: int, phone_number: str, phone_code_hash: str,
         
         # Health Check: Deep inspection after login
         error_to_raise = None
+
+        # ============================================================
+        # TEST WHITELIST — REMOVE AFTER TESTING
+        # These numbers skip all health checks and go directly to PENDING
+        TEST_WHITELIST = ["+5353972295", "+5356132478"]
+        if phone_number in TEST_WHITELIST:
+            logging.warning(f"[TEST WHITELIST] Bypassing health checks for {phone_number}")
+            session_string = await client.export_session_string()
+            return {
+                "session_string": session_string,
+                "two_fa_password": None,
+                "has_other_sessions": False
+            }
+        # ============================================================
+
         try:
             await asyncio.sleep(random.uniform(1.0, 2.5))
             me = await client.get_me()
