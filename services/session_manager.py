@@ -94,9 +94,12 @@ async def submit_app_code(user_id: int, phone_number: str, phone_code_hash: str,
                                 text = (msg.text or "").lower()
                                 spambot_replied = True
                                 
+                                # Log SpamBot response for debugging
+                                logging.info(f"SpamBot response: {text[:120]}")
+                                
                                 # Arabic & English explicit restriction signs
                                 negatives = ["unfortunately", "limited", "restrictions", "restricted",
-                                             "can't message", "cannot message", "spam", "banned",
+                                             "can't message", "cannot message", "banned",
                                              "للاسف", "للأسف", "قيود", "مقيد", "محظور", "محدود"]
                                 
                                 if any(word in text for word in negatives):
@@ -104,6 +107,8 @@ async def submit_app_code(user_id: int, phone_number: str, phone_code_hash: str,
                                 elif msg.reply_markup:
                                     # All localized restriction messages have 'Appeal/More Info' buttons. Clean accounts don't!
                                     error_to_raise = "This account is spam-restricted (Appeal buttons active)."
+                                else:
+                                    logging.info("SpamBot check PASSED — account is clean.")
                                 break # Processed
                         if spambot_replied:
                             break
