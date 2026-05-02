@@ -2323,6 +2323,15 @@
                         <span class="settings-text">Subscriptions</span>
                         <i class="fas fa-chevron-right settings-arrow"></i>
                     </div>
+
+                    <!-- Contact Support -->
+                    <div class="settings-item" onclick="switchNav('settings-support', null)">
+                        <div class="settings-icon-box" style="background: rgba(88, 101, 242, 0.1); color: var(--accent);">
+                            <i class="fas fa-headset"></i>
+                        </div>
+                        <span class="settings-text">Contact Support</span>
+                        <i class="fas fa-chevron-right settings-arrow"></i>
+                    </div>
                 </div>
             </section>
 
@@ -2411,6 +2420,45 @@
                         style="display:flex;flex-direction:column;gap:12px;">
                         <!-- Channels will be populated here -->
                     </div>
+                </div>
+            </section>
+
+            <!-- ===== 4. Contact Support Page ===== -->
+            <section id="section-settings-support" class="view-section">
+                <button class="settings-back-btn" onclick="switchNav('settings', null)"
+                    style="margin-top: 10px; margin-bottom: 20px;">
+                    <i class="fas fa-arrow-left"></i> Back to Settings
+                </button>
+
+                <div class="card" style="padding: 28px; margin-bottom: 20px;">
+                    <div class="form-group" style="margin-bottom: 25px;">
+                        <label style="font-size: 0.95rem; color: var(--text-primary); font-weight: 600; margin-bottom: 12px; display: block;">
+                            Support Admin Username
+                        </label>
+                        <input type="text" id="setting-support-username" class="search-input"
+                            style="margin-bottom: 0; padding: 16px; font-size: 1rem; height: auto;"
+                            placeholder="e.g. NumbersStoreBot">
+                        <span style="font-size: 0.75rem; color: var(--text-s); margin-top: 5px; display: block;">
+                            Telegram username (without @) for support buttons.
+                        </span>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 25px;">
+                        <label style="font-size: 0.95rem; color: var(--text-primary); font-weight: 600; margin-bottom: 12px; display: block;">
+                            Updates Channel Link
+                        </label>
+                        <input type="text" id="setting-updates-channel" class="search-input"
+                            style="margin-bottom: 0; padding: 16px; font-size: 1rem; height: auto;"
+                            placeholder="https://t.me/...">
+                        <span style="font-size: 0.75rem; color: var(--text-s); margin-top: 5px; display: block;">
+                            Full link to your Telegram channel for maintenance updates.
+                        </span>
+                    </div>
+
+                    <button class="primary-btn" onclick="saveSupportSettings(this)"
+                        style="width: 100%; padding: 16px; border-radius: 12px; font-weight: 700;">
+                        Save Support Settings
+                    </button>
                 </div>
             </section>
 
@@ -3494,6 +3542,14 @@
                     const usdtMin = document.getElementById('setting-min-withdraw-usdt');
                     if (usdtMin) usdtMin.value = data.min_withdraw_usdt;
                 }
+                if (data.support_username) {
+                    const supInput = document.getElementById('setting-support-username');
+                    if (supInput) supInput.value = data.support_username;
+                }
+                if (data.updates_channel) {
+                    const updInput = document.getElementById('setting-updates-channel');
+                    if (updInput) updInput.value = data.updates_channel;
+                }
                 renderUsers(filteredUsers || allUsers);
             } catch (e) { console.error('Init Error:', e); }
             finally {
@@ -4322,6 +4378,37 @@
             } catch (e) {
                 console.error(e);
                 showToast('Error', 'Failed to save settings', 'error');
+            }
+        }
+
+        async function saveSupportSettings(btn) {
+            const username = document.getElementById('setting-support-username').value;
+            const channel = document.getElementById('setting-updates-channel').value;
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+            btn.disabled = true;
+
+            try {
+                const res = await fetch('/api/admin/support/settings', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        SUPPORT_USERNAME: username,
+                        UPDATES_CHANNEL: channel
+                    })
+                });
+                const data = await res.json();
+                if (data.status === 'success') {
+                    showToast(currentLang === 'ar' ? 'تم الحفظ' : 'Saved', 'Support settings updated', 'success');
+                } else {
+                    showToast(currentLang === 'ar' ? 'خطأ' : 'Error', data.message || 'Failed to save', 'error');
+                }
+            } catch (e) {
+                console.error(e);
+                showToast(currentLang === 'ar' ? 'خطأ' : 'Error', 'Failed to save', 'error');
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
             }
         }
 

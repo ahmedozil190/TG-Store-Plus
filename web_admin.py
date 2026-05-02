@@ -688,13 +688,25 @@ async def get_store_data(user_id: int = None):
             maintenance_mode = (mnt_obj.value.lower() == "true") if mnt_obj else False
             
             from config import ADMIN_IDS
+            # Support & Channel settings
+            support_username = (await session.execute(select(AppSetting).where(AppSetting.key == "SUPPORT_USERNAME"))).scalar_one_or_none()
+            updates_channel = (await session.execute(select(AppSetting).where(AppSetting.key == "UPDATES_CHANNEL"))).scalar_one_or_none()
+
             if maintenance_mode and user_id not in ADMIN_IDS:
-                return {"maintenance_store": True}
+                return {
+                    "maintenance_store": True,
+                    "support_username": support_username.value if support_username else "NumbersStoreBot",
+                    "updates_channel": updates_channel.value if updates_channel else "https://t.me/NumbersStoreBot"
+                }
 
             if user_id:
                 user = await session.get(User, user_id)
                 if user and user.is_banned_store and user_id not in ADMIN_IDS:
-                    return {"is_banned": True}
+                    return {
+                        "is_banned": True,
+                        "support_username": support_username.value if support_username else "NumbersStoreBot",
+                        "updates_channel": updates_channel.value if updates_channel else "https://t.me/NumbersStoreBot"
+                    }
 
             # 0. Global Settings
             local_enabled_obj = (await session.execute(select(AppSetting).where(AppSetting.key == "local_server_enabled"))).scalar_one_or_none()
@@ -1781,7 +1793,9 @@ async def get_sourcing_data(user_id: int, init_data: str):
                 },
                 "recent": recent,
                 "prices": prices,
-                "users": users_list
+                "users": users_list,
+                "support_username": (await session.execute(select(AppSetting).where(AppSetting.key == "SUPPORT_USERNAME"))).scalar_one_or_none().value if (await session.execute(select(AppSetting).where(AppSetting.key == "SUPPORT_USERNAME"))).scalar_one_or_none() else "NumbersStoreBot",
+                "updates_channel": (await session.execute(select(AppSetting).where(AppSetting.key == "UPDATES_CHANNEL"))).scalar_one_or_none().value if (await session.execute(select(AppSetting).where(AppSetting.key == "UPDATES_CHANNEL"))).scalar_one_or_none() else "https://t.me/NumbersStoreBot"
             }
     except Exception as e:
         logger.error(f"Sourcing Data Error: {e}")
@@ -1937,7 +1951,9 @@ async def get_admin_store_data(user_id: int, init_data: str):
             },
             "users": users,
             "transactions": transactions,
-            "prices": prices
+            "prices": prices,
+            "support_username": (await session.execute(select(AppSetting).where(AppSetting.key == "SUPPORT_USERNAME"))).scalar_one_or_none().value if (await session.execute(select(AppSetting).where(AppSetting.key == "SUPPORT_USERNAME"))).scalar_one_or_none() else "NumbersStoreBot",
+            "updates_channel": (await session.execute(select(AppSetting).where(AppSetting.key == "UPDATES_CHANNEL"))).scalar_one_or_none().value if (await session.execute(select(AppSetting).where(AppSetting.key == "UPDATES_CHANNEL"))).scalar_one_or_none() else "https://t.me/NumbersStoreBot"
         }
     except Exception as e:
         logger.error(f"Store Admin Data Error: {e}")
@@ -2037,6 +2053,22 @@ async def save_store_settings(req: StoreSettingsSubmit):
             return {"status": "success", "message": "Settings saved successfully"}
     except Exception as e:
         logger.error(f"Save Store Settings Error: {e}")
+        return {"status": "error", "message": str(e)}
+
+@app.post("/api/admin/support/settings")
+async def save_support_settings(data: dict):
+    try:
+        async with async_session() as session:
+            for k, v in data.items():
+                if k not in ["SUPPORT_USERNAME", "UPDATES_CHANNEL"]: continue
+                obj = (await session.execute(select(AppSetting).where(AppSetting.key == k))).scalar_one_or_none()
+                if obj:
+                    obj.value = v.strip()
+                else:
+                    session.add(AppSetting(key=k, value=v.strip()))
+            await session.commit()
+            return {"status": "success"}
+    except Exception as e:
         return {"status": "error", "message": str(e)}
 
 @app.get("/api/admin/system/maintenance")
@@ -2610,13 +2642,25 @@ async def get_seller_data(user_id: int):
             maintenance_mode = (mnt_obj.value.lower() == "true") if mnt_obj else False
             
             from config import ADMIN_IDS
+            # Support & Channel settings
+            support_username = (await session.execute(select(AppSetting).where(AppSetting.key == "SUPPORT_USERNAME"))).scalar_one_or_none()
+            updates_channel = (await session.execute(select(AppSetting).where(AppSetting.key == "UPDATES_CHANNEL"))).scalar_one_or_none()
+
             if maintenance_mode and user_id not in ADMIN_IDS:
-                return {"maintenance_sourcing": True}
+                return {
+                    "maintenance_sourcing": True,
+                    "support_username": support_username.value if support_username else "NumbersStoreBot",
+                    "updates_channel": updates_channel.value if updates_channel else "https://t.me/NumbersStoreBot"
+                }
 
             if user_id:
                 user = await session.get(User, user_id)
                 if user and user.is_banned_sourcing and user_id not in ADMIN_IDS:
-                    return {"is_banned": True}
+                    return {
+                        "is_banned": True,
+                        "support_username": support_username.value if support_username else "NumbersStoreBot",
+                        "updates_channel": updates_channel.value if updates_channel else "https://t.me/NumbersStoreBot"
+                    }
 
             user = await session.get(User, user_id)
             if not user:

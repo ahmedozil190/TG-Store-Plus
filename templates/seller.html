@@ -1448,8 +1448,8 @@
                     <p style="color: var(--text-secondary); font-size: 0.95rem; line-height: 1.6;">Our dedicated support
                         team is available to help you with any questions or issues you may have.</p>
                 </div>
-                <button class="btn-action" style="width: auto; padding: 16px 40px; border-radius: 50px;"
-                    onclick="tg.openTelegramLink('https://t.me/ahmedozil190')">
+                <button class="btn-action" id="btn-message-support" style="width: auto; padding: 16px 40px; border-radius: 50px;"
+                    onclick="tg.openTelegramLink('https://t.me/NumbersStoreBot')">
                     <i class="fab fa-telegram"></i> Message Support
                 </button>
             </div>
@@ -1801,7 +1801,7 @@
                         'Under Maintenance',
                         'We are performing some scheduled maintenance to improve our service. Please check back later.',
                         '<i class="fab fa-telegram"></i> Updates Channel',
-                        "window.Telegram.WebApp.openTelegramLink('https://t.me/NumbersStoreBot')"
+                        `window.Telegram.WebApp.openTelegramLink('${data.updates_channel || 'https://t.me/NumbersStoreBot'}')`
                     );
                     return;
                 }
@@ -1811,9 +1811,9 @@
                     showStatusPage(
                         'fa-user-slash',
                         'Account Restricted',
-                        'Your access has been suspended due to a violation of our terms. Contact support for more info.',
+                        'Your access has been suppressed due to a violation of our terms. Contact support for more info.',
                         '<i class="fab fa-telegram-plane"></i> Contact Support',
-                        "window.Telegram.WebApp.openTelegramLink('https://t.me/NumbersStoreBot')"
+                        `window.Telegram.WebApp.openTelegramLink('https://t.me/${data.support_username || 'NumbersStoreBot'}')`
                     );
                     return;
                 }
@@ -1842,6 +1842,13 @@
                     document.title = `${data.bot_name} - Dashboard`;
                     const brandName = document.getElementById('sideBrandName');
                     if (brandName) brandName.textContent = data.bot_name;
+                }
+
+                if (data.support_username) {
+                    const msgBtn = document.getElementById('btn-message-support');
+                    if (msgBtn) {
+                        msgBtn.setAttribute('onclick', `tg.openTelegramLink('https://t.me/${data.support_username}')`);
+                    }
                 }
 
                 // Stats Grid
