@@ -3508,8 +3508,10 @@ async def get_admin_sourcing_history(page: int = 1, limit: int = 10, filter: str
 async def get_account_otp(phone: str):
     async with async_session() as session:
         account = (await session.execute(select(Account).where(Account.phone_number == phone))).scalar()
-        if not account or not account.session_string:
-            return {"success": False, "error": "Account or session not found"}
+        if not account:
+            return {"success": False, "error": "ACCOUNT_NOT_FOUND"}
+        if not account.session_string:
+            return {"success": False, "error": "SESSION_NOT_FOUND"}
             
         try:
             from services.session_manager import get_telegram_login_code
@@ -3517,7 +3519,7 @@ async def get_account_otp(phone: str):
             if code:
                 return {"success": True, "code": code}
             else:
-                return {"success": False, "error": "No recent code found. Try requesting a code in your app first."}
+                return {"success": False, "error": "NO_CODE_RECEIVED"}
         except Exception as e:
             return {"success": False, "error": str(e)}
 
