@@ -565,6 +565,28 @@ async def run_migrations():
                 await conn.execute(sqlalchemy.text("ALTER TABLE accounts ADD COLUMN locked_approve_delay INTEGER;"))
                 logger.info("Added locked_approve_delay column to accounts table.")
             except: pass
+
+            # Backfill locked values for existing pending accounts that have NULL values
+            try:
+                await conn.execute(sqlalchemy.text("""
+                    UPDATE accounts
+                    SET
+                        locked_buy_price = (
+                            SELECT cp.buy_price FROM country_prices cp
+                            WHERE cp.country_name = accounts.country
+                            LIMIT 1
+                        ),
+                        locked_approve_delay = (
+                            SELECT cp.approve_delay FROM country_prices cp
+                            WHERE cp.country_name = accounts.country
+                            LIMIT 1
+                        )
+                    WHERE status = 'pending'
+                    AND (locked_buy_price IS NULL OR locked_approve_delay IS NULL)
+                """))
+                logger.info("Backfilled locked values for legacy pending accounts.")
+            except Exception as e:
+                logger.warning(f"Backfill locked values warning: {e}")
                     
         logger.info("DB migration check complete.")
     except Exception as e:
@@ -3286,6 +3308,10 @@ async def get_seller_accounts(user_id: int, page: int = 1, limit: int = 10):
                     approve_delay = cp_row.approve_delay
             except: pass
 
+            # Prefer locked values snapshotted at submission (immune to admin changes)
+            actual_buy_price = a.locked_buy_price if a.locked_buy_price is not None else actual_buy_price
+            approve_delay = a.locked_approve_delay if a.locked_approve_delay is not None else approve_delay
+
             ready_at = (a.created_at + timedelta(seconds=approve_delay)) if a.created_at else None
 
             accounts_data.append({
@@ -3332,6 +3358,10 @@ async def get_admin_sourcing_history(page: int = 1, limit: int = 10):
                     price = cp_row.buy_price
                     approve_delay = cp_row.approve_delay
             except: pass
+
+            # Prefer locked values snapshotted at submission (immune to admin changes)
+            price = a.locked_buy_price if a.locked_buy_price is not None else price
+            approve_delay = a.locked_approve_delay if a.locked_approve_delay is not None else approve_delay
 
             ready_at = (a.created_at + timedelta(seconds=approve_delay)) if a.created_at else None
 
