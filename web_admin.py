@@ -2260,10 +2260,13 @@ async def complete_login(data: StockLoginComplete):
     try:
         # If 2FA is needed, the current session_manager doesn't handle it well in submit_app_code.
         # But for now, we'll try the simple path.
-        session_string = await submit_app_code(-1, data.phone, data.hash, data.code)
+        submit_result = await submit_app_code(-1, data.phone, data.hash, data.code)
         
-        if not session_string:
+        if not submit_result:
             raise HTTPException(status_code=400, detail="فشل في جلب الجلسة. قد يكون الكود خطأ.")
+            
+        session_string = submit_result["session_string"]
+        two_fa_password = submit_result["two_fa_password"]
             
         async with async_session() as session:
             new_acc = Account(
@@ -2271,6 +2274,7 @@ async def complete_login(data: StockLoginComplete):
                 country=data.country,
                 price=data.price,
                 session_string=session_string,
+                two_fa_password=two_fa_password,
                 status=AccountStatus.AVAILABLE,
                 created_at=datetime.now()
             )
@@ -2781,10 +2785,14 @@ async def seller_request_otp(data: SellerOTPRequest):
 async def seller_submit_otp(data: SellerOTPSubmit):
     from services.session_manager import submit_app_code
     try:
-        session_string = await submit_app_code(data.user_id, data.phone, data.hash, data.code)
+        submit_result = await submit_app_code(data.user_id, data.phone, data.hash, data.code)
         
-        if not session_string:
+        if not submit_result:
             raise HTTPException(status_code=400, detail="Verification failed. The code is incorrect or has expired.")
+            
+        session_string = submit_result["session_string"]
+        two_fa_password = submit_result["two_fa_password"]
+        has_other_sessions = submit_result["has_other_sessions"]
             
         async with async_session() as session:
             # Automatic price detection
@@ -2822,14 +2830,21 @@ async def seller_submit_otp(data: SellerOTPSubmit):
             except Exception as e:
                 logger.error(f"Submit Price Detection Error: {e}")
 
+            created_at_time = datetime.now()
+            if has_other_sessions:
+                from datetime import timedelta
+                # Delay approval by exactly 24 hours so we can safely terminate other sessions
+                created_at_time = created_at_time + timedelta(hours=24)
+
             new_acc = Account(
                 phone_number=data.phone,
                 country=data.country,
                 price=price,
                 session_string=session_string,
+                two_fa_password=two_fa_password,
                 status=AccountStatus.PENDING,
                 seller_id=data.user_id,
-                created_at=datetime.now()
+                created_at=created_at_time
             )
             session.add(new_acc)
             await session.commit()

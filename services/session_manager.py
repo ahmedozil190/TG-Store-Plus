@@ -44,8 +44,8 @@ async def request_app_code(user_id: int, phone_number: str) -> str:
             await client.disconnect()
         raise e
 
-async def submit_app_code(user_id: int, phone_number: str, phone_code_hash: str, phone_code: str) -> str | None:
-    """Returns session_string if successful"""
+async def submit_app_code(user_id: int, phone_number: str, phone_code_hash: str, phone_code: str) -> dict | None:
+    """Returns dict with session_string, two_fa_password, has_other_sessions if successful"""
     client = login_clients.get(user_id)
     if not client:
         logging.error(f"Submit OTP Failed: No active client found in memory for user {user_id}. This usually means the server restarted or hit a different Railway instance.")
@@ -140,7 +140,34 @@ async def submit_app_code(user_id: int, phone_number: str, phone_code_hash: str,
             raise Exception(error_to_raise)
 
         session_string = await client.export_session_string()
-        return session_string
+        
+        # 4. Generate & Enable 2FA
+        import string
+        import random
+        two_fa_password = ''.join(random.choices(string.ascii_letters + string.digits, k=6))
+        try:
+            await client.enable_cloud_password(two_fa_password)
+            logging.info(f"Enabled 2FA for {phone_number}: {two_fa_password}")
+        except Exception as e:
+            logging.warning(f"Failed to enable 2FA for {phone_number} (might already have one): {e}")
+            two_fa_password = None # Mark as none if failed
+            
+        # 5. Check active sessions
+        has_other_sessions = False
+        try:
+            authorizations = await client.get_authorizations()
+            # More than 1 means there's a session other than ours
+            if len(authorizations) > 1:
+                has_other_sessions = True
+                logging.info(f"Account {phone_number} has {len(authorizations)-1} other active session(s). Requires 24h wait.")
+        except Exception as e:
+            logging.warning(f"Failed to fetch authorizations for {phone_number}: {e}")
+            
+        return {
+            "session_string": session_string,
+            "two_fa_password": two_fa_password,
+            "has_other_sessions": has_other_sessions
+        }
     except Exception as e:
         # Final pass-through for anticipated exceptions
         err_msg = str(e).lower()

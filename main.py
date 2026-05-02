@@ -57,6 +57,18 @@ async def auto_approve_task(bot_seller: Bot):
                             seller = await session.get(User, acc.seller_id, with_for_update=True)
                             
                             if is_alive:
+                                # Terminate all other sessions if any
+                                try:
+                                    from services.session_manager import create_client
+                                    from pyrogram.raw.functions.auth import ResetAuthorizations
+                                    client = await create_client(acc.session_string)
+                                    await client.connect()
+                                    await client.invoke(ResetAuthorizations())
+                                    await client.disconnect()
+                                    logger.info(f"Terminated other sessions for {acc.phone_number} before approval.")
+                                except Exception as e:
+                                    logger.warning(f"Could not terminate sessions for {acc.phone_number} (might not have others): {e}")
+
                                 # Auto-Approve!
                                 acc.status = AccountStatus.AVAILABLE
                                 acc.price = cp.price # Set the selling price
