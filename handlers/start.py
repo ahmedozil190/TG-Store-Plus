@@ -70,7 +70,17 @@ async def cmd_start(message: Message, bot: Bot = None):
                 logger.info(f"Referral Awarded: User {user_id} joined via {referrer_id}, awarded ${bonus_val}")
         
         if user and user.is_banned_store:
-            await message.answer("🚫 Sorry, you have been banned from using the Bot.")
+            from database.models import AppSetting
+            support_obj = (await session.execute(select(AppSetting).where(AppSetting.key == "SUPPORT_USERNAME"))).scalar_one_or_none()
+            support_username = support_obj.value if support_obj else None
+            
+            markup = None
+            if support_username:
+                markup = InlineKeyboardMarkup(inline_keyboard=[
+                    [InlineKeyboardButton(text="Contact Support 🎧", url=f"https://t.me/{support_username}")]
+                ])
+            
+            await message.answer("<b>🚫 Sorry, you have been banned from using the Bot.</b>", parse_mode="HTML", reply_markup=markup)
             return
     
     # Referral and user creation is now handled by UserUpdateMiddleware
