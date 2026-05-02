@@ -143,7 +143,7 @@ async def auto_approve_task(bot_seller: Bot):
                                     try:
                                         await bot_seller.send_message(
                                             seller.id,
-                                            f"<b>🎉 Approved <code>{acc.phone_number}</code> Add {buy_price}$</b>",
+                                            f"<b>🎉 Congrats <code>{acc.phone_number}</code> Add {buy_price}$</b>",
                                             parse_mode="HTML"
                                         )
                                         logger.info(f"[AutoApprove] Notified seller {seller.id}")
