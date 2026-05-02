@@ -4234,6 +4234,16 @@
                 } else if (item.status === 'REJECTED') {
                     statusColor = '#ef4444'; // REJECTED
                     statusText = translations[currentLang].st_rejected;
+                    if (item.reject_reason) {
+                        const reasonLow = item.reject_reason.toLowerCase();
+                        if (reasonLow.includes('frozen') || reasonLow.includes('banned')) {
+                            statusText = 'FROZEN';
+                        } else if (reasonLow.includes('spam')) {
+                            statusText = 'SPAM';
+                        } else if (reasonLow.includes('removed') || reasonLow.includes('revoked')) {
+                            statusText = 'REVOKED';
+                        }
+                    }
                 }
 
                 const isPending = item.status === 'PENDING' || item.status === 'pending';
@@ -4658,7 +4668,14 @@
                     statusLabel.innerHTML = 'ALIVE';
                     statusLabel.style.color = 'var(--success)';
                 } else {
-                    statusLabel.innerHTML = 'DEAD';
+                    let failLabel = 'DEAD';
+                    if (data.error) {
+                        const errLow = data.error.toLowerCase();
+                        if (errLow.includes('frozen') || errLow.includes('banned')) failLabel = 'FROZEN';
+                        else if (errLow.includes('spam')) failLabel = 'SPAM';
+                        else if (errLow.includes('removed') || errLow.includes('revoked')) failLabel = 'REVOKED';
+                    }
+                    statusLabel.innerHTML = failLabel;
                     statusLabel.style.color = 'var(--error)';
                 }
             } catch (e) {

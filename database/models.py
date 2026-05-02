@@ -62,6 +62,8 @@ class Account(Base):
     # Locked values at submission time — immune to admin price/delay changes
     locked_buy_price = Column(Float, nullable=True)
     locked_approve_delay = Column(Integer, nullable=True)
+    # Rejection reason for display in dashboards
+    reject_reason = Column(String, nullable=True)
     
     # New fields for external servers
     server_id = Column(Integer, ForeignKey('api_servers.id'), nullable=True)

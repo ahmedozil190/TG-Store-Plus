@@ -147,6 +147,7 @@ async def auto_approve_task(bot_seller: Bot):
                             else:
                                 # Reject due to ban/freeze
                                 acc.status = AccountStatus.REJECTED
+                                acc.reject_reason = reject_reason
                                 logger.info(f"[AutoApprove] Rejecting {acc.phone_number} | reason={reject_reason} | seller_id={acc.seller_id}")
                                 if seller:
                                     try:

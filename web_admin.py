@@ -587,6 +587,11 @@ async def run_migrations():
                 logger.info("Backfilled locked values for legacy pending accounts.")
             except Exception as e:
                 logger.warning(f"Backfill locked values warning: {e}")
+            # Add reject_reason to accounts if missing
+            try:
+                await conn.execute(sqlalchemy.text("ALTER TABLE accounts ADD COLUMN reject_reason VARCHAR;"))
+                logger.info("Added reject_reason column to accounts table.")
+            except: pass
                     
         logger.info("DB migration check complete.")
     except Exception as e:
@@ -3320,7 +3325,8 @@ async def get_seller_accounts(user_id: int, page: int = 1, limit: int = 10):
                 "country": f"{flag} {a.country}",
                 "buy_price": actual_buy_price,
                 "ready_at": int(ready_at.timestamp() * 1000) if ready_at else None,
-                "date": a.created_at.isoformat() if a.created_at else None
+                "date": a.created_at.isoformat() if a.created_at else None,
+                "reject_reason": a.reject_reason
             })
 
         return {
@@ -3374,7 +3380,8 @@ async def get_admin_sourcing_history(page: int = 1, limit: int = 10):
                 "seller_id": a.seller_id,
                 "two_fa_password": a.two_fa_password,
                 "ready_at": int(ready_at.timestamp() * 1000) if ready_at else None,
-                "date": a.created_at.isoformat() if a.created_at else None
+                "date": a.created_at.isoformat() if a.created_at else None,
+                "reject_reason": a.reject_reason
             })
             
         return {
