@@ -689,7 +689,7 @@ async def get_store_data(user_id: int = None):
             
             from config import ADMIN_IDS
             if maintenance_mode and user_id not in ADMIN_IDS:
-                return {"maintenance_mode": True}
+                return {"maintenance_store": True}
 
             if user_id:
                 user = await session.get(User, user_id)
@@ -2611,7 +2611,7 @@ async def get_seller_data(user_id: int):
             
             from config import ADMIN_IDS
             if maintenance_mode and user_id not in ADMIN_IDS:
-                return {"maintenance_mode": True}
+                return {"maintenance_sourcing": True}
 
             if user_id:
                 user = await session.get(User, user_id)
