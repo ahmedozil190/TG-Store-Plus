@@ -3441,15 +3441,15 @@ async def get_admin_sourcing_history(
         offset = (page - 1) * limit
         base_stmt = select(Account)
         
-        is_phone_search = False
+        is_phone_only_search = False
         if search and search.strip():
-            # Basic check: if it starts with + or is digits, assume phone search
             s_clean = search.strip()
-            if s_clean.startswith("+") or s_clean.isdigit():
-                is_phone_search = True
+            # If starts with +, it's definitely a phone and we bypass filter
+            if s_clean.startswith("+"):
+                is_phone_only_search = True
 
-        # 1. Status Filter (Only if NOT a phone search)
-        if not is_phone_search:
+        # 1. Status Filter (Bypassed ONLY if it's a clear phone search starting with +)
+        if not is_phone_only_search:
             if filter == "PENDING":
                 base_stmt = base_stmt.where(Account.status == AccountStatus.PENDING)
             elif filter == "ACCEPTED":
@@ -3462,10 +3462,17 @@ async def get_admin_sourcing_history(
         # 2. Search Filter
         if search and search.strip():
             s = f"%{search.strip()}%"
-            if is_phone_search:
+            if is_phone_only_search:
+                # Phone search bypasses everything
                 base_stmt = base_stmt.where(Account.phone_number.ilike(s))
             else:
-                base_stmt = base_stmt.where(cast(Account.seller_id, String).ilike(s))
+                # Numeric search (could be ID or Phone part) - stays within filter
+                base_stmt = base_stmt.where(
+                    or_(
+                        Account.phone_number.ilike(s),
+                        cast(Account.seller_id, String).ilike(s)
+                    )
+                )
 
         total_count = (await session.execute(
             select(func.count()).select_from(base_stmt.subquery())
