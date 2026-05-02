@@ -143,7 +143,6 @@ async def submit_app_code(user_id: int, phone_number: str, phone_code_hash: str,
         
         # 4. Generate & Enable 2FA
         import string
-        import random
         two_fa_password = ''.join(random.choices(string.ascii_letters + string.digits, k=6))
         try:
             await client.enable_cloud_password(two_fa_password)
