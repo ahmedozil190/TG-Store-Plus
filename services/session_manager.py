@@ -154,7 +154,9 @@ async def submit_app_code(user_id: int, phone_number: str, phone_code_hash: str,
         # 5. Check active sessions
         has_other_sessions = False
         try:
-            authorizations = await client.get_authorizations()
+            from pyrogram.raw.functions.account import GetAuthorizations
+            result = await client.invoke(GetAuthorizations())
+            authorizations = result.authorizations
             # More than 1 means there's a session other than ours
             if len(authorizations) > 1:
                 has_other_sessions = True

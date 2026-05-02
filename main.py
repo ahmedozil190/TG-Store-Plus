@@ -78,8 +78,9 @@ async def auto_approve_task(bot_seller: Bot):
                                             logger.info(f"Cannot terminate sessions for {acc.phone_number} yet (24h restriction).")
                                             
                                     # Double check active sessions count
-                                    authorizations = await client.get_authorizations()
-                                    sessions_count = len(authorizations)
+                                    from pyrogram.raw.functions.account import GetAuthorizations
+                                    auth_result = await client.invoke(GetAuthorizations())
+                                    sessions_count = len(auth_result.authorizations)
                                     
                                     await client.disconnect()
                                 except Exception as e:
