@@ -1726,13 +1726,13 @@
         }
 
         @keyframes toastIn {
-            from { transform: translate(-50%, -100%); opacity: 0; }
-            to { transform: translate(-50%, 0); opacity: 1; }
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
         }
 
         @keyframes toastOut {
-            from { transform: translate(-50%, 0); opacity: 1; }
-            to { transform: translate(-50%, -100%); opacity: 0; }
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(100%); opacity: 0; }
         }
     </style>
 </head>
@@ -4855,7 +4855,7 @@
             if (!container) {
                 const div = document.createElement('div');
                 div.id = 'toast-container';
-                div.style.cssText = 'position:fixed;top:20px;left:50%;transform:translateX(-50%);z-index:9999;display:flex;flex-direction:column;gap:10px;width:90%;max-width:350px;pointer-events:none;';
+                div.style.cssText = 'position:fixed;top:20px;right:20px;z-index:9999;display:flex;flex-direction:column;gap:10px;width:90%;max-width:350px;pointer-events:none;';
                 document.body.appendChild(div);
             }
             
