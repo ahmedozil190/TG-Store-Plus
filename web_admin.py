@@ -695,8 +695,8 @@ async def get_store_data(user_id: int = None):
             if maintenance_mode and user_id not in ADMIN_IDS:
                 return {
                     "maintenance_store": True,
-                    "support_username": support_username.value if support_username else "NumbersStoreBot",
-                    "updates_channel": updates_channel.value if updates_channel else "https://t.me/NumbersStoreBot"
+                    "support_username": support_username.value if support_username else "",
+                    "updates_channel": updates_channel.value if updates_channel else ""
                 }
 
             if user_id:
@@ -704,8 +704,8 @@ async def get_store_data(user_id: int = None):
                 if user and user.is_banned_store and user_id not in ADMIN_IDS:
                     return {
                         "is_banned": True,
-                        "support_username": support_username.value if support_username else "NumbersStoreBot",
-                        "updates_channel": updates_channel.value if updates_channel else "https://t.me/NumbersStoreBot"
+                        "support_username": support_username.value if support_username else "",
+                        "updates_channel": updates_channel.value if updates_channel else ""
                     }
 
             # 0. Global Settings
@@ -1794,8 +1794,8 @@ async def get_sourcing_data(user_id: int, init_data: str):
                 "recent": recent,
                 "prices": prices,
                 "users": users_list,
-                "support_username": (await session.execute(select(AppSetting).where(AppSetting.key == "SUPPORT_USERNAME"))).scalar_one_or_none().value if (await session.execute(select(AppSetting).where(AppSetting.key == "SUPPORT_USERNAME"))).scalar_one_or_none() else "NumbersStoreBot",
-                "updates_channel": (await session.execute(select(AppSetting).where(AppSetting.key == "UPDATES_CHANNEL"))).scalar_one_or_none().value if (await session.execute(select(AppSetting).where(AppSetting.key == "UPDATES_CHANNEL"))).scalar_one_or_none() else "https://t.me/NumbersStoreBot"
+                "support_username": (await session.execute(select(AppSetting).where(AppSetting.key == "SUPPORT_USERNAME"))).scalar_one_or_none().value if (await session.execute(select(AppSetting).where(AppSetting.key == "SUPPORT_USERNAME"))).scalar_one_or_none() else "",
+                "updates_channel": (await session.execute(select(AppSetting).where(AppSetting.key == "UPDATES_CHANNEL"))).scalar_one_or_none().value if (await session.execute(select(AppSetting).where(AppSetting.key == "UPDATES_CHANNEL"))).scalar_one_or_none() else ""
             }
     except Exception as e:
         logger.error(f"Sourcing Data Error: {e}")
@@ -1952,8 +1952,8 @@ async def get_admin_store_data(user_id: int, init_data: str):
             "users": users,
             "transactions": transactions,
             "prices": prices,
-            "support_username": (await session.execute(select(AppSetting).where(AppSetting.key == "SUPPORT_USERNAME"))).scalar_one_or_none().value if (await session.execute(select(AppSetting).where(AppSetting.key == "SUPPORT_USERNAME"))).scalar_one_or_none() else "NumbersStoreBot",
-            "updates_channel": (await session.execute(select(AppSetting).where(AppSetting.key == "UPDATES_CHANNEL"))).scalar_one_or_none().value if (await session.execute(select(AppSetting).where(AppSetting.key == "UPDATES_CHANNEL"))).scalar_one_or_none() else "https://t.me/NumbersStoreBot"
+            "support_username": (await session.execute(select(AppSetting).where(AppSetting.key == "SUPPORT_USERNAME"))).scalar_one_or_none().value if (await session.execute(select(AppSetting).where(AppSetting.key == "SUPPORT_USERNAME"))).scalar_one_or_none() else "",
+            "updates_channel": (await session.execute(select(AppSetting).where(AppSetting.key == "UPDATES_CHANNEL"))).scalar_one_or_none().value if (await session.execute(select(AppSetting).where(AppSetting.key == "UPDATES_CHANNEL"))).scalar_one_or_none() else ""
         }
     except Exception as e:
         logger.error(f"Store Admin Data Error: {e}")
@@ -2649,8 +2649,8 @@ async def get_seller_data(user_id: int):
             if maintenance_mode and user_id not in ADMIN_IDS:
                 return {
                     "maintenance_sourcing": True,
-                    "support_username": support_username.value if support_username else "NumbersStoreBot",
-                    "updates_channel": updates_channel.value if updates_channel else "https://t.me/NumbersStoreBot"
+                    "support_username": support_username.value if support_username else "",
+                    "updates_channel": updates_channel.value if updates_channel else ""
                 }
 
             if user_id:
@@ -2658,8 +2658,8 @@ async def get_seller_data(user_id: int):
                 if user and user.is_banned_sourcing and user_id not in ADMIN_IDS:
                     return {
                         "is_banned": True,
-                        "support_username": support_username.value if support_username else "NumbersStoreBot",
-                        "updates_channel": updates_channel.value if updates_channel else "https://t.me/NumbersStoreBot"
+                        "support_username": support_username.value if support_username else "",
+                        "updates_channel": updates_channel.value if updates_channel else ""
                     }
 
             user = await session.get(User, user_id)
