@@ -1758,46 +1758,56 @@
                 const res = await fetch(`/api/seller/data?user_id=${userId}`);
                 const data = await res.json();
 
-                // Check Maintenance Mode
-                if (data.maintenance_mode === true || data.maintenance_mode === "true") {
-                    document.body.innerHTML = `
-                        <div style="height: 100vh; background: #1a1a1c; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 40px; font-family: 'Cairo', 'Plus Jakarta Sans', sans-serif; color: white;">
-                            <div style="width: 100px; height: 100px; background: rgba(239, 68, 68, 0.1); color: #ef4444; border-radius: 30px; display: flex; align-items: center; justify-content: center; font-size: 3rem; margin-bottom: 30px; border: 1px solid rgba(239, 68, 68, 0.2);">
-                                <i class="fas fa-tools"></i>
-                            </div>
-                            <h1 style="font-size: 2rem; font-weight: 800; margin-bottom: 15px;">Under Maintenance</h1>
-                            <p style="color: #a1a1aa; font-size: 1.1rem; max-width: 320px; line-height: 1.6; margin-bottom: 40px;">
-                                We are performing some scheduled maintenance to improve our service. Please check back later.
-                            </p>
-                            <button onclick="window.Telegram.WebApp.close()" style="padding: 16px 40px; background: #ef4444; color: white; border: none; border-radius: 18px; font-weight: 800; font-size: 1.1rem; cursor: pointer; box-shadow: 0 8px 25px rgba(239, 68, 68, 0.3);">
-                                Close
-                            </button>
-                        </div>
-                    `;
-                    return;
-                }
+                // ─── Status Overlays (Maintenance & Ban) ───
+                const showStatusPage = (icon, title, desc, btnText, btnLink, isDanger = true) => {
+                    const accentColor = isDanger ? 'var(--error)' : 'var(--accent)';
+                    const accentBg = isDanger ? 'rgba(239, 68, 68, 0.1)' : 'rgba(88, 101, 242, 0.1)';
+                    const accentBorder = isDanger ? 'rgba(239, 68, 68, 0.2)' : 'rgba(88, 101, 242, 0.2)';
+                    const btnBg = isDanger ? 'var(--error)' : 'var(--accent)';
+                    const btnShadow = isDanger ? 'rgba(239, 68, 68, 0.3)' : 'rgba(88, 101, 242, 0.3)';
 
-                // Check Banned Status
-                if (data.is_banned === true) {
                     document.body.innerHTML = `
-                        <div style="height: 100vh; background: #0f172a; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 40px; font-family: 'Cairo', 'Plus Jakarta Sans', sans-serif; color: white;">
-                            <div style="width: 100px; height: 100px; background: rgba(239, 68, 68, 0.1); color: #ef4444; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 3rem; margin-bottom: 30px; border: 2px solid rgba(239, 68, 68, 0.2); box-shadow: 0 0 40px rgba(239, 68, 68, 0.2);">
-                                <i class="fas fa-user-slash"></i>
+                        <div style="height: 100vh; background: var(--bg); display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 40px; font-family: inherit; color: var(--text-p);">
+                            <div style="width: 100px; height: 100px; background: ${accentBg}; color: ${accentColor}; border-radius: 30px; display: flex; align-items: center; justify-content: center; font-size: 3rem; margin-bottom: 30px; border: 1px solid ${accentBorder}; box-shadow: 0 0 40px ${accentBg};">
+                                <i class="fas ${icon}"></i>
                             </div>
-                            <h1 style="font-size: 2.2rem; font-weight: 900; margin-bottom: 10px; color: #fff;">Account Suspended</h1>
-                            <p style="color: #94a3b8; font-size: 1.1rem; max-width: 340px; line-height: 1.6; margin-bottom: 40px;">
-                                Your access to the sourcing panel has been restricted due to a violation of our terms of service.
+                            <h1 style="font-size: 2rem; font-weight: 800; margin-bottom: 15px;">${title}</h1>
+                            <p style="color: var(--text-s); font-size: 1.1rem; max-width: 320px; line-height: 1.6; margin-bottom: 40px;">
+                                ${desc}
                             </p>
-                            <div style="display: flex; flex-direction: column; gap: 15px; width: 100%; max-width: 300px;">
-                                <button onclick="window.Telegram.WebApp.openTelegramLink('https://t.me/NumbersStoreBot')" style="padding: 16px; background: #3b82f6; color: white; border: none; border-radius: 16px; font-weight: 800; font-size: 1rem; cursor: pointer; box-shadow: 0 8px 20px rgba(59, 130, 246, 0.3); display: flex; align-items: center; justify-content: center; gap: 10px;">
-                                    <i class="fab fa-telegram-plane"></i> Contact Support
+                            <div style="display: flex; flex-direction: column; gap: 12px; width: 100%; max-width: 280px;">
+                                <button onclick="${btnLink}" style="padding: 16px; background: ${btnBg}; color: white; border: none; border-radius: 18px; font-weight: 800; font-size: 1.1rem; cursor: pointer; box-shadow: 0 8px 25px ${btnShadow}; display: flex; align-items: center; justify-content: center; gap: 10px;">
+                                    ${btnText}
                                 </button>
-                                <button onclick="window.Telegram.WebApp.close()" style="padding: 16px; background: rgba(255,255,255,0.05); color: #94a3b8; border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; font-weight: 700; font-size: 1rem; cursor: pointer;">
+                                <button onclick="window.Telegram.WebApp.close()" style="padding: 16px; background: transparent; color: var(--text-s); border: 1px solid var(--border); border-radius: 18px; font-weight: 700; font-size: 1rem; cursor: pointer;">
                                     Close App
                                 </button>
                             </div>
                         </div>
                     `;
+                };
+
+                // Check Maintenance Mode
+                if (data.maintenance_mode === true || data.maintenance_mode === "true") {
+                    showStatusPage(
+                        'fa-tools',
+                        'Under Maintenance',
+                        'We are performing some scheduled maintenance to improve our service. Please check back later.',
+                        '<i class="fab fa-telegram"></i> Updates Channel',
+                        "window.Telegram.WebApp.openTelegramLink('https://t.me/NumbersStoreBot')"
+                    );
+                    return;
+                }
+
+                // Check Banned Status
+                if (data.is_banned === true) {
+                    showStatusPage(
+                        'fa-user-slash',
+                        'Account Restricted',
+                        'Your access has been suspended due to a violation of our terms. Contact support for more info.',
+                        '<i class="fab fa-telegram-plane"></i> Contact Support',
+                        "window.Telegram.WebApp.openTelegramLink('https://t.me/NumbersStoreBot')"
+                    );
                     return;
                 }
 

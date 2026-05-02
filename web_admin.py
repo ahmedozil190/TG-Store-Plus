@@ -684,7 +684,7 @@ async def get_store_data(user_id: int = None):
     try:
         async with async_session() as session:
             # CHECK MAINTENANCE MODE FIRST (Admins bypass)
-            mnt_obj = (await session.execute(select(AppSetting).where(AppSetting.key == "maintenance_mode"))).scalar_one_or_none()
+            mnt_obj = (await session.execute(select(AppSetting).where(AppSetting.key == "maintenance_mode_store"))).scalar_one_or_none()
             maintenance_mode = (mnt_obj.value.lower() == "true") if mnt_obj else False
             
             from config import ADMIN_IDS
@@ -2042,15 +2042,20 @@ async def save_store_settings(req: StoreSettingsSubmit):
 @app.get("/api/admin/system/maintenance")
 async def get_maintenance():
     async with async_session() as session:
-        setting = (await session.execute(select(AppSetting).where(AppSetting.key == "maintenance_mode"))).scalar_one_or_none()
-        return {"enabled": (setting.value.lower() == "true") if setting else False}
+        mnt_store = (await session.execute(select(AppSetting).where(AppSetting.key == "maintenance_mode_store"))).scalar_one_or_none()
+        mnt_src = (await session.execute(select(AppSetting).where(AppSetting.key == "maintenance_mode_sourcing"))).scalar_one_or_none()
+        return {
+            "store_enabled": (mnt_store.value.lower() == "true") if mnt_store else False,
+            "sourcing_enabled": (mnt_src.value.lower() == "true") if mnt_src else False
+        }
 
 @app.post("/api/admin/system/maintenance")
-async def set_maintenance(enabled: bool):
+async def set_maintenance(enabled: bool, target: str = "sourcing"):
     async with async_session() as session:
-        setting = (await session.execute(select(AppSetting).where(AppSetting.key == "maintenance_mode"))).scalar_one_or_none()
+        key = f"maintenance_mode_{target}"
+        setting = (await session.execute(select(AppSetting).where(AppSetting.key == key))).scalar_one_or_none()
         if not setting:
-            setting = AppSetting(key="maintenance_mode", value="true" if enabled else "false")
+            setting = AppSetting(key=key, value="true" if enabled else "false")
             session.add(setting)
         else:
             setting.value = "true" if enabled else "false"
@@ -2595,7 +2600,7 @@ async def get_seller_data(user_id: int):
     try:
         async with async_session() as session:
             # CHECK MAINTENANCE MODE FIRST (Admins bypass)
-            mnt_obj = (await session.execute(select(AppSetting).where(AppSetting.key == "maintenance_mode"))).scalar_one_or_none()
+            mnt_obj = (await session.execute(select(AppSetting).where(AppSetting.key == "maintenance_mode_sourcing"))).scalar_one_or_none()
             maintenance_mode = (mnt_obj.value.lower() == "true") if mnt_obj else False
             
             from config import ADMIN_IDS

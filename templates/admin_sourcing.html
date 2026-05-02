@@ -2282,19 +2282,32 @@
             <!-- ===== Settings Section ===== -->
             <section id="section-settings" class="view-section">
                 <div id="settings-main-menu" class="settings-menu active">
-                    <!-- Maintenance Mode Toggle -->
-                    <div class="settings-item"
-                        style="cursor: default; border-bottom: 1px solid var(--border); margin-bottom: 10px; padding-bottom: 20px;">
+                    <!-- Maintenance Mode Toggle: Sourcing -->
+                    <div class="settings-item" style="cursor: default; border-bottom: 1px solid var(--border); margin-bottom: 10px; padding-bottom: 20px;">
                         <div class="settings-icon-box" style="background: rgba(239, 68, 68, 0.1); color: #ef4444;">
                             <i class="fas fa-tools"></i>
                         </div>
                         <div style="flex: 1; display: flex; flex-direction: column;">
-                            <span class="settings-text" style="margin-bottom: 2px;">Maintenance Mode</span>
-                            <span style="font-size: 0.75rem; color: var(--text-s);">Stops bot for users</span>
+                            <span class="settings-text" style="margin-bottom: 2px;">Sourcing Maintenance</span>
+                            <span style="font-size: 0.75rem; color: var(--text-s);">Stops Sourcing bot for users</span>
                         </div>
                         <label class="custom-switch">
-                            <input type="checkbox" id="src-maintenance-toggle"
-                                onchange="toggleMaintenanceMode(this.checked)">
+                            <input type="checkbox" id="src-maintenance-toggle" onchange="toggleMaintenanceMode(this.checked, 'sourcing')">
+                            <span class="switch-slider"></span>
+                        </label>
+                    </div>
+
+                    <!-- Maintenance Mode Toggle: Store -->
+                    <div class="settings-item" style="cursor: default; border-bottom: 1px solid var(--border); margin-bottom: 10px; padding-bottom: 20px;">
+                        <div class="settings-icon-box" style="background: rgba(245, 158, 11, 0.1); color: #f59e0b;">
+                            <i class="fas fa-store-slash"></i>
+                        </div>
+                        <div style="flex: 1; display: flex; flex-direction: column;">
+                            <span class="settings-text" style="margin-bottom: 2px;">Store Maintenance</span>
+                            <span style="font-size: 0.75rem; color: var(--text-s);">Stops Store bot for users</span>
+                        </div>
+                        <label class="custom-switch">
+                            <input type="checkbox" id="store-maintenance-toggle" onchange="toggleMaintenanceMode(this.checked, 'store')">
                             <span class="switch-slider"></span>
                         </label>
                     </div>
@@ -4333,22 +4346,24 @@
             try {
                 const res = await fetch('/api/admin/system/maintenance');
                 const data = await res.json();
-                const toggle = document.getElementById('src-maintenance-toggle');
-                if (toggle) toggle.checked = data.enabled;
+                const srcToggle = document.getElementById('src-maintenance-toggle');
+                const storeToggle = document.getElementById('store-maintenance-toggle');
+                if (srcToggle) srcToggle.checked = data.sourcing_enabled;
+                if (storeToggle) storeToggle.checked = data.store_enabled;
             } catch (e) {
                 console.error('Error loading maintenance mode', e);
             }
         }
 
-        async function toggleMaintenanceMode(enabled) {
+        async function toggleMaintenanceMode(enabled, target) {
             try {
-                const res = await fetch(`/api/admin/system/maintenance?enabled=${enabled}`, { method: 'POST' });
+                const res = await fetch(`/api/admin/system/maintenance?enabled=${enabled}&target=${target}`, { method: 'POST' });
                 const data = await res.json();
                 if (data.status === 'success') {
                     showToast(
                         currentLang === 'ar' ? 'تم التحديث' : 'Updated',
                         enabled
-                            ? (currentLang === 'ar' ? 'البوت الآن في وضع الصيانة' : 'Bot is now in maintenance mode')
+                            ? (currentLang === 'ar' ? `${target === 'store' ? 'متجر الأرقام' : 'بوت التوريد'} الآن في وضع الصيانة` : `${target === 'store' ? 'Store' : 'Sourcing'} bot is now in maintenance mode`)
                             : (currentLang === 'ar' ? 'البوت متاح الآن للجميع' : 'Bot is now live for everyone'),
                         'success'
                     );
