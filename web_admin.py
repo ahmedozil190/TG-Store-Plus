@@ -687,8 +687,6 @@ async def get_store_data(user_id: int = None):
             mnt_obj = (await session.execute(select(AppSetting).where(AppSetting.key == "STORE_UNDER_MAINTENANCE"))).scalar_one_or_none()
             maintenance_mode = (mnt_obj.value.lower() == "true") if mnt_obj else False
             
-            logger.info(f"[Maintenance LOG] Store API check for user {user_id} -> {maintenance_mode}")
-            
             from config import ADMIN_IDS
             if maintenance_mode and user_id not in ADMIN_IDS:
                 return {"maintenance_mode": True}
@@ -2046,33 +2044,21 @@ async def get_maintenance():
     async with async_session() as session:
         mnt_store = (await session.execute(select(AppSetting).where(AppSetting.key == "STORE_UNDER_MAINTENANCE"))).scalar_one_or_none()
         mnt_src = (await session.execute(select(AppSetting).where(AppSetting.key == "SOURCING_UNDER_MAINTENANCE"))).scalar_one_or_none()
-        
-        st_val = (mnt_store.value.lower() == "true") if mnt_store else False
-        sr_val = (mnt_src.value.lower() == "true") if mnt_src else False
-        
-        logger.info(f"[Maintenance LOG] GET STATUS -> Store: {st_val}, Sourcing: {sr_val}")
         return {
-            "store_enabled": st_val,
-            "sourcing_enabled": sr_val
+            "store_enabled": (mnt_store.value.lower() == "true") if mnt_store else False,
+            "sourcing_enabled": (mnt_src.value.lower() == "true") if mnt_src else False
         }
 
 async def _update_maintenance(key: str, enabled: bool):
-    try:
-        async with async_session() as session:
-            logger.info(f"[Maintenance LOG] UPDATING KEY: {key} TO: {enabled}")
-            setting = (await session.execute(select(AppSetting).where(AppSetting.key == key))).scalar_one_or_none()
-            if not setting:
-                logger.info(f"[Maintenance LOG] Creating new setting for {key}")
-                session.add(AppSetting(key=key, value="true" if enabled else "false"))
-            else:
-                logger.info(f"[Maintenance LOG] Updating existing setting for {key} from {setting.value} to {'true' if enabled else 'false'}")
-                setting.value = "true" if enabled else "false"
-            await session.commit()
-            logger.info(f"[Maintenance LOG] COMMIT SUCCESSFUL for {key}")
-        return {"status": "success"}
-    except Exception as e:
-        logger.error(f"[Maintenance LOG] ERROR UPDATING {key}: {e}")
-        return {"status": "error", "message": str(e)}
+    async with async_session() as session:
+        logger.info(f"[Maintenance] Updating {key} to {enabled}")
+        setting = (await session.execute(select(AppSetting).where(AppSetting.key == key))).scalar_one_or_none()
+        if not setting:
+            session.add(AppSetting(key=key, value="true" if enabled else "false"))
+        else:
+            setting.value = "true" if enabled else "false"
+        await session.commit()
+    return {"status": "success"}
 
 @app.post("/api/admin/store/maintenance")
 async def set_store_maintenance(enabled: bool):
@@ -2622,8 +2608,6 @@ async def get_seller_data(user_id: int):
             # CHECK MAINTENANCE MODE FIRST (Admins bypass)
             mnt_obj = (await session.execute(select(AppSetting).where(AppSetting.key == "SOURCING_UNDER_MAINTENANCE"))).scalar_one_or_none()
             maintenance_mode = (mnt_obj.value.lower() == "true") if mnt_obj else False
-            
-            logger.info(f"[Maintenance LOG] Sourcing API check for user {user_id} -> {maintenance_mode}")
             
             from config import ADMIN_IDS
             if maintenance_mode and user_id not in ADMIN_IDS:
@@ -3473,31 +3457,7 @@ async def sync_user_identity(data: UserSync):
         logger.error(f"Identity Sync Error: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
-# --- Maintenance Mode ---
-@app.get("/api/admin/system/maintenance")
-async def get_maintenance():
-    async with async_session() as session:
-        stmt = select(AppSetting).where(AppSetting.key == "maintenance_mode")
-        res = await session.execute(stmt)
-        s = res.scalar_one_or_none()
-        return {"enabled": s.value.lower() == "true" if s else False}
-
-@app.post("/api/admin/system/maintenance")
-async def set_maintenance(enabled: bool):
-    async with async_session() as session:
-        stmt = select(AppSetting).where(AppSetting.key == "maintenance_mode")
-        res = await session.execute(stmt)
-        s = res.scalar_one_or_none()
-        
-        val = "true" if enabled else "false"
-        if s:
-            s.value = val
-        else:
-            session.add(AppSetting(key="maintenance_mode", value=val))
-        
-        await session.commit()
-        return {"status": "success", "enabled": enabled}
-
+# --- Settings Management ---
 @app.post("/api/admin/system/settings")
 async def save_system_settings(data: dict):
     async with async_session() as session:
