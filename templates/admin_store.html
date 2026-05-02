@@ -3023,9 +3023,9 @@
             } catch (e) { console.error('Error loading maintenance mode', e); }
         }
 
-        async function toggleMaintenanceMode(enabled, target = 'store') {
+        async function toggleMaintenanceMode(enabled) {
             try {
-                const res = await fetch(`/api/admin/system/maintenance?enabled=${enabled}&target=${target}`, { method: 'POST' });
+                const res = await fetch(`/api/admin/store/maintenance?enabled=${enabled}`, { method: 'POST' });
                 const data = await res.json();
                 if (data.status === 'success') {
                     showToast(
