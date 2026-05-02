@@ -2143,8 +2143,6 @@
             const phone = document.getElementById('phoneInput').value.trim();
             if (!phone) return showToast("Error", "Phone number required");
 
-            showToast("System", "Requesting OTP...", "info");
-
             const btn = document.getElementById('requestCodeBtn');
             btn.disabled = true;
             btn.innerHTML = '<span class="loader-ring" style="width:20px;height:20px"></span>';

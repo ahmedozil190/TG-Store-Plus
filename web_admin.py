@@ -2910,8 +2910,19 @@ async def seller_request_otp(data: SellerOTPRequest):
         logger.error(f"Seller OTP Request Error: {e}")
         if isinstance(e, HTTPException): raise e
         err_msg = str(e)
-        if any(x in err_msg.lower() for x in ["banned", "frozen", "security"]):
-             raise HTTPException(status_code=400, detail=err_msg)
+        err_lower = err_msg.lower()
+        # Handle Telegram FLOOD_WAIT
+        if "flood_wait" in err_lower or "flood" in err_lower:
+            import re as _re
+            wait_match = _re.search(r'wait of (\d+) seconds', err_msg, _re.IGNORECASE)
+            wait_secs = int(wait_match.group(1)) if wait_match else 3600
+            if wait_secs >= 3600:
+                wait_str = f"{wait_secs // 3600}h {(wait_secs % 3600) // 60}m"
+            else:
+                wait_str = f"{wait_secs // 60}m {wait_secs % 60}s"
+            raise HTTPException(status_code=429, detail=f"Telegram rate limit. Try again in {wait_str}.")
+        if any(x in err_lower for x in ["banned", "frozen", "security"]):
+            raise HTTPException(status_code=400, detail=err_msg)
         raise HTTPException(status_code=500, detail=f"Request error: {str(e)}")
 
 @app.post("/api/seller/submit-otp")
