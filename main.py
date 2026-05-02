@@ -119,8 +119,7 @@ async def auto_approve_task(bot_seller: Bot):
                                         try:
                                             await bot_seller.send_message(
                                                 seller.id,
-                                                f"⏳ **Pending:** `{acc.phone_number}`\n"
-                                                f"Active sessions found. Wait **24h**.",
+                                                f"⏳ **Pending:** `{acc.phone_number}` Sessions Found. Wait **24h**.",
                                                 parse_mode="Markdown"
                                             )
                                         except Exception as n_err:
@@ -144,8 +143,7 @@ async def auto_approve_task(bot_seller: Bot):
                                     try:
                                         await bot_seller.send_message(
                                             seller.id,
-                                            f"✅ **Approved:** `{acc.phone_number}`\n"
-                                            f"💰 **+${buy_price}** added to your balance.",
+                                            f"🎉 Approved `{acc.phone_number}` Add {buy_price}$",
                                             parse_mode="Markdown"
                                         )
                                         logger.info(f"[AutoApprove] Notified seller {seller.id}")
@@ -162,8 +160,7 @@ async def auto_approve_task(bot_seller: Bot):
                                     try:
                                         await bot_seller.send_message(
                                             seller.id,
-                                            f"❌ **Rejected:** `{acc.phone_number}`\n"
-                                            f"{reject_reason}",
+                                            f"❌ **Rejected:** `{acc.phone_number}`\n{reject_reason}",
                                             parse_mode="Markdown"
                                         )
                                         logger.info(f"[AutoApprove] Rejection notification sent to seller {seller.id}")

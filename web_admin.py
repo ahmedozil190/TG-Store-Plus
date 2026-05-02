@@ -3103,21 +3103,15 @@ async def admin_withdrawal_action(data: WithdrawAction):
                 lang = user.language if user else "ar"
                 
                 if lang == "ar":
-                    msg = (
-                        f"📢 **تنبيه سحب جديد**\n\n"
-                        f"الحالة: {msg_theme} {data.action.upper()}\n"
-                        f"المبلغ: ${req.amount:.2f}\n"
-                        f"المعرف: <code>{req.transaction_id}</code>\n\n"
-                        f"{'✅ تم تحويل أموالك بنجاح.' if data.action == 'approve' else '❌ تم رفض طلب السحب الخاص بك.'}"
-                    )
+                    if data.action == 'approve':
+                        msg = f"🎉 Congrats `{req.transaction_id}` withdrawal {req.amount}$"
+                    else:
+                        msg = f"❌ Rejected `{req.transaction_id}` withdrawal {req.amount}$"
                 else:
-                    msg = (
-                        f"📢 **Withdrawal Update**\n\n"
-                        f"Status: {msg_theme} {data.action.upper()}\n"
-                        f"Amount: ${req.amount:.2f}\n"
-                        f"ID: <code>{req.transaction_id}</code>\n\n"
-                        f"{'✅ Your funds have been transferred successfully.' if data.action == 'approve' else '❌ Your withdrawal request has been rejected.'}"
-                    )
+                    if data.action == 'approve':
+                        msg = f"🎉 Congrats `{req.transaction_id}` withdrawal {req.amount}$"
+                    else:
+                        msg = f"❌ Rejected `{req.transaction_id}` withdrawal {req.amount}$"
                 
                 await bot.send_message(req.user_id, msg, parse_mode="HTML")
             except Exception as e:
