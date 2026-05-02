@@ -97,7 +97,7 @@ async def auto_approve_task(bot_seller: Bot):
                                             await bot_seller.send_message(
                                                 seller.id,
                                                 f"⏳ **Pending:** `{acc.phone_number}`\n"
-                                                f"Has active sessions. Securing and approving in **24h**.",
+                                                f"Active sessions found. Wait **24h**.",
                                                 parse_mode="Markdown"
                                             )
                                         except Exception as n_err:
