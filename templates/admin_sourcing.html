@@ -4344,7 +4344,7 @@
 
         async function loadMaintenanceMode() {
             try {
-                const res = await fetch('/api/admin/system/maintenance');
+                const res = await fetch(`/api/admin/system/maintenance?_t=${Date.now()}`);
                 const data = await res.json();
                 const srcToggle = document.getElementById('src-maintenance-toggle');
                 const storeToggle = document.getElementById('store-maintenance-toggle');
