@@ -236,7 +236,7 @@ async def is_session_alive(session_string: str) -> tuple[bool, str]:
         except Exception as e:
             err_type = type(e).__name__
             if any(x in err_type for x in ["PeerFlood", "UserRestricted", "Forbidden", "ChatWriteForbidden"]):
-                return False, "Account is spam-restricted (Cannot message)."
+                return False, "Account is spam-restricted."
             # Any other error (PEER_ID_INVALID, Timeout, etc) = can't verify = reject
             return False, "Account is frozen or banned."
             
