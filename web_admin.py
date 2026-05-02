@@ -691,6 +691,11 @@ async def get_store_data(user_id: int = None):
             if maintenance_mode and user_id not in ADMIN_IDS:
                 return {"maintenance_mode": True}
 
+            if user_id:
+                user = await session.get(User, user_id)
+                if user and user.is_banned_store and user_id not in ADMIN_IDS:
+                    return {"is_banned": True}
+
             # 0. Global Settings
             local_enabled_obj = (await session.execute(select(AppSetting).where(AppSetting.key == "local_server_enabled"))).scalar_one_or_none()
             local_enabled = (local_enabled_obj.value.lower() == "true") if local_enabled_obj else True
@@ -2596,6 +2601,11 @@ async def get_seller_data(user_id: int):
             from config import ADMIN_IDS
             if maintenance_mode and user_id not in ADMIN_IDS:
                 return {"maintenance_mode": True}
+
+            if user_id:
+                user = await session.get(User, user_id)
+                if user and user.is_banned_sourcing and user_id not in ADMIN_IDS:
+                    return {"is_banned": True}
 
             user = await session.get(User, user_id)
             if not user:

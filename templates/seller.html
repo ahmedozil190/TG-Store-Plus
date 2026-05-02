@@ -1777,6 +1777,30 @@
                     return;
                 }
 
+                // Check Banned Status
+                if (data.is_banned === true) {
+                    document.body.innerHTML = `
+                        <div style="height: 100vh; background: #0f172a; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 40px; font-family: 'Cairo', 'Plus Jakarta Sans', sans-serif; color: white;">
+                            <div style="width: 100px; height: 100px; background: rgba(239, 68, 68, 0.1); color: #ef4444; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 3rem; margin-bottom: 30px; border: 2px solid rgba(239, 68, 68, 0.2); box-shadow: 0 0 40px rgba(239, 68, 68, 0.2);">
+                                <i class="fas fa-user-slash"></i>
+                            </div>
+                            <h1 style="font-size: 2.2rem; font-weight: 900; margin-bottom: 10px; color: #fff;">Account Suspended</h1>
+                            <p style="color: #94a3b8; font-size: 1.1rem; max-width: 340px; line-height: 1.6; margin-bottom: 40px;">
+                                Your access to the sourcing panel has been restricted due to a violation of our terms of service.
+                            </p>
+                            <div style="display: flex; flex-direction: column; gap: 15px; width: 100%; max-width: 300px;">
+                                <button onclick="window.Telegram.WebApp.openTelegramLink('https://t.me/NumbersStoreBot')" style="padding: 16px; background: #3b82f6; color: white; border: none; border-radius: 16px; font-weight: 800; font-size: 1rem; cursor: pointer; box-shadow: 0 8px 20px rgba(59, 130, 246, 0.3); display: flex; align-items: center; justify-content: center; gap: 10px;">
+                                    <i class="fab fa-telegram-plane"></i> Contact Support
+                                </button>
+                                <button onclick="window.Telegram.WebApp.close()" style="padding: 16px; background: rgba(255,255,255,0.05); color: #94a3b8; border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; font-weight: 700; font-size: 1rem; cursor: pointer;">
+                                    Close App
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    return;
+                }
+
                 userBalance = data.user.balance;
                 document.getElementById('currBal').innerHTML = `${formatMoney(userBalance)} <span>USD</span>`;
                 
