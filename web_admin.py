@@ -3135,6 +3135,7 @@ async def test_notifications(user_id: int):
             f"⏳ **Pending:** `{test_phone}` Sessions Found. Wait **24h**.",
             f"🎉 Approved `{test_phone}` Add {test_price}$",
             f"❌ **Rejected:** `{test_phone}`\nAccount is Frozen",
+            f"❌ **Rejected:** `{test_phone}`\nAccount is Spam",
             f"🎉 Congrats <code>{test_tx}</code> withdrawal {test_amt}$",
             f"❌ Rejected <code>{test_tx}</code> withdrawal {test_amt}$"
         ]
