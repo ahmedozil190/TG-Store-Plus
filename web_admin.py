@@ -3462,17 +3462,13 @@ async def get_admin_sourcing_history(
         # 2. Search Filter
         if search and search.strip():
             s = f"%{search.strip()}%"
-            if is_phone_only_search:
-                # Phone search bypasses everything
-                base_stmt = base_stmt.where(Account.phone_number.ilike(s))
-            else:
-                # Numeric search (could be ID or Phone part) - stays within filter
-                base_stmt = base_stmt.where(
-                    or_(
-                        Account.phone_number.ilike(s),
-                        cast(Account.seller_id, String).ilike(s)
-                    )
+            # We always search both phone and ID to be safe
+            base_stmt = base_stmt.where(
+                or_(
+                    Account.phone_number.ilike(s),
+                    cast(Account.seller_id, String).ilike(s)
                 )
+            )
 
         total_count = (await session.execute(
             select(func.count()).select_from(base_stmt.subquery())
