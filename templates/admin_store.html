@@ -2206,7 +2206,7 @@
                         </div>
                         <label class="custom-switch">
                             <input type="checkbox" id="maintenance-toggle"
-                                onchange="toggleMaintenanceMode(this.checked)">
+                                onchange="toggleMaintenanceMode(this.checked, 'store')">
                             <span class="switch-slider"></span>
                         </label>
                     </div>
@@ -3016,16 +3016,16 @@
 
         async function loadMaintenanceMode() {
             try {
-                const res = await fetch('/api/admin/system/maintenance');
+                const res = await fetch(`/api/admin/system/maintenance?_t=${Date.now()}`);
                 const data = await res.json();
                 const toggle = document.getElementById('maintenance-toggle');
-                if (toggle) toggle.checked = data.enabled;
+                if (toggle) toggle.checked = data.store_enabled;
             } catch (e) { console.error('Error loading maintenance mode', e); }
         }
 
-        async function toggleMaintenanceMode(enabled) {
+        async function toggleMaintenanceMode(enabled, target = 'store') {
             try {
-                const res = await fetch(`/api/admin/system/maintenance?enabled=${enabled}`, { method: 'POST' });
+                const res = await fetch(`/api/admin/system/maintenance?enabled=${enabled}&target=${target}`, { method: 'POST' });
                 const data = await res.json();
                 if (data.status === 'success') {
                     showToast(
