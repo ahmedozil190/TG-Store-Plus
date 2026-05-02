@@ -3441,32 +3441,19 @@ async def get_admin_sourcing_history(
         offset = (page - 1) * limit
         base_stmt = select(Account)
         
-        is_phone_only_search = False
-        if search and search.strip():
-            s_clean = search.strip()
-            
-            # If starts with + OR is a long digit string (likely phone), bypass filter
-            if s_clean.startswith("+") or (s_clean.isdigit() and len(s_clean) >= 10):
-                is_phone_only_search = True
-            # Also handle cases where + might have been sent as space by browser
-            elif search.startswith(" ") and len(s_clean) >= 9:
-                is_phone_only_search = True
-
-        # 1. Status Filter (Bypassed ONLY if it's a clear phone search)
-        if not is_phone_only_search:
-            if filter == "PENDING":
-                base_stmt = base_stmt.where(Account.status == AccountStatus.PENDING)
-            elif filter == "ACCEPTED":
-                base_stmt = base_stmt.where(Account.status.in_([AccountStatus.AVAILABLE, AccountStatus.SOLD]))
-            elif filter == "FROZEN":
-                base_stmt = base_stmt.where(Account.status == AccountStatus.REJECTED, Account.reject_reason.ilike("%frozen%"))
-            elif filter == "SPAM":
-                base_stmt = base_stmt.where(Account.status == AccountStatus.REJECTED, Account.reject_reason.ilike("%spam%"))
+        # 1. Status Filter (Always applied)
+        if filter == "PENDING":
+            base_stmt = base_stmt.where(Account.status == AccountStatus.PENDING)
+        elif filter == "ACCEPTED":
+            base_stmt = base_stmt.where(Account.status.in_([AccountStatus.AVAILABLE, AccountStatus.SOLD]))
+        elif filter == "FROZEN":
+            base_stmt = base_stmt.where(Account.status == AccountStatus.REJECTED, Account.reject_reason.ilike("%frozen%"))
+        elif filter == "SPAM":
+            base_stmt = base_stmt.where(Account.status == AccountStatus.REJECTED, Account.reject_reason.ilike("%spam%"))
         
-        # 2. Search Filter
+        # 2. Search Filter (Phone or ID)
         if search and search.strip():
             s = f"%{search.strip()}%"
-            # We always search both phone and ID to be safe
             base_stmt = base_stmt.where(
                 or_(
                     Account.phone_number.ilike(s),

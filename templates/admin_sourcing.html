@@ -4007,8 +4007,7 @@
 
         async function fetchAdminHistory(page) {
             try {
-                const query = encodeURIComponent(historySearchQuery);
-                const res = await fetch(`/api/admin/sourcing/history?page=${page}&limit=${ADMIN_HISTORY_LIMIT}&filter=${currentHistoryFilter}&search=${query}`);
+                const res = await fetch(`/api/admin/sourcing/history?page=${page}&limit=${ADMIN_HISTORY_LIMIT}&filter=${currentHistoryFilter}&search=${historySearchQuery}`);
                 const data = await res.json();
 
                 if (data.server_now) {
@@ -4392,32 +4391,6 @@
             const container = document.getElementById('history-list');
             if (!container) return;
 
-            // Smart UI Switch for Phone Search
-            if (historySearchQuery && list && list.length > 0) {
-                const first = list[0];
-                let statusToSet = 'PENDING';
-                let colorToSet = '#fbbf24';
-
-                if (first.status === 'AVAILABLE' || first.status === 'SOLD') {
-                    statusToSet = 'ACCEPTED'; colorToSet = '#10b981';
-                } else if (first.status === 'REJECTED') {
-                    if (first.reject_reason) {
-                        const r = first.reject_reason.toLowerCase();
-                        if (r.includes('frozen')) { statusToSet = 'FROZEN'; colorToSet = '#3b82f6'; }
-                        else if (r.includes('spam')) { statusToSet = 'SPAM'; colorToSet = '#ef4444'; }
-                    }
-                }
-
-                // If it's a phone search, visually sync the filter label to the result's category
-                const sClean = historySearchQuery.trim();
-                const isLikelyPhone = sClean.startsWith("+") || (/^\d+$/.test(sClean) && sClean.length >= 10);
-                if (isLikelyPhone) {
-                    document.getElementById('filter-status-dot').style.background = colorToSet;
-                    document.getElementById('current-filter-label').style.color = colorToSet;
-                    document.getElementById('current-filter-label').innerText = statusToSet;
-                    currentHistoryFilter = statusToSet;
-                }
-            }
 
             if (!list || !list.length) {
                 container.innerHTML = `
