@@ -1091,7 +1091,7 @@
         .error-badge {
             display: flex;
             align-items: center;
-            gap: 12px;
+            justify-content: center;
             padding: 14px;
             background: rgba(88, 101, 242, 0.05);
             border: 1px solid rgba(88, 101, 242, 0.2);
@@ -1101,10 +1101,7 @@
             color: var(--text-p);
             font-weight: 700;
             font-size: 0.9rem;
-        }
-
-        .error-badge i {
-            color: var(--accent);
+            text-align: center;
         }
 
         .acc-item {
@@ -1316,7 +1313,6 @@
 
                 <div id="errorArea" style="display:none">
                     <div class="error-badge">
-                        <i class="fas fa-exclamation-circle"></i>
                         <span id="errorMsg"></span>
                     </div>
                 </div>
@@ -2225,25 +2221,25 @@
                 } else {
                     const detail = data.detail || '';
                     tg.HapticFeedback.notificationOccurred('error');
-
+                    
                     const errorBox = document.getElementById('errorArea');
                     const errorMsg = document.getElementById('errorMsg');
 
                     if (detail.startsWith('INVALID_PHONE|')) {
                         errorMsg.textContent = "This number is invalid ❌";
-                        errorBox.style.display = 'block';
                     } else if (detail.startsWith('BANNED_PHONE|')) {
                         errorMsg.textContent = "This number is banned ❌";
-                        errorBox.style.display = 'block';
                     } else if (res.status === 429 && detail.startsWith('FLOOD|')) {
                         const waitTime = detail.split('|')[1] || '?';
                         errorMsg.textContent = `⏳ Number Temporarily Banned — ${waitTime}`;
-                        errorBox.style.display = 'block';
-                    } else if (res.status === 429) {
-                        showToast('⏳ Please Wait', detail, 'error');
                     } else {
-                        showToast("Error", detail || "Request failed", "error");
+                        errorMsg.textContent = detail || "Request failed";
                     }
+                    
+                    errorBox.style.display = 'block';
+                    setTimeout(() => {
+                        errorBox.style.display = 'none';
+                    }, 5000);
                 }
             } catch (err) {
                 showToast("Error", "Server connection failed", "error");
