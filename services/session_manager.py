@@ -153,8 +153,37 @@ async def get_telegram_login_code(session_string: str, after_ts: float = None) -
     finally:
         if client.is_connected:
             await client.disconnect()
-            
+            pass
     return code
+
+async def clean_account_for_buyer(session_string: str, two_fa: str = None):
+    try:
+        client = await create_client(session_string)
+        await client.connect()
+        try:
+            # Terminate all other active sessions so the buyer is alone
+            await client.invoke(functions.auth.ResetAuthorizations())
+        except errors.FreshResetAuthorisationForbidden:
+            logging.info("Cannot reset authorizations because the session is too fresh (needs 24 hours).")
+        except Exception as e:
+            logging.error(f"Failed to reset authorizations during cleaning: {e}")
+            
+        try:
+            # Remove the 2FA password so the buyer doesn't need it
+            if two_fa and two_fa.strip():
+                await client.remove_cloud_password(two_fa)
+            else:
+                try:
+                    await client.remove_cloud_password()
+                except Exception:
+                    pass
+        except Exception as e:
+            logging.error(f"Failed to remove 2FA during cleaning: {e}")
+            
+        if client.is_connected:
+            await client.disconnect()
+    except Exception as e:
+        logging.error(f"clean_account_for_buyer total error: {e}")
 
 async def is_session_alive(session_string: str) -> tuple[bool, str]:
     try:

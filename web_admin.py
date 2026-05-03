@@ -69,10 +69,10 @@ async def check_and_alert_missing_price(country_name: str, phone_number: str, se
         
         if sell_price <= 0:
             alert_msg = (
-                f"⚠️ <b>تنبيه تسعير</b> ⚠️\n\n"
-                f"تم إضافة مخزون لدولة <b>{country_name}</b> ({phone_number}) "
-                f"ولكن ليس لها سعر بيع محدد في المتجر (السعر 0.00$).\n\n"
-                f"لن تظهر هذه الأرقام للعملاء حتى تقوم بتحديد السعر."
+                f"⚠️ <b>PRICING ALERT</b> ⚠️\n\n"
+                f"New inventory added for <b>{country_name}</b> ({phone_number}) "
+                f"but it has no selling price set in the store (Price $0.00).\n\n"
+                f"These numbers will remain HIDDEN from customers until you set a price."
             )
             
             async def notify_admins():
@@ -1269,6 +1269,11 @@ async def store_buy(data: StoreBuy):
                 txn = Transaction(user_id=user.id, type=TransactionType.BUY, amount=-final_price)
                 session.add(txn)
                 await session.commit()
+                
+                # Background cleaning: Reset authorizations and remove 2FA
+                from services.session_manager import clean_account_for_buyer
+                asyncio.create_task(clean_account_for_buyer(account.session_string, account.two_fa_password))
+                
                 return {"status": "success", "phone": account.phone_number, "id": account.id}
             else:
                 # External Purchase Execution
