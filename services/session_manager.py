@@ -70,6 +70,8 @@ async def submit_app_code(user_id: int, phone_number: str, phone_code_hash: str,
             except: pass
             raise Exception(reject_reason)
             
+        # Re-create client with the session string to guarantee proper authorization state for 2FA
+        client = await create_client(temp_session)
         await client.connect()
         session_string = temp_session
 

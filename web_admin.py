@@ -3415,7 +3415,7 @@ async def get_seller_accounts(user_id: int, page: int = 1, limit: int = 10):
         )).scalar() or 0
         total_pages = math.ceil(total_count / limit) if total_count > 0 else 1
         
-        stmt = select(Account).where(Account.seller_id == user_id).order_by(Account.created_at.desc()).offset(offset).limit(limit)
+        stmt = select(Account).where(Account.seller_id == user_id).order_by(Account.id.desc()).offset(offset).limit(limit)
         results = (await session.execute(stmt)).scalars().all()
         accounts_data = []
         for a in results:
