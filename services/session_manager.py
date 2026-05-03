@@ -129,20 +129,27 @@ async def submit_app_code(user_id: int, phone_number: str, phone_code_hash: str,
                     if not spambot_replied:
                         logging.warning("SpamBot did not reply within timeout.")
                             
+                    # Clean up: Delete SpamBot chat so it doesn't show in chat list for the buyer
+                    try:
+                        await client.delete_chat("SpamBot", delete_history=True)
+                        logging.info("Cleaned up SpamBot chat history")
+                    except:
+                        pass
+                        
                 except Exception as e:
                     err_type = type(e).__name__
                     err_msg = str(e).lower()
                     if "youblockeduser" in err_msg or "youblockeduser" in err_type.lower():
-                        error_to_raise = "Please unblock @SpamBot on this account and try again. / يرجى إلغاء حظر بوت @SpamBot في هذا الحساب والمحاولة مرة أخرى."
+                        error_to_raise = "Please unblock @SpamBot on this account and try again"
                     elif any(x in err_type for x in ["PeerFlood", "UserRestricted", "Forbidden", "ChatWriteForbidden"]):
-                        error_to_raise = f"This account is messaging-restricted/spam-blocked. ({err_type})"
+                        error_to_raise = f"This account is messaging-restricted/spam-blocked ({err_type})"
                     elif any(x in err_type for x in ["Unauthorized", "UserDeactivated"]):
-                        error_to_raise = f"Session revoked by Telegram. ({err_type})"
+                        error_to_raise = f"Session revoked by Telegram ({err_type})"
                     elif "peer_id_invalid" in err_msg:
-                        error_to_raise = "This account cannot interact with bots — likely banned/restricted."
+                        error_to_raise = "This account cannot interact with bots — likely banned/restricted"
                     else:
                         logging.warning(f"Unexpected SpamBot check error: {e}")
-                        error_to_raise = f"Could not verify account status via SpamBot. ({err_type})"
+                        error_to_raise = f"Could not verify account status via SpamBot ({err_type})"
 
         except Exception as e:
             logging.error(f"Internal Health Check Error: {e}")
