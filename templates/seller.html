@@ -1108,6 +1108,16 @@
                 transform: translateY(0);
             }
         }
+
+        @keyframes toastIn {
+            from { opacity: 0; transform: translateY(-20px) scale(0.95); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        @keyframes toastOut {
+            from { opacity: 1; transform: translateY(0) scale(1); }
+            to { opacity: 0; transform: translateY(-20px) scale(0.95); }
+        }
     </style>
 </head>
 
@@ -2369,7 +2379,7 @@
             if (!container) {
                 container = document.createElement('div');
                 container.id = 'toast-container';
-                container.style.cssText = 'position:fixed;top:20px;left:20px;right:20px;z-index:9999;display:flex;flex-direction:column;gap:10px;pointer-events:none;';
+                container.style.cssText = 'position:fixed;top:80px;left:50%;transform:translateX(-50%);width:100%;max-width:400px;z-index:9999;display:flex;flex-direction:column;gap:10px;pointer-events:none;padding:0 20px;';
                 document.body.appendChild(container);
             }
 
