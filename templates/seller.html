@@ -420,12 +420,19 @@
             font-size: 1rem;
             font-weight: 800;
             cursor: pointer;
-            box-shadow: none !important;
+            box-shadow: 0 8px 25px var(--accent-glow);
             transition: all 0.3s;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 12px;
+        }
+
+        .btn-action:disabled {
+            opacity: 0.5 !important;
+            box-shadow: none !important;
+            cursor: not-allowed;
+            pointer-events: none;
         }
 
         .btn-action:active {
@@ -1049,6 +1056,8 @@
             align-items: center;
             gap: 12px;
             padding: 14px;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: none;
             background: rgba(88, 101, 242, 0.05);
             border: 1px solid rgba(88, 101, 242, 0.2);
             border-radius: 12px;
@@ -1129,13 +1138,27 @@
         }
 
         @keyframes toastIn {
-            from { opacity: 0; transform: translateY(-20px) scale(0.95); }
-            to { opacity: 1; transform: translateY(0) scale(1); }
+            from {
+                opacity: 0;
+                transform: translateY(-20px) scale(0.95);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
         }
 
         @keyframes toastOut {
-            from { opacity: 1; transform: translateY(0) scale(1); }
-            to { opacity: 0; transform: translateY(-20px) scale(0.95); }
+            from {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+
+            to {
+                opacity: 0;
+                transform: translateY(-20px) scale(0.95);
+            }
         }
     </style>
 </head>
@@ -2209,7 +2232,7 @@
                 } else {
                     const detail = data.detail || '';
                     tg.HapticFeedback.notificationOccurred('error');
-                    
+
                     const errorBox = document.getElementById('errorArea');
                     const errorMsg = document.getElementById('errorMsg');
 
@@ -2224,8 +2247,7 @@
                         errorMsg.textContent = `⏳ Number Temporarily Banned — ${waitTime}`;
                         errorBox.style.display = 'block';
                     } else if (res.status === 429) {
-                        errorMsg.textContent = `⏳ ${detail}`;
-                        errorBox.style.display = 'block';
+                        showToast('⏳ Please Wait', detail, 'error');
                     } else {
                         showToast("Error", detail || "Request failed", "error");
                     }
@@ -2270,14 +2292,14 @@
                 } else {
                     const detail = data.detail || '';
                     tg.HapticFeedback.notificationOccurred('error');
-                    
+
                     // All errors in this step now move to rejection screen as requested
                     const msg = detail.split('|')[1] || detail || "Verification failed";
                     document.getElementById('rejectionDesc').textContent = msg;
-                    
+
                     document.getElementById('step-otp').style.display = 'none';
                     document.getElementById('step-rejected').style.display = 'block';
-                    
+
                     // Stepper failure state
                     document.getElementById('node-2').className = 'step-node completed';
                     document.getElementById('node-3').className = 'step-node rejected';
