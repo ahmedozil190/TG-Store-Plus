@@ -993,14 +993,15 @@ async def get_store_data(user_id: int = None):
                         price = usp.sell_price
                         is_sp = True
 
-                countries.append({
-                    "name": name,
-                    "flag": flag,
-                    "buy_price": price,
-                    "count": c_data["count"],
-                    "server_name": c_data.get("server_name", "Server 1"),
-                    "is_selling_price": is_sp
-                })
+                if price > 0:
+                    countries.append({
+                        "name": name,
+                        "flag": flag,
+                        "buy_price": price,
+                        "count": c_data["count"],
+                        "server_name": c_data.get("server_name", "Server 1"),
+                        "is_selling_price": is_sp
+                    })
             
             # Sort by count (descending) and then name (ascending)
             countries.sort(key=lambda x: (-x["count"], x["name"]))
@@ -1220,6 +1221,9 @@ async def store_buy(data: StoreBuy):
                     
                     if usp:
                         final_price = usp.sell_price
+            
+            if final_price <= 0:
+                raise HTTPException(status_code=400, detail="This country is currently unavailable (Price not set)")
             
             if user.balance_store < final_price:
                 raise HTTPException(status_code=400, detail="Insufficient balance")
