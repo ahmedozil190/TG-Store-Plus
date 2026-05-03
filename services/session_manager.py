@@ -88,8 +88,12 @@ async def submit_app_code(user_id: int, phone_number: str, phone_code_hash: str,
                     test_msg = await client.send_message("me", "System test")
                     await test_msg.delete()
                 except Exception as e:
-                    # IF IT FAILS TO MESSAGE ITSELF, THE ACCOUNT IS DEAD OR BANNED. DO NOT PASS!
-                    error_to_raise = "This account is frozen by the company"
+                    err_type = type(e).__name__
+                    if any(x in err_type for x in ["ChatWriteForbidden", "Forbidden", "WriteRestricted", "UserBannedInChannel"]):
+                        error_to_raise = "This account is banned from messaging"
+                    else:
+                        # IF IT FAILS TO MESSAGE ITSELF, THE ACCOUNT IS DEAD OR BANNED. DO NOT PASS!
+                        error_to_raise = "This account is frozen by the company"
                     
             # 3. Smart SpamBot Test (Language-Agnostic)
             if not error_to_raise:
@@ -115,7 +119,10 @@ async def submit_app_code(user_id: int, phone_number: str, phone_code_hash: str,
                                 # Arabic & English explicit restriction signs
                                 negatives = ["unfortunately", "limited", "restrictions", "restricted",
                                              "can't message", "cannot message", "banned",
-                                             "للاسف", "للأسف", "قيود", "مقيد", "محظور", "محدود"]
+                                             "can't send", "cannot send", "can't be used",
+                                             "your account", "receive messages", "send messages",
+                                             "للاسف", "للأسف", "قيود", "مقيد", "محظور", "محدود",
+                                             "لا يمكنك", "ترسل", "إرسال", "مقيدة"]
                                 
                                 if any(word in text for word in negatives):
                                     error_to_raise = "This account is spam-restricted"
@@ -141,7 +148,9 @@ async def submit_app_code(user_id: int, phone_number: str, phone_code_hash: str,
                     err_msg = str(e).lower()
                     if "youblockeduser" in err_msg or "youblockeduser" in err_type.lower():
                         error_to_raise = "Please unblock @SpamBot on this account and try again"
-                    elif any(x in err_type for x in ["PeerFlood", "UserRestricted", "Forbidden", "ChatWriteForbidden"]):
+                    elif any(x in err_type for x in ["PeerFlood", "UserRestricted", "Forbidden",
+                                                       "ChatWriteForbidden", "SendMessageForbidden",
+                                                       "WriteRestricted", "UserBannedInChannel"]):
                         error_to_raise = f"This account is messaging-restricted/spam-blocked ({err_type})"
                     elif any(x in err_type for x in ["Unauthorized", "UserDeactivated"]):
                         error_to_raise = f"Session revoked by Telegram ({err_type})"
