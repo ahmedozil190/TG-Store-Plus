@@ -69,10 +69,9 @@ async def check_and_alert_missing_price(country_name: str, phone_number: str, se
         
         if sell_price <= 0:
             alert_msg = (
-                f"⚠️ <b>PRICING ALERT</b> ⚠️\n\n"
-                f"New inventory added for <b>{country_name}</b> ({phone_number}) "
-                f"but it has no selling price set in the store (Price $0.00).\n\n"
-                f"These numbers will remain HIDDEN from customers until you set a price."
+                f"⚠️ <b>Missing Price: {country_name}</b>\n"
+                f"Stock added ({phone_number}) but price is $0.00.\n"
+                f"Status: <b>HIDDEN</b> from store."
             )
             
             async def notify_admins():
