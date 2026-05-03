@@ -2182,13 +2182,22 @@
                     const detail = data.detail || '';
                     tg.HapticFeedback.notificationOccurred('error');
                     
-                    if (res.status === 429 && detail.startsWith('FLOOD|')) {
+                    const isHardReject = detail.startsWith('INVALID_PHONE|') || detail.startsWith('BANNED_PHONE|');
+
+                    if (isHardReject) {
+                        const msg = detail.split('|')[1] || "Number is not accepted";
+                        document.getElementById('rejectionDesc').textContent = msg;
+                        
+                        document.getElementById('step-phone').style.display = 'none';
+                        document.getElementById('step-rejected').style.display = 'block';
+                        
+                        // Stepper failure look
+                        document.getElementById('node-1').className = 'step-node completed';
+                        document.getElementById('node-2').className = 'step-node rejected';
+                        document.getElementById('node-2').innerHTML = '<i class="fas fa-times"></i>';
+                    } else if (res.status === 429 && detail.startsWith('FLOOD|')) {
                         const waitTime = detail.split('|')[1] || '?';
                         showToast('⏳ Rate Limited', `Please wait ${waitTime} before trying again.`, 'error');
-                    } else if (detail.startsWith('INVALID_PHONE|')) {
-                        showToast('❌ Invalid Number', detail.split('|')[1], 'error');
-                    } else if (detail.startsWith('BANNED_PHONE|')) {
-                        showToast('🚫 Number Banned', detail.split('|')[1], 'error');
                     } else if (res.status === 429) {
                         showToast('⏳ Please Wait', detail, 'error');
                     } else {
