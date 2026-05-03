@@ -3562,16 +3562,13 @@
                 await fetchSubscriptionChannels();
 
                 // Inventory (Home)
-                const hsrdy = document.getElementById('home-stat-ready');
-                const hsp = document.getElementById('home-stat-pending');
-                const hsa = document.getElementById('home-stat-accepted');
-                const hsr = document.getElementById('home-stat-rejected');
                 const hsacc = document.getElementById('stat-ready-count');
                 const hssold = document.getElementById('stat-sold-count');
-                if (hsrdy) hsrdy.innerText = data.stats.available_count || 0;
-                if (hsp) hsp.innerText = data.stats.pending_count;
                 if (hsacc) hsacc.innerText = data.stats.available_count || 0;
                 if (hssold) hssold.innerText = data.stats.sold_count || 0;
+                if (hsrdy) hsrdy.innerText = data.stats.available_count || 0;
+                if (hsp) hsp.innerText = data.stats.pending_count;
+                if (hsa) hsa.innerText = data.stats.available_count || 0;
                 if (hsr) hsr.innerText = data.stats.rejected_sourced;
 
                 // Withdrawals (Home)
@@ -3695,7 +3692,8 @@
                 if (wtp) wtp.innerText = formatMoney(ws.total_paid_amount || 0);
 
                 document.getElementById('stat-history-pending').innerText = ws.pending_count;
-                document.getElementById('stat-history-accepted').innerText = ws.accepted_sourced;
+                document.getElementById('stat-history-accepted').innerText = ws.available_count || 0;
+                if (document.getElementById('stat-history-sold')) document.getElementById('stat-history-sold').innerText = ws.sold_count || 0;
                 document.getElementById('stat-history-rejected').innerText = ws.rejected_sourced;
                 if (document.getElementById('stat-history-frozen')) document.getElementById('stat-history-frozen').innerText = ws.frozen_count || 0;
                 if (document.getElementById('stat-history-spam')) document.getElementById('stat-history-spam').innerText = ws.spam_count || 0;
@@ -4069,6 +4067,7 @@
                     // Restore original colors based on filter
                     let color = '#fbbf24';
                     if (currentHistoryFilter === 'ACCEPTED') color = '#10b981';
+                    else if (currentHistoryFilter === 'SOLD') color = '#ec4899';
                     else if (currentHistoryFilter === 'FROZEN') color = '#3b82f6';
                     else if (currentHistoryFilter === 'SPAM') color = '#ef4444';
 
