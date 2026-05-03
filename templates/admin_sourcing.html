@@ -2292,6 +2292,16 @@
                     </div>
                     <div class="info-card">
                         <div class="info-card-l">
+                            <span class="info-card-lbl" data-i18n="stat_sold_ops">SOLD ACCOUNTS</span>
+                            <div class="info-card-val"><span id="stat-history-sold">0</span> <span
+                                    data-i18n="unit_accs">ACCOUNTS</span></div>
+                        </div>
+                        <div class="info-card-icon" style="background: rgba(236, 72, 153, 0.1); color: #ec4899;">
+                            <i class="fas fa-cart-shopping"></i>
+                        </div>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-card-l">
                             <span class="info-card-lbl" data-i18n="stat_rejected_ops">REJECTED ACCOUNTS</span>
                             <div class="info-card-val"><span id="stat-history-rejected">0</span> <span
                                     data-i18n="unit_accs">ACCOUNTS</span></div>
@@ -2742,6 +2752,7 @@
                 lbl_ready_accs: "READY ACCOUNTS",
                 stat_total_ops: "TOTAL ACCOUNTS",
                 stat_accepted_ops: "ACCEPTED ACCOUNTS",
+                stat_sold_ops: "SOLD ACCOUNTS",
                 stat_rejected_ops: "REJECTED ACCOUNTS",
                 unit_ops: "ACCOUNTS",
                 unit_accs: "ACCOUNTS",
@@ -3555,9 +3566,12 @@
                 const hsp = document.getElementById('home-stat-pending');
                 const hsa = document.getElementById('home-stat-accepted');
                 const hsr = document.getElementById('home-stat-rejected');
+                const hsacc = document.getElementById('stat-ready-count');
+                const hssold = document.getElementById('stat-sold-count');
                 if (hsrdy) hsrdy.innerText = data.stats.available_count || 0;
                 if (hsp) hsp.innerText = data.stats.pending_count;
-                if (hsa) hsa.innerText = data.stats.accepted_sourced;
+                if (hsacc) hsacc.innerText = data.stats.available_count || 0;
+                if (hssold) hssold.innerText = data.stats.sold_count || 0;
                 if (hsr) hsr.innerText = data.stats.rejected_sourced;
 
                 // Withdrawals (Home)
@@ -4459,9 +4473,12 @@
                 let statusColor = '#f59e0b'; // PENDING
                 let statusText = translations[currentLang].st_pending;
 
-                if (item.status === 'AVAILABLE' || item.status === 'SOLD') {
+                if (item.status === 'AVAILABLE') {
                     statusColor = '#10b981'; // ACCEPTED
                     statusText = translations[currentLang].st_accepted;
+                } else if (item.status === 'SOLD') {
+                    statusColor = '#ec4899'; // SOLD
+                    statusText = 'SOLD';
                 } else if (item.status === 'REJECTED') {
                     statusColor = '#ef4444'; // REJECTED
                     statusText = translations[currentLang].st_rejected;
