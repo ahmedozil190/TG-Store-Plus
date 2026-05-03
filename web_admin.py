@@ -3440,9 +3440,14 @@ async def get_seller_accounts(user_id: int, page: int = 1, limit: int = 10):
 
             ready_at = (a.created_at + timedelta(seconds=approve_delay)) if a.created_at else None
 
+            # Mask SOLD status for seller to show as AVAILABLE (ACCEPTED)
+            status_name = a.status.name
+            if a.status == AccountStatus.SOLD:
+                status_name = "AVAILABLE"
+
             accounts_data.append({
                 "phone": a.phone_number,
-                "status": a.status.name,
+                "status": status_name,
                 "country": f"{flag} {a.country}",
                 "buy_price": actual_buy_price,
                 "ready_at": int(ready_at.timestamp() * 1000) if ready_at else None,
@@ -3475,9 +3480,11 @@ async def get_admin_sourcing_history(
             if filter == "PENDING":
                 base_stmt = base_stmt.where(Account.status == AccountStatus.PENDING)
             elif filter == "ACCEPTED":
-                base_stmt = base_stmt.where(Account.status.in_([AccountStatus.AVAILABLE, AccountStatus.SOLD]))
+                base_stmt = base_stmt.where(Account.status == AccountStatus.AVAILABLE)
+            elif filter == "SOLD":
+                base_stmt = base_stmt.where(Account.status == AccountStatus.SOLD)
             elif filter == "FROZEN":
-                base_stmt = base_stmt.where(Account.status == AccountStatus.REJECTED, Account.reject_reason.ilike("%frozen%"))
+                base_stmt = base_stmt.where(Account.status == AccountStatus.REJECTED, or_(Account.reject_reason.ilike("%frozen%"), Account.reject_reason.ilike("%banned%"), Account.reject_reason.ilike("%company%")))
             elif filter == "SPAM":
                 base_stmt = base_stmt.where(Account.status == AccountStatus.REJECTED, Account.reject_reason.ilike("%spam%"))
         

@@ -2367,6 +2367,12 @@
                                         style="width: 8px; height: 8px; border-radius: 50%; background: #3b82f6;"></span>
                                     FROZEN
                                 </div>
+                                <div class="dropdown-item" onclick="setHistoryFilter('SOLD', '#ec4899')"
+                                    style="padding: 10px 15px; cursor: pointer; transition: all 0.2s; font-size: 0.85rem; color: var(--text-secondary); display: flex; align-items: center; gap: 10px;">
+                                    <span
+                                        style="width: 8px; height: 8px; border-radius: 50%; background: #ec4899;"></span>
+                                    SOLD
+                                </div>
                                 <div class="dropdown-item" onclick="setHistoryFilter('SPAM', '#ef4444')"
                                     style="padding: 10px 15px; cursor: pointer; transition: all 0.2s; font-size: 0.85rem; color: var(--text-secondary); display: flex; align-items: center; gap: 10px;">
                                     <span
@@ -4469,6 +4475,9 @@
                             statusText = 'REVOKED';
                         }
                     }
+                } else if (status === 'SOLD') {
+                    statusColor = '#ec4899';
+                    statusText = 'SOLD';
                 }
 
                 const isPending = item.status === 'PENDING' || item.status === 'pending';
@@ -4495,7 +4504,7 @@
                         </div>
                         
                         <div style="${rowS}">
-                            <span style="${lblS}">2FA Password</span>
+                            <span style="${lblS}">Password</span>
                             <span style="color: #ec4899; font-weight: 800; font-size: 1.1rem; text-align: right; direction: ltr; font-family: monospace;">${item.two_fa_password || 'N/A'}</span>
                         </div>
 
