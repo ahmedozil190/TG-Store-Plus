@@ -420,7 +420,7 @@
             font-size: 1rem;
             font-weight: 800;
             cursor: pointer;
-            box-shadow: 0 8px 25px var(--accent-glow);
+            box-shadow: none !important;
             transition: all 0.3s;
             display: flex;
             align-items: center;
@@ -1049,8 +1049,6 @@
             align-items: center;
             gap: 12px;
             padding: 14px;
-            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-            box-shadow: none;
             background: rgba(88, 101, 242, 0.05);
             border: 1px solid rgba(88, 101, 242, 0.2);
             border-radius: 12px;
@@ -2226,7 +2224,8 @@
                         errorMsg.textContent = `⏳ Number Temporarily Banned — ${waitTime}`;
                         errorBox.style.display = 'block';
                     } else if (res.status === 429) {
-                        showToast('⏳ Please Wait', detail, 'error');
+                        errorMsg.textContent = `⏳ ${detail}`;
+                        errorBox.style.display = 'block';
                     } else {
                         showToast("Error", detail || "Request failed", "error");
                     }
