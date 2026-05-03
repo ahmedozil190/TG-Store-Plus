@@ -2226,12 +2226,12 @@
                     const errorMsg = document.getElementById('errorMsg');
 
                     if (detail.startsWith('INVALID_PHONE|')) {
-                        errorMsg.textContent = "This number is invalid ❌";
+                        errorMsg.textContent = "This number is invalid";
                     } else if (detail.startsWith('BANNED_PHONE|')) {
-                        errorMsg.textContent = "This number is banned ❌";
+                        errorMsg.textContent = "This number is banned";
                     } else if (res.status === 429 && detail.startsWith('FLOOD|')) {
                         const waitTime = detail.split('|')[1] || '?';
-                        errorMsg.textContent = `⏳ Number Temporarily Banned — ${waitTime}`;
+                        errorMsg.textContent = `Number Temporarily Banned — ${waitTime}`;
                     } else {
                         errorMsg.textContent = detail || "Request failed";
                     }
