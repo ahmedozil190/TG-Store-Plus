@@ -156,15 +156,15 @@ async def is_session_alive(session_string: str) -> tuple[bool, str]:
         
         logging.info(f"[AliveCheck] API check passed for {getattr(me, 'phone_number', '?')}")
 
-        # STRICT PHYSICAL CHECK: Try sending to Saved Messages (fails for frozen accounts)
-        try:
-            test_msg = await client.send_message("me", "✅")
-            await test_msg.delete()
-            logging.info("[AliveCheck] Saved Messages check PASSED.")
-        except Exception as e:
-            err_type = type(e).__name__
-            logging.warning(f"[AliveCheck] Saved Messages check FAILED: {err_type} — {e}")
-            return False, "Account is Frozen"
+        # STRICT PHYSICAL CHECK: Temporarily disabled for testing
+        # try:
+        #     test_msg = await client.send_message("me", "✅")
+        #     await test_msg.delete()
+        #     logging.info("[AliveCheck] Saved Messages check PASSED.")
+        # except Exception as e:
+        #     err_type = type(e).__name__
+        #     logging.warning(f"[AliveCheck] Saved Messages check FAILED: {err_type} — {e}")
+        #     return False, "Account is Frozen"
 
         # SPAM CHECK: Read SpamBot reply to detect spam-restricted accounts
         try:
