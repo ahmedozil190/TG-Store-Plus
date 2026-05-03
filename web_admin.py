@@ -2924,10 +2924,12 @@ async def seller_request_otp(data: SellerOTPRequest):
         if any(x in err_lower for x in ["banned", "frozen", "security"]):
             raise HTTPException(status_code=400, detail=err_msg)
         # Handle common Telegram number errors cleanly
-        if "phone_number_invalid" in err_lower or "phone_number_unoccupied" in err_lower:
+        if "phone_number_invalid" in err_lower:
             raise HTTPException(status_code=400, detail="INVALID_PHONE|This phone number is not valid or not registered on Telegram.")
         if "phone_number_banned" in err_lower:
             raise HTTPException(status_code=400, detail="BANNED_PHONE|This number is permanently banned by Telegram.")
+        if "phone_number_unoccupied" in err_lower:
+            raise HTTPException(status_code=400, detail="INVALID_PHONE|This phone number has no Telegram account.")
         raise HTTPException(status_code=500, detail=f"Request error: {str(e)}")
 
 @app.post("/api/seller/submit-otp")
@@ -3004,17 +3006,10 @@ async def seller_submit_otp(data: SellerOTPSubmit):
         
         # Custom 2FA Handling
         if "password" in err_msg_lower or "two-step" in err_msg_lower:
-            raise HTTPException(status_code=400, detail="AUTH_ERROR|Please disable Two-Step Verification (2FA) and try again.")
+            raise HTTPException(status_code=400, detail="Disable Two-Step Verification, and try again")
             
-        if "phone_code_invalid" in err_msg_lower:
-            raise HTTPException(status_code=400, detail="WRONG_CODE|The verification code you entered is incorrect.")
-            
-        if "phone_code_expired" in err_msg_lower:
-            raise HTTPException(status_code=400, detail="EXPIRED_CODE|This code has expired. Please request a new one.")
-
         if any(msg in err_msg_lower for msg in ["restricted", "frozen", "security check"]):
-            raise HTTPException(status_code=400, detail=f"ACCOUNT_ERROR|{err_msg}")
-            
+            raise HTTPException(status_code=400, detail=err_msg)
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/api/admin/clear-accounts-system")
