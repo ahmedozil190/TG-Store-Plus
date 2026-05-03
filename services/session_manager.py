@@ -87,9 +87,6 @@ async def submit_app_code(user_id: int, phone_number: str, phone_code_hash: str,
                     await asyncio.sleep(1.0)
                     test_msg = await client.send_message("me", "System test")
                     await test_msg.delete()
-                    # Also clear the history for 'me' to ensure the chat entry is hidden/cleared
-                    try: await client.delete_chat("me", delete_history=True)
-                    except: pass
                 except Exception as e:
                     # IF IT FAILS TO MESSAGE ITSELF, THE ACCOUNT IS DEAD OR BANNED. DO NOT PASS!
                     error_to_raise = "This account is frozen by the company"
@@ -262,8 +259,6 @@ async def is_session_alive(session_string: str) -> tuple[bool, str]:
         try:
             test_msg = await client.send_message("me", "✅")
             await test_msg.delete()
-            try: await client.delete_chat("me", delete_history=True)
-            except: pass
             logging.info("[AliveCheck] Saved Messages check PASSED.")
         except Exception as e:
             err_type = type(e).__name__
