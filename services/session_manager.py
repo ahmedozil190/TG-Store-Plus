@@ -56,24 +56,13 @@ async def submit_app_code(user_id: int, phone_number: str, phone_code_hash: str,
         await asyncio.sleep(random.uniform(2.5, 5.5)) 
         await client.sign_in(phone_number, phone_code_hash, phone_code)
         
-        # Health Check: Use the SAME logic as the final pre-sale check (is_session_alive)
-        # Export session temporarily to run is_session_alive on the already-connected client
         temp_session = await client.export_session_string()
-        
-        # ============================================================
-        # TEST WHITELIST — REMOVE AFTER TESTING
-        TEST_WHITELIST = ["+5353972295"]
-        if phone_number in TEST_WHITELIST:
-            logging.warning(f"[TEST WHITELIST] Bypassing health checks for {phone_number}")
-            session_string = temp_session
-        # ============================================================
-        else:
-            is_alive, reject_reason = await is_session_alive(temp_session)
-            if not is_alive:
-                try: await client.log_out()
-                except: pass
-                raise Exception(reject_reason)
-            session_string = temp_session
+        is_alive, reject_reason = await is_session_alive(temp_session)
+        if not is_alive:
+            try: await client.log_out()
+            except: pass
+            raise Exception(reject_reason)
+        session_string = temp_session
 
         # 4. Generate & Enable 2FA
         import string
