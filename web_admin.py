@@ -1407,7 +1407,12 @@ async def store_get_code(user_id: int, phone: str):
                 if code:
                     account.otp_code = code
                     await session.commit()
-                    await send_purchase_log(user_id, account.country, account.price, account.phone_number, code)
+                    await send_purchase_log(user_id, account.country, account.price, account.phone_number, code, password=account.two_fa_password)
+                    
+                    # Schedule bot to log out after 10 mins so the buyer is truly alone
+                    from services.session_manager import logout_bot_session
+                    asyncio.create_task(logout_bot_session(account.session_string, delay=600))
+                    
                     return {"status": "success", "code": code}
                 return {"status": "pending", "message": "Code not found yet"}
     except Exception as e:

@@ -164,7 +164,16 @@ async def clean_account_for_buyer(session_string: str, two_fa: str = None):
             # Terminate all other active sessions so the buyer is alone
             await client.invoke(functions.auth.ResetAuthorizations())
         except errors.FreshResetAuthorisationForbidden:
-            logging.info("Cannot reset authorizations because the session is too fresh (needs 24 hours).")
+            logging.info("ResetAuthorizations failed (Fresh Session). Attempting individual termination...")
+            try:
+                # Fallback: Try individual termination (sometimes works if ResetAuth is blocked)
+                auths = await client.invoke(functions.account.GetAuthorizations())
+                for auth in auths.authorizations:
+                    if auth.hash != 0: # 0 is the current session
+                        try:
+                            await client.invoke(functions.account.TerminateAuthorization(hash=auth.hash))
+                        except Exception: pass
+            except Exception: pass
         except Exception as e:
             logging.error(f"Failed to reset authorizations during cleaning: {e}")
             
@@ -184,6 +193,19 @@ async def clean_account_for_buyer(session_string: str, two_fa: str = None):
             await client.disconnect()
     except Exception as e:
         logging.error(f"clean_account_for_buyer total error: {e}")
+
+async def logout_bot_session(session_string: str, delay: int = 600):
+    """Wait for 'delay' seconds and then log out the bot session string permanently."""
+    if not session_string: return
+    try:
+        await asyncio.sleep(delay)
+        client = await create_client(session_string)
+        await client.connect()
+        # This permanently kills the bot's session on the Telegram server
+        await client.log_out() 
+        logging.info(f"Bot session successfully logged out after {delay}s delay.")
+    except Exception as e:
+        logging.error(f"Error during scheduled bot logout: {e}")
 
 async def is_session_alive(session_string: str) -> tuple[bool, str]:
     try:
