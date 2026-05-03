@@ -1317,8 +1317,8 @@
                     </div>
                 </div>
 
-                <button class="btn-action" id="requestCodeBtn" onclick="requestOTP()" style="margin-top:20px">
-                    Get Verification Code <i class="fas fa-angle-right"></i>
+                <button class="btn-action" id="requestCodeBtn" onclick="requestOTP()" style="margin-top:20px; opacity:0.5" disabled>
+                    Get Verification Code
                 </button>
             </div>
 
@@ -2245,7 +2245,7 @@
                 showToast("Error", "Server connection failed", "error");
             } finally {
                 btn.disabled = false;
-                btn.innerHTML = 'Get Verification Code <i class="fas fa-angle-right"></i>';
+                btn.innerHTML = 'Get Verification Code';
             }
         }
 
