@@ -3615,11 +3615,13 @@
                 const hrEl = document.getElementById('stat-history-rejected');
                 const hfEl = document.getElementById('stat-history-frozen');
                 const hsEl = document.getElementById('stat-history-spam');
+                const hSoldEl = document.getElementById('stat-history-sold');
                 if (hpEl) hpEl.innerText = data.stats.pending_count;
-                if (haEl) haEl.innerText = data.stats.accepted_sourced;
+                if (haEl) haEl.innerText = data.stats.available_count || 0;
                 if (hrEl) hrEl.innerText = data.stats.rejected_sourced;
                 if (hfEl) hfEl.innerText = data.stats.frozen_count || 0;
                 if (hsEl) hsEl.innerText = data.stats.spam_count || 0;
+                if (hSoldEl) hSoldEl.innerText = data.stats.sold_count || 0;
 
                 // Customers Section (Home)
                 const huTotal = document.getElementById('home-total-users');
