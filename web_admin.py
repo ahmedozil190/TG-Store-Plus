@@ -1876,6 +1876,9 @@ async def get_admin_store_data(user_id: int, init_data: str):
             min_price = (await session.execute(select(func.min(CountryPrice.price)).where(CountryPrice.price > 0))).scalar() or 0.0
             max_price = (await session.execute(select(func.max(CountryPrice.price)).where(CountryPrice.price > 0))).scalar() or 0.0
 
+            unpriced_countries_result = await session.execute(select(CountryPrice).where(CountryPrice.price <= 0))
+            unpriced_countries = [p.country_name for p in unpriced_countries_result.scalars().all()]
+
             # Custom User stats
             from sqlalchemy import distinct
             total_custom_users = (await session.execute(select(func.count(distinct(UserStorePrice.user_id))))).scalar() or 0
@@ -1971,7 +1974,8 @@ async def get_admin_store_data(user_id: int, init_data: str):
                 "total_custom_users": total_custom_users,
                 "total_custom_countries": total_custom_countries,
                 "min_price": min_price,
-                "max_price": max_price
+                "max_price": max_price,
+                "unpriced_countries": unpriced_countries
             },
             "users": users,
             "transactions": transactions,
