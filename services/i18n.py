@@ -19,8 +19,8 @@ MESSAGES = {
         "spam_restricted": "Account is spam-restricted",
         "session_removed": "Bot session was removed",
         "check_failed": "Account check failed: {error}",
-        "unauthorized": "Unauthorized identity",
-        "banned_sourcing": "Sorry, you are banned from sourcing."
+        "banned_sourcing": "Sorry, you are banned from sourcing.",
+        "referral_earned": "🎁 You earned <b>${amount}</b> from a new referral!"
     },
     "ar": {
         "banned_phone": "هذا الرقم محظور من تليجرام",
@@ -41,8 +41,8 @@ MESSAGES = {
         "spam_restricted": "الحساب مقيد بسبب السبام",
         "session_removed": "تمت إزالة جلسة البوت",
         "check_failed": "فشل فحص الحساب: {error}",
-        "unauthorized": "هوية غير مصرح بها",
-        "banned_sourcing": "عذراً، أنت محظور من التوريد."
+        "banned_sourcing": "عذراً، أنت محظور من التوريد.",
+        "referral_earned": "🎁 لقد ربحت <b>${amount}</b> من إحالة جديدة!"
     },
     "ru": {
         "banned_phone": "Этот номер заблокирован в Telegram",
@@ -63,8 +63,8 @@ MESSAGES = {
         "spam_restricted": "Аккаунт ограничен из-за спама",
         "session_removed": "Сессия бота была удалена",
         "check_failed": "Ошибка проверки аккаунта: {error}",
-        "unauthorized": "Неавторизованная личность",
-        "banned_sourcing": "К сожалению, вам запрещено поставлять номера."
+        "banned_sourcing": "К сожалению, вам запрещено поставлять номера.",
+        "referral_earned": "🎁 Вы заработали <b>${amount}</b> за нового реферала!"
     },
     "uz": {
         "banned_phone": "Ushbu raqam Telegram'dan bloklangan",
@@ -85,8 +85,8 @@ MESSAGES = {
         "spam_restricted": "Hisob spam tufayli cheklangan",
         "session_removed": "Bot seansi olib tashlandi",
         "check_failed": "Hisobni tekshirish muvaffaqiyatsiz tugadi: {error}",
-        "unauthorized": "Ruxsatsiz shaxs",
-        "banned_sourcing": "Kechirasiz, sizga raqam yetkazib berish taqiqlangan."
+        "banned_sourcing": "Kechirasiz, sizga raqam yetkazib berish taqiqlangan.",
+        "referral_earned": "🎁 Yangi taklifingiz uchun <b>${amount}</b> bonus oldingiz!"
     },
     "es": {
         "banned_phone": "Este número de teléfono está prohibido en Telegram",
@@ -107,8 +107,8 @@ MESSAGES = {
         "spam_restricted": "Cuenta restringida por spam",
         "session_removed": "Se eliminó la sesión del bot",
         "check_failed": "Error al comprobar la cuenta: {error}",
-        "unauthorized": "Identidad no autorizada",
-        "banned_sourcing": "Lo sentimos, tienes prohibido el suministro."
+        "banned_sourcing": "Lo sentimos, tienes prohibido el suministro.",
+        "referral_earned": "🎁 ¡Ganaste <b>${amount}</b> de un nuevo referido!"
     },
     "tr": {
         "banned_phone": "Bu telefon numarası Telegram'dan yasaklanmış",
@@ -129,8 +129,8 @@ MESSAGES = {
         "spam_restricted": "Hesap spam kısıtlamalı",
         "session_removed": "Bot oturumu kaldırıldı",
         "check_failed": "Hesap kontrolü başarısız: {error}",
-        "unauthorized": "Yetkisiz kimlik",
-        "banned_sourcing": "Üzgünüz, numara tedarik etmeniz yasaklandı."
+        "banned_sourcing": "Üzgünüz, numara tedarik etmeniz yasaklandı.",
+        "referral_earned": "🎁 Yeni bir referanstan <b>${amount}</b> kazandınız!"
     },
     "zh": {
         "banned_phone": "此电话号码已被 Telegram 封禁",
@@ -151,8 +151,8 @@ MESSAGES = {
         "spam_restricted": "账号因垃圾邮件受限",
         "session_removed": "机器人会话已移除",
         "check_failed": "账号检查失败：{error}",
-        "unauthorized": "身份未经授权",
-        "banned_sourcing": "抱歉，您被禁止供应号码。"
+        "banned_sourcing": "抱歉，您被禁止供应号码。",
+        "referral_earned": "🎁 您从一个新的推荐中赚取了 <b>${amount}</b>！"
     },
     "fa": {
         "banned_phone": "این شماره تلفن از تلگرام مسدود شده است",
@@ -173,8 +173,8 @@ MESSAGES = {
         "spam_restricted": "حساب به دلیل اسپم محدود شده است",
         "session_removed": "نشست ربات حذف شد",
         "check_failed": "بررسی حساب ناموفق بود: {error}",
-        "unauthorized": "هویت غیرمجاز",
-        "banned_sourcing": "متأسفیم، شما از تامین شماره محروم هستید."
+        "banned_sourcing": "متأسفیم، شما از تامین شماره محروم هستید.",
+        "referral_earned": "🎁 شما <b>${amount}</b> از یک زیرمجموعه جدید کسب کردید!"
     },
     "bn": {
         "banned_phone": "এই ফোন নম্বরটি টেলিগ্রাম থেকে নিষিদ্ধ",
@@ -195,8 +195,8 @@ MESSAGES = {
         "spam_restricted": "অ্যাকাউন্টটি স্প্যাম-সীমাবদ্ধ",
         "session_removed": "বট সেশন মুছে ফেলা হয়েছে",
         "check_failed": "অ্যাকাউন্ট যাচাই ব্যর্থ হয়েছে: {error}",
-        "unauthorized": "অননুমোদিত পরিচয়",
-        "banned_sourcing": "দুঃখিত, আপনাকে সোর্সিং থেকে নিষিদ্ধ করা হয়েছে।"
+        "banned_sourcing": "দুঃখিত, আপনাকে সোর্সিং থেকে নিষিদ্ধ করা হয়েছে।",
+        "referral_earned": "🎁 আপনি নতুন রেফারাল থেকে <b>${amount}</b> উপার্জন করেছেন!"
     }
 }
 

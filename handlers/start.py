@@ -75,9 +75,11 @@ async def cmd_start(message: Message, bot: Bot = None):
                     # Notify referrer
                     try:
                         target_bot = bot or message.bot
+                        ref_lang = referrer.language if referrer.language else "ar"
                         formatted_bonus = f"{bonus_val:.3f}" if f"{bonus_val:.3f}"[-1] != '0' else f"{bonus_val:.2f}"
                         
-                        msg_text = f"🎁 You earned <b>${formatted_bonus}</b> from a new referral!"
+                        from services.i18n import get_text
+                        msg_text = get_text("referral_earned", ref_lang, amount=formatted_bonus)
                             
                         await target_bot.send_message(referrer_id, msg_text, parse_mode="HTML")
                         logger.info(f"Referral notification sent to {referrer_id}")
