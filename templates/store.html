@@ -3349,7 +3349,7 @@
                         </div>
                         <div style="${rowS('#8b5cf6')}" onclick="copyText('${h.phone}')">
                             <span style="${lblS}">${translations[currentLang].number || 'NUMBER'}</span>
-                            <span style="color: var(--text-secondary); font-weight: 500; font-size: 1.1rem; text-align: end; direction: ltr; word-break: break-all; flex: 1; min-width: 0; cursor: pointer;">${h.phone}</span>
+                            <span style="color: var(--text-secondary); font-weight: 500; font-size: 1.1rem; text-align: ${currentLang === 'ar' || currentLang === 'fa' ? 'left' : 'right'}; direction: ltr; word-break: break-all; flex: 1; min-width: 0; cursor: pointer;">${h.phone}</span>
                         </div>
                         <div style="${rowS('#f59e0b')}" onclick="if('${h.otp_code}') copyText('${h.otp_code}')">
                             <span style="${lblS}">${currentLang === 'ar' ? 'كود التحقق' : 'CODE'}</span>
@@ -3359,7 +3359,7 @@
                         </div>
                         <div style="${rowS('#ec4899')}">
                             <span style="${lblS}">${currentLang === 'ar' ? 'كلمة السر' : 'PASSWORD'}</span>
-                            <span style="color: var(--text-secondary); font-weight: 500; font-size: 1.1rem; text-align: end; direction: ltr; font-family: monospace; word-break: break-all; flex: 1; min-width: 0;">${h.password || 'N/A'}</span>
+                            <span style="color: var(--text-secondary); font-weight: 500; font-size: 1.1rem; text-align: ${currentLang === 'ar' || currentLang === 'fa' ? 'left' : 'right'}; direction: ltr; font-family: monospace; word-break: break-all; flex: 1; min-width: 0;">${h.password || 'N/A'}</span>
                         </div>
                         <div style="${rowS('#3b82f6')}">
                             <span style="${lblS}">${translations[currentLang].price || 'PRICE'}</span>
@@ -3697,7 +3697,7 @@
                         </div>
                         <div style="${rowS('#3b82f6')}" onclick="copyText('${d.txid}')" title="${d.txid}">
                             <span style="${lblS}">${translations[currentLang].lbl_txid || 'TXID'}</span>
-                            <span style="color: var(--text-secondary); font-weight: 500; font-size: 0.85rem; text-align: end; direction: ltr; font-family: monospace; flex: 1; min-width: 0; cursor: pointer;">
+                            <span style="color: var(--text-secondary); font-weight: 500; font-size: 0.85rem; text-align: ${currentLang === 'ar' || currentLang === 'fa' ? 'left' : 'right'}; direction: ltr; font-family: monospace; flex: 1; min-width: 0; cursor: pointer;">
                                 ${d.txid.length > 16 ? d.txid.slice(0, 8) + '···' + d.txid.slice(-6) : d.txid}
                             </span>
                         </div>
