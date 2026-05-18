@@ -1882,6 +1882,7 @@
                 opacity: 0;
             }
         }
+
         @keyframes toastIn {
             from {
                 transform: translateX(100%);
@@ -1905,6 +1906,7 @@
                 opacity: 0;
             }
         }
+
         /* Copy Toast */
         .copy-toast-container {
             position: fixed;
@@ -1918,6 +1920,7 @@
             width: 100%;
             align-items: flex-end;
         }
+
         .copy-toast {
             background: var(--bg-elevated);
             backdrop-filter: blur(12px);
@@ -1934,9 +1937,11 @@
             transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
             pointer-events: auto;
         }
+
         .copy-toast.show {
             transform: translateX(0);
         }
+
         .copy-toast-icon {
             width: 44px;
             height: 44px;
@@ -1947,18 +1952,24 @@
             flex-shrink: 0;
             font-size: 1.1rem;
         }
-        .copy-toast-content { flex: 1; }
+
+        .copy-toast-content {
+            flex: 1;
+        }
+
         .copy-toast-title {
             font-weight: 800;
             font-size: 1rem;
             color: var(--text-p);
             margin-bottom: 2px;
         }
+
         .copy-toast-desc {
             font-size: 0.85rem;
             color: var(--text-s);
             font-weight: 500;
         }
+
         .copy-toast-close {
             color: var(--text-s);
             cursor: pointer;
@@ -1967,7 +1978,10 @@
             opacity: 0.5;
             transition: 0.2s;
         }
-        .copy-toast-close:hover { opacity: 1; }
+
+        .copy-toast-close:hover {
+            opacity: 1;
+        }
     </style>
 </head>
 
@@ -2636,13 +2650,6 @@
                                     <span
                                         style="width: 8px; height: 8px; border-radius: 50%; background: #10b981;"></span>
                                     ACCEPTED
-                                </div>
-
-                                <div class="dropdown-item" onclick="setHistoryFilter('REJECTED', '#ef4444')"
-                                    style="padding: 10px 15px; cursor: pointer; transition: all 0.2s; font-size: 0.85rem; color: var(--text-secondary); display: flex; align-items: center; gap: 10px;">
-                                    <span
-                                        style="width: 8px; height: 8px; border-radius: 50%; background: #ef4444;"></span>
-                                    REJECTED
                                 </div>
 
                                 <div class="dropdown-item" onclick="setHistoryFilter('FROZEN', '#3b82f6')"
@@ -4880,7 +4887,7 @@
             const yesBtn = document.querySelector('.confirm-yes');
             const noBtn = document.querySelector('.confirm-no');
             if (noBtn) noBtn.style.display = 'flex';
-            
+
             if (yesBtn) {
                 yesBtn.className = 'confirm-btn confirm-yes ' + btnClass;
                 yesBtn.innerHTML = (btnClass === 'approve' ? '<i class="fas fa-check" style="margin-inline-end: 8px;"></i>' : (btnClass === 'reject' ? '<i class="fas fa-ban" style="margin-inline-end: 8px;"></i>' : '<i class="fas fa-trash-alt" style="margin-inline-end: 8px;"></i>')) + btnText;
