@@ -1716,9 +1716,7 @@
             <div class="wizard-pane" id="step-success" style="display:none; padding-top:0">
                 <div class="w-icon" style="color:var(--success)"><i class="fas fa-check-double"></i></div>
                 <h2 class="w-title" data-i18n="success_title_sub">Great Work!</h2>
-                <p class="w-desc" data-i18n="success_desc_sub">Account <span id="successPhone"
-                        style="font-weight:700"></span> has been submitted for
-                    review.</p>
+                <p class="w-desc" id="success-desc-node"></p>
                 <div style="display:flex; gap:10px; margin-top:20px">
                     <button class="btn-secondary" style="flex:1; opacity:0.9" onclick="resetSubmission()"
                         data-i18n="btn_try_another">Try
@@ -1733,8 +1731,7 @@
                 <div class="w-icon" style="background:rgba(239, 68, 68, 0.1); color:var(--error)"><i
                         class="fas fa-ban"></i></div>
                 <h2 class="w-title" data-i18n="rejected_title_sub">Account Rejected</h2>
-                <p class="w-desc" id="rejectionDesc" data-i18n="rejected_desc_sub">This account is restricted or frozen
-                    and cannot be accepted.</p>
+                <p class="w-desc" id="rejectionDesc"></p>
                 <div style="display:flex; gap:10px; margin-top:20px">
                     <button class="btn-secondary" style="flex:1; opacity:0.9" onclick="resetSubmission()"
                         data-i18n="btn_try_another">Try
@@ -2515,7 +2512,7 @@
                 account_details_title: "Account Details", account_details_desc: "Enter the international phone number. We'll automatically detect the country and your reward price.",
                 phone_number_lbl: "Phone Number", btn_get_code: "Get Verification Code",
                 verify_login_title: "Verify Login", telegram_code_lbl: "Telegram Code",
-                btn_finish_sub: "Finish Submission", success_title_sub: "Great Work!", success_desc_sub: "Account has been submitted for review.",
+                btn_finish_sub: "Finish Submission", success_title_sub: "Great Work!", success_desc_sub: "Account {phone} has been submitted for review.",
                 btn_try_another: "Try Another", btn_home: "Home", rejected_title_sub: "Account Rejected",
                 rejected_desc_sub: "This account is restricted or frozen and cannot be accepted.",
                 sub_history_title: "Sales History", prev: "Prev", next: "Next", no_subs_found: "No sales found yet.",
@@ -2586,7 +2583,7 @@
                 account_details_title: "تفاصيل الحساب", account_details_desc: "أدخل رقم الهاتف الدولي. سنقوم تلقائياً بتحديد الدولة وسعر المكافأة الخاص بك.",
                 phone_number_lbl: "رقم الهاتف", btn_get_code: "الحصول على كود التحقق",
                 verify_login_title: "تأكيد تسجيل الدخول", telegram_code_lbl: "كود تليجرام",
-                btn_finish_sub: "إنهاء الإرسال", success_title_sub: "عمل رائع!", success_desc_sub: "تم إرسال الحساب للمراجعة بنجاح.",
+                btn_finish_sub: "إنهاء الإرسال", success_title_sub: "عمل رائع!", success_desc_sub: "تم إرسال الحساب {phone} للمراجعة بنجاح.",
                 btn_try_another: "إضافة آخر", btn_home: "الرئيسية", rejected_title_sub: "تم رفض الحساب",
                 rejected_desc_sub: "هذا الحساب مقيد أو محظور ولا يمكن قبوله.",
                 sub_history_title: "سجل المبيعات", prev: "السابق", next: "التالي", no_subs_found: "لا توجد مبيعات حتى الآن.",
@@ -2656,7 +2653,7 @@
                 account_details_title: "账号详情", account_details_desc: "输入国际电话号码。我们将自动检测国家和您的奖励价格。",
                 phone_number_lbl: "电话号码", btn_get_code: "获取验证码",
                 verify_login_title: "验证登录", telegram_code_lbl: "电报验证码",
-                btn_finish_sub: "完成提交", success_title_sub: "做得好！", success_desc_sub: "账号已提交审核。",
+                btn_finish_sub: "完成提交", success_title_sub: "做得好！", success_desc_sub: "账号 {phone} 已提交审核。",
                 btn_try_another: "提交另一个", btn_home: "首页", rejected_title_sub: "账号被拒绝",
                 rejected_desc_sub: "此账号受限或被封锁，无法接收。",
                 sub_history_title: "销售历史", prev: "上一页", next: "下一页", no_subs_found: "暂无销售记录。",
@@ -2720,7 +2717,7 @@
                 account_details_title: "অ্যাকাউন্ট বিবরণ", account_details_desc: "আন্তর্জাতিক ফোন নম্বর লিখুন। আমরা স্বয়ংক্রিয়ভাবে দেশ এবং আপনার পুরস্কারের মূল্য নির্ধারণ করব।",
                 phone_number_lbl: "ফোন নম্বর", btn_get_code: "যাচাইকরণ কোড নিন",
                 verify_login_title: "যাচাই লগইন করুন", telegram_code_lbl: "টেলিগ্রাম কোড",
-                btn_finish_sub: "সাবমিশন সম্পন্ন করুন", success_title_sub: "চমৎকার কাজ!", success_desc_sub: "পর্যালোচনার জন্য অ্যাকাউন্ট জমা দেওয়া হয়েছে।",
+                btn_finish_sub: "সাবমিশন সম্পন্ন করুন", success_title_sub: "চমৎকার কাজ!", success_desc_sub: "পর্যালোচনার জন্য অ্যাকাউন্ট {phone} জমা দেওয়া হয়েছে।",
                 btn_try_another: "আরেকটি চেষ্টা করুন", btn_home: "হোম", rejected_title_sub: "অ্যাকাউন্ট প্রত্যাখ্যাত",
                 rejected_desc_sub: "এই অ্যাকাউন্টটি সীমাবদ্ধ বা স্থগিত এবং গ্রহণ করা যাবে না।",
                 sub_history_title: "বিক্রয় ইতিহাস", prev: "পূর্ববর্তী", next: "পরবর্তী", no_subs_found: "এখনও কোনো বিক্রয় পাওয়া যায়নি।",
@@ -2790,7 +2787,7 @@
                 account_details_title: "جزئیات حساب", account_details_desc: "شماره تلفن بین‌المللی را وارد کنید. ما به طور خودکار کشور و قیمت پاداش شما را شناسایی می‌کنیم.",
                 phone_number_lbl: "شماره تلفن", btn_get_code: "دریافت کد تأیید",
                 verify_login_title: "تأیید ورود", telegram_code_lbl: "کد تلگرام",
-                btn_finish_sub: "پایان ارسال", success_title_sub: "عالی بود!", success_desc_sub: "حساب برای بررسی ارسال شد.",
+                btn_finish_sub: "پایان ارسال", success_title_sub: "عالی بود!", success_desc_sub: "حساب {phone} برای بررسی ارسال شد.",
                 btn_try_another: "ارسال مورد دیگر", btn_home: "خانه", rejected_title_sub: "حساب رد شد",
                 rejected_desc_sub: "این حساب محدود یا مسدود شده است و قابل قبول نیست.",
                 sub_history_title: "تاریخچه فروش", prev: "قبلی", next: "بعدی", no_subs_found: "هنوز هیچ فروشی یافت نشده است.",
@@ -2860,7 +2857,7 @@
                 account_details_title: "Данные аккаунта", account_details_desc: "Введите международный номер телефона. Мы автоматически определим страну и сумму вознаграждения.",
                 phone_number_lbl: "Номер телефона", btn_get_code: "Получить код подтверждения",
                 verify_login_title: "Подтверждение входа", telegram_code_lbl: "Код Telegram",
-                btn_finish_sub: "Завершить отправку", success_title_sub: "Отличная работа!", success_desc_sub: "Аккаунт отправлен на проверку.",
+                btn_finish_sub: "Завершить отправку", success_title_sub: "Отличная работа!", success_desc_sub: "Аккаунт {phone} отправлен на проверку.",
                 btn_try_another: "Добавить еще", btn_home: "Главная", rejected_title_sub: "Аккаунт отклонен",
                 rejected_desc_sub: "Этот аккаунт ограничен или заморожен и не может быть принят.",
                 sub_history_title: "История продаж", prev: "Пред.", next: "След.", no_subs_found: "Продаж пока нет.",
@@ -2930,7 +2927,7 @@
                 account_details_title: "Hisob ma'lumotlari", account_details_desc: "Xalqaro telefon raqamini kiriting. Biz avtomatik ravishda davlatni va mukofot miqdorini aniqlaymiz.",
                 phone_number_lbl: "Telefon raqami", btn_get_code: "Tasdiqlash kodini olish",
                 verify_login_title: "Kirishni tasdiqlash", telegram_code_lbl: "Telegram kodi",
-                btn_finish_sub: "Yakunlash", success_title_sub: "Ajoyib!", success_desc_sub: "Hisob ko'rib chiqish uchun yuborildi.",
+                btn_finish_sub: "Yakunlash", success_title_sub: "Ajoyib!", success_desc_sub: "Hisob {phone} ko'rib chiqish uchun yuborildi.",
                 btn_try_another: "Yana qo'shish", btn_home: "Bosh sahifa", rejected_title_sub: "Hisob rad etildi",
                 rejected_desc_sub: "Ushbu hisob cheklangan yoki muzlatilgan va qabul qilinishi mumkin emas.",
                 sub_history_title: "Sotuvlar tarixi", prev: "Oldingi", next: "Keyingi", no_subs_found: "Hozircha sotuvlar yo'q.",
@@ -3000,7 +2997,7 @@
                 account_details_title: "Detalles de la Cuenta", account_details_desc: "Ingrese el número de teléfono internacional. Detectaremos automáticamente el país y su precio de recompensa.",
                 phone_number_lbl: "Número de Teléfono", btn_get_code: "Obtener Código de Verificación",
                 verify_login_title: "Verificar Inicio de Sesión", telegram_code_lbl: "Código de Telegram",
-                btn_finish_sub: "Finalizar Envío", success_title_sub: "¡Buen trabajo!", success_desc_sub: "La cuenta ha sido enviada para revisión.",
+                btn_finish_sub: "Finalizar Envío", success_title_sub: "¡Buen trabajo!", success_desc_sub: "La cuenta {phone} ha sido enviada para revisión.",
                 btn_try_another: "Intentar con otro", btn_home: "Inicio", rejected_title_sub: "Cuenta Rechazada",
                 rejected_desc_sub: "Esta cuenta está restringida o congelada y no puede ser aceptada.",
                 sub_history_title: "Historial de Ventas", prev: "Ant.", next: "Sig.", no_subs_found: "No se han encontrado ventas aún.",
@@ -3070,7 +3067,7 @@
                 account_details_title: "Hesap Detayları", account_details_desc: "Uluslararası telefon numarasını girin. Ülkeyi ve ödül miktarınızı otomatik olarak belirleyeceğiz.",
                 phone_number_lbl: "Telefon Numarası", btn_get_code: "Doğrulama Kodu Al",
                 verify_login_title: "Girişi Doğrula", telegram_code_lbl: "Telegram Kodu",
-                btn_finish_sub: "Gönderimi Tamamla", success_title_sub: "Harika İş!", success_desc_sub: "Hesap inceleme için gönderildi.",
+                btn_finish_sub: "Gönderimi Tamamla", success_title_sub: "Harika İş!", success_desc_sub: "Hesap {phone} inceleme için gönderildi.",
                 btn_try_another: "Başka Bir Tane Ekle", btn_home: "Ana Sayfa", rejected_title_sub: "Hesap Reddedildi",
                 rejected_desc_sub: "Bu hesap kısıtlanmış veya dondurulmuş ve kabul edilemez.",
                 sub_history_title: "Satış Geçmişi", prev: "Geri", next: "İleri", no_subs_found: "Henüz satış bulunamadı.",
@@ -3222,6 +3219,14 @@
                 const phoneVal = currentPhone || '';
                 const template = translations[currentLang].otp_sent_desc || 'A 5-digit code was sent to {phone} on Telegram.';
                 otpDesc.innerHTML = template.replace('{phone}', `<b id="displayPhone" style="direction: ltr; display: inline-block;">${phoneVal}</b>`);
+            }
+
+            // Update Success description text dynamically
+            const successDesc = document.getElementById('success-desc-node');
+            if (successDesc) {
+                const phoneVal = currentPhone || '';
+                const template = translations[currentLang].success_desc_sub || 'Account {phone} has been submitted for review.';
+                successDesc.innerHTML = template.replace('{phone}', `<b id="successPhone" style="direction: ltr; display: inline-block;">${phoneVal}</b>`);
             }
 
             // Restore transitions
@@ -4034,7 +4039,7 @@
                 const data = await res.json();
                 if (res.ok) {
                     tg.HapticFeedback.notificationOccurred('success');
-                    document.getElementById('successPhone').textContent = currentPhone;
+                    updateTranslations();
                     document.getElementById('node-2').className = 'step-node completed';
                     document.getElementById('node-3').className = 'step-node completed';
                     document.getElementById('step-otp').style.display = 'none';
