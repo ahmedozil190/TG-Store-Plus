@@ -1731,16 +1731,52 @@ async def check_binance_pay_transaction(txid: str, api_key: str, api_secret: str
         if response.status_code == 200:
             if data.get("code") == "000000" and "data" in data:
                 transactions = data.get("data", [])
+                txid_clean = txid.strip().lower()
+                logger.info(f"Binance Pay API checked. Retrieved {len(transactions)} transactions.")
+                
                 for tx in transactions:
-                    # Check orderId or transactionId
-                    if str(tx.get("orderId")) == txid or str(tx.get("transactionId")) == txid:
-                        status = tx.get("status") # SUCCESS is expected
-                        if status == "SUCCESS":
+                    # Sift through all values in the transaction to find matching txid
+                    match_found = False
+                    
+                    # 1. Direct check of common fields
+                    for k in ("orderId", "transactionId", "id", "prepayId"):
+                        val = tx.get(k)
+                        if val and str(val).strip().lower() == txid_clean:
+                            match_found = True
+                            break
+                            
+                    # 2. Deep recursive check fallback
+                    if not match_found:
+                        def search_dict(d):
+                            for key, val in d.items():
+                                if isinstance(val, dict):
+                                    if search_dict(val):
+                                        return True
+                                elif isinstance(val, list):
+                                    for item in val:
+                                        if isinstance(item, dict) and search_dict(item):
+                                            return True
+                                        elif str(item).strip().lower() == txid_clean:
+                                            return True
+                                elif str(val).strip().lower() == txid_clean:
+                                    return True
+                            return False
+                        match_found = search_dict(tx)
+                        
+                    if match_found:
+                        status = tx.get("status")
+                        is_status_ok = True
+                        if status is not None:
+                            status_str = str(status).upper()
+                            if status_str not in ("SUCCESS", "1", "COMPLETED", "SUCCESSFUL"):
+                                is_status_ok = False
+                                
+                        if is_status_ok:
                             amount = float(tx.get("amount", 0))
                             currency = tx.get("currency", "USDT")
                             
                             # Check time (24h)
-                            tx_time = tx.get("transactionTime") or 0
+                            tx_time = tx.get("transactionTime") or tx.get("time") or 0
                             current_time = int(time.time() * 1000)
                             if tx_time > 0 and (current_time - tx_time) > (24 * 60 * 60 * 1000):
                                 return False, "Transaction is too old.", 0
@@ -1751,6 +1787,7 @@ async def check_binance_pay_transaction(txid: str, api_key: str, api_secret: str
                                 amount = amount * price
                                 
                             return True, "Success", amount
+                
                 return False, "Transaction not found in Binance Pay history.", 0
             else:
                 return False, f"Binance Pay API Error: {data.get('msg', 'Unknown')}", 0

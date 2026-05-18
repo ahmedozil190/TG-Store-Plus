@@ -1807,7 +1807,7 @@
                 lbl_status: "Status",
                 lbl_amount: "Amount",
                 lbl_method: "Method",
-                lbl_txid: "TXID"
+                lbl_txid: "المعرف"
             },
             ar: {
                 loading: "تحسين المتجر...", nav_home: "لوحة التحكم", nav_store: "شراء رقم", nav_deposit: "إيداع", nav_history: "سجل الطلبات", nav_support: "الدعم", nav_referrals: "نظام الإحالات",
@@ -1866,7 +1866,7 @@
                 lbl_status: "الحالة",
                 lbl_amount: "المبلغ",
                 lbl_method: "الطريقة",
-                lbl_txid: "معرف العملية"
+                lbl_txid: "المعرف"
             },
             zh: {
                 loading: "优化商店...", nav_home: "控制面板", nav_store: "购买号码", nav_deposit: "充值", nav_history: "订单历史", nav_support: "支持", nav_referrals: "邀请系统",
@@ -1928,7 +1928,7 @@
                 lbl_status: "状态",
                 lbl_amount: "金额",
                 lbl_method: "方式",
-                lbl_txid: "交易 ID"
+                lbl_txid: "المعرف"
             },
             bn: {
                 loading: "স্টোর অপ্টিমাইজ করা হচ্ছে...", nav_home: "ড্যাশবোর্ড", nav_store: "নম্বর কিনুন", nav_deposit: "আমানত", nav_history: "অর্ডার ইতিহাস", nav_support: "সমর্থন", nav_referrals: "রেফারাল সিস্টেম",
@@ -1987,7 +1987,7 @@
                 lbl_status: "অবস্থা",
                 lbl_amount: "পরিমাণ",
                 lbl_method: "পদ্ধতি",
-                lbl_txid: "লেনদেন আইডি"
+                lbl_txid: "المعرف"
             },
             fa: {
                 loading: "بهینه‌سازی فروشگاه...", nav_home: "داشبورد", nav_store: "خرید شماره", nav_deposit: "شارژ حساب", nav_history: "تاریخچه سفارشات", nav_support: "پشتیبانی", nav_referrals: "سیستم دعوت",
@@ -2046,7 +2046,7 @@
                 lbl_status: "وضعیت",
                 lbl_amount: "مبلغ",
                 lbl_method: "روش",
-                lbl_txid: "شناسه تراکنش"
+                lbl_txid: "المعرف"
             },
             ru: {
                 loading: "Оптимизация магазина...", nav_home: "Панель управления", nav_store: "Купить номер", nav_deposit: "Пополнение", nav_history: "История заказов", nav_support: "Поддержка", nav_referrals: "Рефералы",
@@ -2105,7 +2105,7 @@
                 lbl_status: "Статус",
                 lbl_amount: "Сумма",
                 lbl_method: "Метод",
-                lbl_txid: "ID транзакции"
+                lbl_txid: "المعرف"
             },
             uz: {
                 loading: "Do'kon optimallashtirilmoqda...", nav_home: "Boshqaruv paneli", nav_store: "Raqam sotib olish", nav_deposit: "Hisobni to'ldirish", nav_history: "Buyurtmalar tarixi", nav_support: "Qo'llab-quvvatlash", nav_referrals: "Takliflar tizimi",
@@ -2164,7 +2164,7 @@
                 lbl_status: "Holati",
                 lbl_amount: "Miqdori",
                 lbl_method: "Usuli",
-                lbl_txid: "Tranzaksiya ID"
+                lbl_txid: "المعرف"
             },
             es: {
                 loading: "Optimizando tienda...", nav_home: "Panel", nav_store: "Comprar número", nav_deposit: "Depósito", nav_history: "Historial", nav_support: "Soporte", nav_referrals: "Referidos",
@@ -2223,7 +2223,7 @@
                 lbl_status: "Estado",
                 lbl_amount: "Cantidad",
                 lbl_method: "Método",
-                lbl_txid: "ID de transacción"
+                lbl_txid: "المعرف"
             },
             tr: {
                 loading: "Mağaza optimize ediliyor...", nav_home: "Panel", nav_store: "Numara Satın Al", nav_deposit: "Bakiye Yükle", nav_history: "Sipariş Geçmişi", nav_support: "Destek", nav_referrals: "Referanslar",
@@ -2278,8 +2278,12 @@
                 unit_usd: "USD",
                 unit_users: "KULLANICI",
                 unit_countries: "ÜLKE",
-                unit_deposits: "YÜKLEME"
-            }
+                unit_deposits: "YÜKLEME",
+                lbl_status: "Durum",
+                lbl_amount: "Tutar",
+                lbl_method: "Yöntem",
+                lbl_txid: "المعرف"
+            },
         };
 
         const translations = new Proxy(rawTranslations, {
@@ -3487,8 +3491,31 @@
             const txid = txidInput.value.trim();
             const btn = document.getElementById('btn-verify-deposit');
 
+            let errTitle = "Error";
+            let errMsg = "Please enter Transaction ID";
+            let verifyingText = '<i class="fas fa-spinner fa-spin"></i> Verifying...';
+            let successTitle = "Success";
+            let failTitle = "Verification Failed";
+            let connErrMsg = "Connection error. Please try again.";
+
+            if (currentLang === 'ar') {
+                errTitle = "خطأ";
+                errMsg = "يرجى إدخال المعرف";
+                verifyingText = '<i class="fas fa-spinner fa-spin"></i> جاري التحقق...';
+                successTitle = "نجاح";
+                failTitle = "فشل التحقق";
+                connErrMsg = "خطأ في الاتصال. يرجى المحاولة مرة أخرى.";
+            } else if (currentLang === 'fa') {
+                errTitle = "خطا";
+                errMsg = "لطفاً شناسه را وارد کنید";
+                verifyingText = '<i class="fas fa-spinner fa-spin"></i> در حال بررسی...';
+                successTitle = "موفقیت";
+                failTitle = "تأیید ناموفق";
+                connErrMsg = "خطا در اتصال. لطفاً دوباره تلاش کنید.";
+            }
+
             if (!txid) {
-                showToast("Error", "Please enter Transaction ID", "error");
+                showToast(errTitle, errMsg, "error");
                 return;
             }
 
@@ -3501,7 +3528,7 @@
 
             btn.disabled = true;
             const originalHtml = btn.innerHTML;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verifying...';
+            btn.innerHTML = verifyingText;
 
             try {
                 const res = await fetch('/api/store/deposit/verify', {
@@ -3511,8 +3538,27 @@
                 });
                 const data = await res.json();
 
+                let displayMessage = data.message || "";
                 if (data.status === 'success') {
-                    showToast("Success", data.message || "Deposit verified!", "success");
+                    if (currentLang === 'ar') {
+                        if (displayMessage.includes("Successfully deposited $")) {
+                            const amt = displayMessage.replace("Successfully deposited $", "").trim();
+                            displayMessage = `تم إيداع $${amt} بنجاح في حسابك!`;
+                        } else {
+                            displayMessage = "تم تأكيد الإيداع بنجاح!";
+                        }
+                    } else if (currentLang === 'fa') {
+                        if (displayMessage.includes("Successfully deposited $")) {
+                            const amt = displayMessage.replace("Successfully deposited $", "").trim();
+                            displayMessage = `مبلغ $${amt} با موفقیت به حساب شما واریز شد!`;
+                        } else {
+                            displayMessage = "واریز تأیید شد!";
+                        }
+                    } else if (!displayMessage) {
+                        displayMessage = "Deposit verified!";
+                    }
+
+                    showToast(successTitle, displayMessage, "success");
                     txidInput.value = "";
                     if (data.new_balance !== undefined) {
                         updateBalanceUI(data.new_balance);
@@ -3520,11 +3566,51 @@
                     await fetchDeposits();
                     tg.HapticFeedback.notificationOccurred('success');
                 } else {
-                    showToast("Verification Failed", data.message || "Could not verify this deposit.", "error");
+                    if (currentLang === 'ar') {
+                        if (displayMessage.includes("Verification failed: ")) {
+                            const reason = displayMessage.replace("Verification failed: ", "").trim();
+                            let arReason = reason;
+                            if (reason.includes("Transaction not found")) {
+                                arReason = "لم يتم العثور على العملية في سجل بينانس باي.";
+                            } else if (reason.includes("Transaction is too old")) {
+                                arReason = "العملية قديمة جداً (أكثر من 24 ساعة).";
+                            } else if (reason.includes("already used") || reason.includes("already been verified")) {
+                                arReason = "هذه العملية تم استخدامها وتأكيدها من قبل.";
+                            } else if (reason.includes("API keys not configured")) {
+                                arReason = "مفاتيح API الخاصة ببينانس غير مكوّنة.";
+                            } else if (reason.includes("Transaction verification failed")) {
+                                arReason = "فشل التحقق من العملية. يرجى التأكد من المعرف.";
+                            }
+                            displayMessage = `فشل التحقق: ${arReason}`;
+                        } else if (displayMessage.includes("already processed") || displayMessage.includes("used")) {
+                            displayMessage = "هذه العملية تم استخدامها وتأكيدها من قبل.";
+                        } else if (!displayMessage) {
+                            displayMessage = "لم نتمكن من التحقق من هذا الإيداع.";
+                        }
+                    } else if (currentLang === 'fa') {
+                        if (displayMessage.includes("Verification failed: ")) {
+                            const reason = displayMessage.replace("Verification failed: ", "").trim();
+                            let faReason = reason;
+                            if (reason.includes("Transaction not found")) {
+                                faReason = "تراکنش در تاریخچه بایننس پیدا نشد.";
+                            } else if (reason.includes("Transaction is too old")) {
+                                faReason = "تراکنش قدیمی است (بیش از 24 ساعت).";
+                            } else if (reason.includes("already used") || reason.includes("already been verified")) {
+                                faReason = "این تراکنش قبلاً استفاده شده است.";
+                            }
+                            displayMessage = `تأیید ناموفق: ${faReason}`;
+                        } else if (!displayMessage) {
+                            displayMessage = "تأیید این واریز امکان‌پذیر نبود.";
+                        }
+                    } else if (!displayMessage) {
+                        displayMessage = "Could not verify this deposit.";
+                    }
+
+                    showToast(failTitle, displayMessage, "error");
                 }
             } catch (e) {
                 console.error("Deposit error:", e);
-                showToast("Error", "Connection error. Please try again.", "error");
+                showToast(errTitle, connErrMsg, "error");
             } finally {
                 btn.disabled = false;
                 btn.innerHTML = originalHtml;
