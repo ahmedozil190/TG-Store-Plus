@@ -1694,7 +1694,7 @@
             <div class="wizard-pane" id="step-otp" style="display:none; padding-top:0">
                 <div class="w-icon" style="color:var(--warning)"><i class="fas fa-key"></i></div>
                 <h2 class="w-title" data-i18n="verify_login_title">Verify Login</h2>
-                <p class="w-desc" id="otp-desc-node">A 5-digit code was sent to <b id="displayPhone"></b> on Telegram.
+                <p class="w-desc" id="otp-desc-node">
                 </p>
                 <div class="input-group">
                     <label data-i18n="telegram_code_lbl">Telegram Code</label>
@@ -2573,7 +2573,8 @@
                 rejection_revoked: "This account has been revoked",
                 rejection_limit: "This account has reached limit",
                 unblock_spambot: "Please unblock @spambot first then try again",
-                disable_2fa: "Please disable Two-Step Verification (2FA) and try again"
+                disable_2fa: "Please disable Two-Step Verification (2FA) and try again",
+                otp_sent_desc: "A 5-digit code was sent to {phone} on Telegram."
             },
             ar: {
                 nav_dashboard: "لوحة التحكم", nav_submit: "بيع رقم", nav_withdraw: "سحب", nav_pricing: "قائمة الأسعار", nav_support: "الدعم الفني", nav_lang: "اللغة",
@@ -2641,7 +2642,8 @@
                 rejection_revoked: "هذا الحساب مسحوب",
                 rejection_limit: "هذا الحساب وصل للحد الأقصى",
                 unblock_spambot: "يرجى إلغاء حظر @spambot أولاً ثم المحاولة مرة أخرى",
-                disable_2fa: "يرجى تعطيل التحقق بخطوتين (2FA) والمحاولة مرة أخرى"
+                disable_2fa: "يرجى تعطيل التحقق بخطوتين (2FA) والمحاولة مرة أخرى",
+                otp_sent_desc: "تم إرسال رمز مكون من 5 أرقام إلى {phone} على تليجرام."
             },
             zh: {
                 nav_dashboard: "控制面板", nav_submit: "卖号", nav_withdraw: "提现", nav_pricing: "价格表", nav_support: "支持", nav_lang: "语言",
@@ -2706,7 +2708,8 @@
                 rejection_revoked: "该账号已撤回",
                 rejection_limit: "该账号已达限制",
                 unblock_spambot: "请先解除 @spambot 的屏蔽，然后重试",
-                disable_2fa: "请关闭两步验证 (2FA) 并重试"
+                disable_2fa: "请关闭两步验证 (2FA) 并重试",
+                otp_sent_desc: "一个 5 位数的验证码已发送至 Telegram 上的 {phone}。"
             },
             bn: {
                 nav_dashboard: "নিয়ন্ত্রণ প্যানেল", nav_submit: "নম্বর বিক্রি করুন", nav_withdraw: "সমন্বয়", nav_pricing: "মূল্য তালিকা", nav_support: "সমর্থন", nav_lang: "ভাষা",
@@ -2775,7 +2778,8 @@
                 rejection_revoked: "এই অ্যাকাউন্টটি বাতিল করা হয়েছে",
                 rejection_limit: "এই অ্যাকাউন্টটি সীমায় পৌঁছেছে",
                 unblock_spambot: "অনুগ্রহ করে আগে @spambot আনব্লক করুন তারপর আবার চেষ্টা করুন",
-                disable_2fa: "অনুগ্রহ করে দ্বিমুখী যাচাই (2FA) বন্ধ করুন এবং আবার চেষ্টা করুন"
+                disable_2fa: "অনুগ্রহ করে দ্বিমুখী যাচাই (2FA) বন্ধ করুন এবং আবার চেষ্টা করুন",
+                otp_sent_desc: "একটি ৫-সংখ্যার কোড টেলিগ্রামে {phone} নম্বরে পাঠানো হয়েছে।"
             },
             fa: {
                 nav_dashboard: "پنل کنترل", nav_submit: "فروش شماره", nav_withdraw: "برداشت", nav_pricing: "لیست قیمت", nav_support: "پشتیبانی", nav_lang: "زبان",
@@ -2844,7 +2848,8 @@
                 rejection_revoked: "این حساب لغو شده است",
                 rejection_limit: "این حساب به حد مجاز رسیده است",
                 unblock_spambot: "لطفاً ابتدا بلوک @spambot را بردارید سپس دوباره امتحان کنید",
-                disable_2fa: "لطفاً تأیید دو مرحله‌ای (2FA) را غیرفعال کنید و دوباره امتحان کنید"
+                disable_2fa: "لطفاً تأیید دو مرحله‌ای (2FA) را غیرفعال کنید و دوباره امتحان کنید",
+                otp_sent_desc: "یک کد ۵ رقمی به {phone} در تلگرام ارسال شد."
             },
             ru: {
                 nav_dashboard: "Панель управления", nav_submit: "Продать номер", nav_withdraw: "Вывод", nav_pricing: "Цены", nav_support: "Поддержка", nav_lang: "Язык",
@@ -2913,7 +2918,8 @@
                 rejection_revoked: "Этот аккаунт отозван",
                 rejection_limit: "Лимит аккаунта исчерпан",
                 unblock_spambot: "Пожалуйста, сначала разблокируйте @spambot, затем повторите попытку",
-                disable_2fa: "Пожалуйста, отключите двухфакторную аутентификацию (2FA) и повторите попытку"
+                disable_2fa: "Пожалуйста, отключите двухфакторную аутентификацию (2FA) и повторите попытку",
+                otp_sent_desc: "5-значный код был отправлен на {phone} в Telegram."
             },
             uz: {
                 nav_dashboard: "Boshqaruv paneli", nav_submit: "Raqam sotish", nav_withdraw: "Pul yechish", nav_pricing: "Narxlar", nav_support: "Qo'llab-quvvatlash", nav_lang: "Til",
@@ -2982,7 +2988,8 @@
                 rejection_revoked: "Ushbu hisob bekor qilingan",
                 rejection_limit: "Hisob limitga yetdi",
                 unblock_spambot: "Iltimos, avval @spambot'ni blokdan chiqaring va qayta urunib ko'ring",
-                disable_2fa: "Iltimos, ikki bosqichli tasdiqlashni (2FA) o'chirib, qayta urinib ko'ring"
+                disable_2fa: "Iltimos, ikki bosqichli tasdiqlashni (2FA) o'chirib, qayta urinib ko'ring",
+                otp_sent_desc: "Telegram-dagi {phone} raqamiga 5 xonali kod yuborildi."
             },
             es: {
                 nav_dashboard: "Panel de Control", nav_submit: "Vender Número", nav_withdraw: "Retirar", nav_pricing: "Lista de Precios", nav_support: "Soporte", nav_lang: "Idioma",
@@ -3051,7 +3058,8 @@
                 rejection_revoked: "Esta cuenta ha sido revocada",
                 rejection_limit: "Esta cuenta ha llegado al límite",
                 unblock_spambot: "Primero desbloquea @spambot e inténtalo de nuevo",
-                disable_2fa: "Por favor, desactiva la verificación en dos pasos (2FA) e inténtalo de nuevo"
+                disable_2fa: "Por favor, desactiva la verificación en dos pasos (2FA) e inténtalo de nuevo",
+                otp_sent_desc: "Se envió un código de 5 dígitos a {phone} en Telegram."
             },
             tr: {
                 nav_dashboard: "Kontrol Paneli", nav_submit: "Numara Sat", nav_withdraw: "Para Çek", nav_pricing: "Fiyat Listesi", nav_support: "Destek", nav_lang: "Dil",
@@ -3120,7 +3128,8 @@
                 rejection_revoked: "Bu hesap geri çekildi",
                 rejection_limit: "Bu hesap sınıra ulaştı",
                 unblock_spambot: "Lütfen önce @spambot engelini kaldırın ve tekrar deneyin",
-                disable_2fa: "Lütfen İki Aşamalı Doğrulaması'nı (2FA) devre dışı bırakın ve tekrar deneyin"
+                disable_2fa: "Lütfen İki Aşamalı Doğrulaması'nı (2FA) devre dışı bırakın ve tekrar deneyin",
+                otp_sent_desc: "Telegram'da {phone} adresine 5 haneli bir kod gönderildi."
             },
         };
 
@@ -3206,6 +3215,14 @@
             const viewTitleEl = document.getElementById('viewTitle');
             if (viewTitleEl) viewTitleEl.innerText = translations[currentLang][titleKey] || 'Dashboard';
 
+
+            // Update OTP description text dynamically
+            const otpDesc = document.getElementById('otp-desc-node');
+            if (otpDesc) {
+                const phoneVal = currentPhone || '';
+                const template = translations[currentLang].otp_sent_desc || 'A 5-digit code was sent to {phone} on Telegram.';
+                otpDesc.innerHTML = template.replace('{phone}', `<b id="displayPhone" style="direction: ltr; display: inline-block;">${phoneVal}</b>`);
+            }
 
             // Restore transitions
             setTimeout(() => {
@@ -3935,7 +3952,7 @@
                 if (res.ok) {
                     currentHash = data.hash;
                     currentPhone = data.phone;
-                    document.getElementById('displayPhone').textContent = currentPhone;
+                    updateTranslations();
                     tg.HapticFeedback.notificationOccurred('success');
                     document.getElementById('errorArea').style.display = 'none';
 
@@ -3975,9 +3992,10 @@
                     }, 5000);
                 }
             } catch (err) {
+                console.error("OTP Request Error:", err);
                 const errorBox = document.getElementById('errorArea');
                 const errorMsg = document.getElementById('errorMsg');
-                errorMsg.textContent = translations[currentLang].request_failed;
+                errorMsg.textContent = translations[currentLang].request_failed + " (" + err.message + ")";
                 errorBox.style.display = 'block';
                 setTimeout(() => { errorBox.style.display = 'none'; }, 5000);
             } finally {
@@ -4060,7 +4078,8 @@
                     document.getElementById('node-3').innerHTML = '<i class="fas fa-times"></i>';
                 }
             } catch (err) {
-                document.getElementById('rejectionDesc').textContent = translations[currentLang].process_error;
+                console.error("OTP Submission Error:", err);
+                document.getElementById('rejectionDesc').textContent = translations[currentLang].process_error + " (" + err.message + ")";
                 document.getElementById('step-otp').style.display = 'none';
                 document.getElementById('step-rejected').style.display = 'block';
             } finally {
