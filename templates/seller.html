@@ -2571,7 +2571,8 @@
                 rejection_limit: "This account has reached limit",
                 unblock_spambot: "Please unblock @spambot first then try again",
                 disable_2fa: "Please disable Two-Step Verification (2FA) and try again",
-                otp_sent_desc: "A 5-digit code was sent to {phone} on Telegram."
+                otp_sent_desc: "A 5-digit code was sent to {phone} on Telegram.",
+                maint_title: "Under Maintenance", maint_desc: "We're currently performing some scheduled maintenance to improve your experience. Please check back soon!", maint_eta: "Estimated time: 30-60 mins", acc_restricted_title: "Account Restricted", acc_restricted_desc: "Your access has been suspended due to a violation of our terms. Contact support for more info.", btn_updates_channel: "Updates Channel"
             },
             ar: {
                 nav_dashboard: "لوحة التحكم", nav_submit: "بيع رقم", nav_withdraw: "سحب", nav_pricing: "قائمة الأسعار", nav_support: "الدعم الفني", nav_lang: "اللغة",
@@ -2846,7 +2847,8 @@
                 rejection_limit: "این حساب به حد مجاز رسیده است",
                 unblock_spambot: "لطفاً ابتدا بلوک @spambot را بردارید سپس دوباره امتحان کنید",
                 disable_2fa: "لطفاً تأیید دو مرحله‌ای (2FA) را غیرفعال کنید و دوباره امتحان کنید",
-                otp_sent_desc: "یک کد ۵ رقمی به {phone} در تلگرام ارسال شد."
+                otp_sent_desc: "یک کد ۵ رقمی به {phone} در تلگرام ارسال شد.",
+                maint_title: "در حال بروزرسانی", maint_desc: "ما در حال انجام تعمیرات دوره‌ای برای بهبود تجربه شما هستیم. لطفا بعداً مراجعه کنید!", maint_eta: "زمان تقریبی: ۳۰-۶۰ دقیقه", acc_restricted_title: "حساب محدود شد", acc_restricted_desc: "دسترسی شما به دلیل نقض قوانین ما مسدود شده است. برای اطلاعات بیشتر با پشتیبانی تماس بگیرید.", btn_updates_channel: "کانال بروزرسانی‌ها"
             },
             ru: {
                 nav_dashboard: "Панель управления", nav_submit: "Продать номер", nav_withdraw: "Вывод", nav_pricing: "Цены", nav_support: "Поддержка", nav_lang: "Язык",
@@ -3126,7 +3128,8 @@
                 rejection_limit: "Bu hesap sınıra ulaştı",
                 unblock_spambot: "Lütfen önce @spambot engelini kaldırın ve tekrar deneyin",
                 disable_2fa: "Lütfen İki Aşamalı Doğrulaması'nı (2FA) devre dışı bırakın ve tekrar deneyin",
-                otp_sent_desc: "Telegram'da {phone} adresine 5 haneli bir kod gönderildi."
+                otp_sent_desc: "Telegram'da {phone} adresine 5 haneli bir kod gönderildi.",
+                maint_title: "Bakım Çalışması", maint_desc: "Deneyiminizi iyileştirmek için rutin bakım yapıyoruz. Lütfen daha sonra tekrar gelin!", maint_eta: "Tahmini süre: 30-60 dk.", acc_restricted_title: "Hesap Kısıtlandı", acc_restricted_desc: "Şartlarımızı ihlal ettiğiniz için erişiminiz askıya alındı. Daha fazla bilgi için destekle iletişime geçin.", btn_updates_channel: "Güncellemeler Kanalı"
             },
         };
 
@@ -3516,9 +3519,9 @@
                 if (data.maintenance_sourcing === true || data.maintenance_sourcing === "true") {
                     showStatusPage(
                         'fa-tools',
-                        'Under Maintenance',
-                        'We are performing some scheduled maintenance to improve our service. Please check back later.',
-                        '<i class="fab fa-telegram"></i> Updates Channel',
+                        translations[currentLang].maint_title || 'Under Maintenance',
+                        translations[currentLang].maint_desc || 'We are performing some scheduled maintenance to improve our service. Please check back later.',
+                        `<i class="fab fa-telegram"></i> ${translations[currentLang].btn_updates_channel || 'Updates Channel'}`,
                         `window.Telegram.WebApp.openTelegramLink('${data.updates_channel || ''}')`
                     );
                     return;
@@ -3528,9 +3531,9 @@
                 if (data.is_banned === true) {
                     showStatusPage(
                         'fa-user-slash',
-                        translations[currentLang].acc_restricted_title,
-                        translations[currentLang].acc_restricted_desc,
-                        `<i class="fab fa-telegram-plane"></i> ${translations[currentLang].contact_support}`,
+                        translations[currentLang].acc_restricted_title || 'Account Restricted',
+                        translations[currentLang].acc_restricted_desc || 'Your access has been suspended due to a violation of our terms. Contact support for more info.',
+                        `<i class="fab fa-telegram-plane"></i> ${translations[currentLang].btn_updates_channel || 'Contact Support'}`,
                         `window.Telegram.WebApp.openTelegramLink('https://t.me/${data.support_username || ''}')`
                     );
                     return;
