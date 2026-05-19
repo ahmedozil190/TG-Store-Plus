@@ -295,16 +295,20 @@
             border: 1px solid transparent;
         }
 
-        .nav-item:hover {
+        .nav-item:hover,
+        .nav-item.active {
             background: var(--card-glass);
             color: var(--text-p);
         }
 
         .nav-item.active {
-            background: rgba(88, 101, 242, 0.05);
             color: var(--accent);
+        }
+
+        .nav-item:active {
             border: 1px solid var(--accent);
             box-shadow: 0 0 12px var(--accent-glow);
+            transform: scale(0.98);
         }
 
         .nav-item i {
@@ -2590,7 +2594,8 @@
                 get_login_code: "Get Login Code",
                 processing: "Processing...",
                 server_error: "Server Error: ",
-                connection_err_prefix: "Connection Error: "},
+                connection_err_prefix: "Connection Error: "
+            },
             ar: {
                 nav_dashboard: "لوحة التحكم", nav_submit: "بيع رقم", nav_withdraw: "سحب", nav_pricing: "قائمة الأسعار", nav_support: "الدعم الفني", nav_lang: "اللغة",
                 financials_header: "البيانات المالية", stats_header: "الإحصائيات",
@@ -2674,7 +2679,8 @@
                 get_login_code: "جلب كود الدخول",
                 processing: "جاري المعالجة...",
                 server_error: "خطأ في السيرفر: ",
-                connection_err_prefix: "خطأ في الاتصال: "},
+                connection_err_prefix: "خطأ في الاتصال: "
+            },
             zh: {
                 nav_dashboard: "控制面板", nav_submit: "卖号", nav_withdraw: "提现", nav_pricing: "价格表", nav_support: "支持", nav_lang: "语言",
                 financials_header: "财务数据", stats_header: "数据统计",
@@ -2755,7 +2761,8 @@
                 get_login_code: "获取登录码",
                 processing: "正在处理...",
                 server_error: "服务器错误: ",
-                connection_err_prefix: "连接错误: "},
+                connection_err_prefix: "连接错误: "
+            },
             bn: {
                 nav_dashboard: "নিয়ন্ত্রণ প্যানেল", nav_submit: "নম্বর বিক্রি করুন", nav_withdraw: "সমন্বয়", nav_pricing: "মূল্য তালিকা", nav_support: "সমর্থন", nav_lang: "ভাষা",
                 curr_bal: "বর্তমান ব্যালেন্স", pend_with: "অপেক্ষমান উত্তোলন", total_with: "মোট উত্তোলন",
@@ -2840,7 +2847,8 @@
                 get_login_code: "লগইন কোড পান",
                 processing: "প্রক্রিয়া করা হচ্ছে...",
                 server_error: "সার্ভার ত্রুটি: ",
-                connection_err_prefix: "সংযোগ ত্রুটি: "},
+                connection_err_prefix: "সংযোগ ত্রুটি: "
+            },
             fa: {
                 nav_dashboard: "پنل کنترل", nav_submit: "فروش شماره", nav_withdraw: "برداشت", nav_pricing: "لیست قیمت", nav_support: "پشتیبانی", nav_lang: "زبان",
                 curr_bal: "موجودی فعلی", pend_with: "در انتظار برداشت", total_with: "کل برداشت شده",
@@ -2925,7 +2933,8 @@
                 get_login_code: "دریافت کد ورود",
                 processing: "در حال پردازش...",
                 server_error: "خطای سرور: ",
-                connection_err_prefix: "خطا در اتصال: "},
+                connection_err_prefix: "خطا در اتصال: "
+            },
             ru: {
                 nav_dashboard: "Панель управления", nav_submit: "Продать номер", nav_withdraw: "Вывод", nav_pricing: "Цены", nav_support: "Поддержка", nav_lang: "Язык",
                 curr_bal: "Текущий баланс", pend_with: "Ожидает вывода", total_with: "Всего выведено",
@@ -3010,7 +3019,8 @@
                 get_login_code: "Получить код входа",
                 processing: "Обработка...",
                 server_error: "Ошибка сервера: ",
-                connection_err_prefix: "Ошибка подключения: "},
+                connection_err_prefix: "Ошибка подключения: "
+            },
             uz: {
                 nav_dashboard: "Boshqaruv paneli", nav_submit: "Raqam sotish", nav_withdraw: "Pul yechish", nav_pricing: "Narxlar", nav_support: "Qo'llab-quvvatlash", nav_lang: "Til",
                 curr_bal: "Joriy balans", pend_with: "Kutilayotgan to'lov", total_with: "Jami yechilgan",
@@ -3095,7 +3105,8 @@
                 get_login_code: "Kirish kodini olish",
                 processing: "Jarayonda...",
                 server_error: "Server xatosi: ",
-                connection_err_prefix: "Ulanish xatosi: "},
+                connection_err_prefix: "Ulanish xatosi: "
+            },
             es: {
                 nav_dashboard: "Panel de Control", nav_submit: "Vender Número", nav_withdraw: "Retirar", nav_pricing: "Lista de Precios", nav_support: "Soporte", nav_lang: "Idioma",
                 curr_bal: "Saldo Actual", pend_with: "Retiro Pendiente", total_with: "Total Retirado",
@@ -3180,7 +3191,8 @@
                 get_login_code: "Obtener código de inicio",
                 processing: "Procesando...",
                 server_error: "Error del servidor: ",
-                connection_err_prefix: "Error de conexión: "},
+                connection_err_prefix: "Error de conexión: "
+            },
             tr: {
                 nav_dashboard: "Kontrol Paneli", nav_submit: "Numara Sat", nav_withdraw: "Para Çek", nav_pricing: "Fiyat Listesi", nav_support: "Destek", nav_lang: "Dil",
                 curr_bal: "Mevcut Bakiye", pend_with: "Bekleyen Çekim", total_with: "Toplam Çekilen",
@@ -3265,7 +3277,8 @@
                 get_login_code: "Giriş Kodunu Al",
                 processing: "İşleniyor...",
                 server_error: "Sunucu Hatası: ",
-                connection_err_prefix: "Bağlantı Hatası: "},
+                connection_err_prefix: "Bağlantı Hatası: "
+            },
         };
 
         const translations = new Proxy(rawTranslations, {

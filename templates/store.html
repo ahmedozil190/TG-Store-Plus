@@ -221,16 +221,20 @@
             border: 1px solid transparent;
         }
 
-        .nav-item:hover {
+        .nav-item:hover,
+        .nav-item.active {
             background: var(--card-glass);
             color: var(--text-p);
         }
 
         .nav-item.active {
-            background: rgba(88, 101, 242, 0.05);
             color: var(--accent);
+        }
+
+        .nav-item:active {
             border: 1px solid var(--accent);
             box-shadow: 0 0 12px var(--accent-glow);
+            transform: scale(0.98);
         }
 
         .side-brand {
@@ -1832,7 +1836,8 @@
                 btn_get_login: "Get Login Code",
                 lbl_number: "NUMBER",
                 lbl_date: "DATE",
-                lbl_paid: "PAID"},
+                lbl_paid: "PAID"
+            },
             ar: {
                 loading: "تحسين المتجر...", nav_home: "لوحة التحكم", nav_store: "شراء رقم", nav_deposit: "إيداع", nav_history: "سجل الطلبات", nav_support: "الدعم", nav_referrals: "نظام الإحالات",
                 financials_header: "البيانات المالية", stats_header: "الإحصائيات", balance: "الرصيد الحالي", total_spent: "إجمالي المشتريات", total_deposits: "إجمالي الإيداعات",
@@ -1912,7 +1917,8 @@
                 btn_get_login: "احصل على رمز الدخول",
                 lbl_number: "رقم الهاتف",
                 lbl_date: "التاريخ",
-                lbl_paid: "مكتمل"},
+                lbl_paid: "مكتمل"
+            },
             zh: {
                 loading: "优化商店...", nav_home: "控制面板", nav_store: "购买号码", nav_deposit: "充值", nav_history: "订单历史", nav_support: "支持", nav_referrals: "邀请系统",
                 total_numbers: "总号码", countries: "总国家", lowest_price: "最低价格",
@@ -1995,7 +2001,8 @@
                 btn_get_login: "获取登录码",
                 lbl_number: "号码",
                 lbl_date: "日期",
-                lbl_paid: "已支付"},
+                lbl_paid: "已支付"
+            },
             bn: {
                 loading: "স্টোর অপ্টিমাইজ করা হচ্ছে...", nav_home: "ড্যাশবোর্ড", nav_store: "নম্বর কিনুন", nav_deposit: "আমানত", nav_history: "অর্ডার ইতিহাস", nav_support: "সমর্থন", nav_referrals: "রেফারাল সিস্টেম",
                 financials_header: "আর্থিক তথ্য", stats_header: "পরিসংখ্যান", balance: "বর্তমান ব্যালেন্স", total_spent: "মোট খরচ", total_deposits: "মোট আমানত",
@@ -2075,7 +2082,8 @@
                 btn_get_login: "লগইন কোড পান",
                 lbl_number: "নম্বর",
                 lbl_date: "তারিখ",
-                lbl_paid: "প্রদত্ত"},
+                lbl_paid: "প্রদত্ত"
+            },
             fa: {
                 loading: "بهینه‌سازی فروشگاه...", nav_home: "داشبورد", nav_store: "خرید شماره", nav_deposit: "شارژ حساب", nav_history: "تاریخچه سفارشات", nav_support: "پشتیبانی", nav_referrals: "سیستم دعوت",
                 financials_header: "داده‌های مالی", stats_header: "آمار", balance: "موجودی فعلی", total_spent: "کل هزینه", total_deposits: "کل واریزی‌ها",
@@ -2155,7 +2163,8 @@
                 btn_get_login: "دریافت کد ورود",
                 lbl_number: "شماره",
                 lbl_date: "تاریخ",
-                lbl_paid: "تکمیل شده"},
+                lbl_paid: "تکمیل شده"
+            },
             ru: {
                 loading: "Оптимизация магазина...", nav_home: "Панель управления", nav_store: "Купить номер", nav_deposit: "Пополнение", nav_history: "История заказов", nav_support: "Поддержка", nav_referrals: "Рефералы",
                 financials_header: "Финансы", stats_header: "Статистика", balance: "Текущий баланс", total_spent: "Всего потрачено", total_deposits: "Всего пополнено",
@@ -2235,7 +2244,8 @@
                 btn_get_login: "Получить код входа",
                 lbl_number: "НОМЕР",
                 lbl_date: "ДАТА",
-                lbl_paid: "ОПЛАЧЕНО"},
+                lbl_paid: "ОПЛАЧЕНО"
+            },
             uz: {
                 loading: "Do'kon optimallashtirilmoqda...", nav_home: "Boshqaruv paneli", nav_store: "Raqam sotib olish", nav_deposit: "Hisobni to'ldirish", nav_history: "Buyurtmalar tarixi", nav_support: "Qo'llab-quvvatlash", nav_referrals: "Takliflar tizimi",
                 financials_header: "Moliyaviy ma'lumotlar", stats_header: "Statistika", balance: "Joriy balans", total_spent: "Jami sarflangan", total_deposits: "Jami to'ldirilgan",
@@ -2315,7 +2325,8 @@
                 btn_get_login: "Kirish kodini olish",
                 lbl_number: "RAQAM",
                 lbl_date: "SANA",
-                lbl_paid: "TOLANDI"},
+                lbl_paid: "TOLANDI"
+            },
             es: {
                 loading: "Optimizando tienda...", nav_home: "Panel", nav_store: "Comprar número", nav_deposit: "Depósito", nav_history: "Historial", nav_support: "Soporte", nav_referrals: "Referidos",
                 financials_header: "Finanzas", stats_header: "Estadísticas", balance: "Saldo actual", total_spent: "Total gastado", total_deposits: "Total depositado",
@@ -2395,7 +2406,8 @@
                 btn_get_login: "Obtener código de inicio",
                 lbl_number: "NÚMERO",
                 lbl_date: "FECHA",
-                lbl_paid: "PAGADO"},
+                lbl_paid: "PAGADO"
+            },
             tr: {
                 loading: "Mağaza optimize ediliyor...", nav_home: "Panel", nav_store: "Numara Satın Al", nav_deposit: "Bakiye Yükle", nav_history: "Sipariş Geçmişi", nav_support: "Destek", nav_referrals: "Referanslar",
                 financials_header: "Finansal Veriler", stats_header: "İstatistikler", balance: "Mevcut Bakiye", total_spent: "Toplam Harcama", total_deposits: "Toplam Yükleme",
@@ -2475,7 +2487,8 @@
                 btn_get_login: "Giriş Kodunu Al",
                 lbl_number: "NUMARA",
                 lbl_date: "TARİH",
-                lbl_paid: "ÖDENDİ"},
+                lbl_paid: "ÖDENDİ"
+            },
         };
 
         const translations = new Proxy(rawTranslations, {
