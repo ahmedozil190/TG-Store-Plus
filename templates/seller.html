@@ -201,12 +201,12 @@
         .sidebar {
             position: fixed;
             top: 0;
-            left: 0;
+            inset-inline-start: 0;
             width: var(--sidebar-width);
             height: 100%;
             background: var(--bg-elevated);
             z-index: 3000;
-            transform: translateX(-100%);
+            transform: translateX(calc(-100% * var(--sidebar-dir-mult, 1)));
             transition: transform 0.2s var(--ease);
             padding: 40px 20px;
             display: flex;
@@ -217,22 +217,16 @@
             overflow-x: hidden;
         }
 
+        body[dir="rtl"], body.rtl {
+            --sidebar-dir-mult: -1;
+        }
+
         /* Prevent sidebar from jumping across screen during language switch */
         body.switching .sidebar {
             transition: none !important;
         }
 
-        body.rtl .sidebar {
-            left: auto;
-            right: 0;
-            transform: translateX(100%);
-        }
-
         .sidebar.open {
-            transform: translateX(0);
-        }
-
-        body.rtl .sidebar.open {
             transform: translateX(0);
         }
 
