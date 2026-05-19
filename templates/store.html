@@ -3582,7 +3582,7 @@
             const safeId = phone.replace(/\D/g, '');
             btn.disabled = true;
             const originalHtml = btn.innerHTML;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Checking...';
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> ' + (translations[currentLang].checking || 'Checking...');
 
             try {
                 const res = await fetch(`/api/store/get-code?user_id=${userId}&phone=${encodeURIComponent(phone)}`);
