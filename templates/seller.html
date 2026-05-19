@@ -3490,7 +3490,7 @@
         window.onhashchange = () => {
             const hash = window.location.hash.replace('#', '');
             if (hash) {
-                const valid = ['dashboard', 'submit', 'withdraw', 'pricing', 'support'];
+                const valid = ['dashboard', 'submit', 'withdraw', 'pricing', 'support', 'lang'];
                 if (valid.includes(hash)) changeView(hash);
             }
         };
@@ -4364,7 +4364,7 @@
         window.onload = () => {
             // Check hash for persistence
             const hash = window.location.hash.replace('#', '');
-            const validViews = ['dashboard', 'submit', 'withdraw', 'pricing', 'support'];
+            const validViews = ['dashboard', 'submit', 'withdraw', 'pricing', 'support', 'lang'];
             if (hash && validViews.includes(hash)) {
                 changeView(hash);
             }
