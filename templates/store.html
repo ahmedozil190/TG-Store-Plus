@@ -218,16 +218,19 @@
             transition: all 0.2s;
             box-sizing: border-box;
             outline: none;
+            border: 1px solid transparent;
         }
 
-        .nav-item:hover,
-        .nav-item.active {
+        .nav-item:hover {
             background: var(--card-glass);
             color: var(--text-p);
         }
 
         .nav-item.active {
+            background: rgba(88, 101, 242, 0.05);
             color: var(--accent);
+            border: 1px solid var(--accent);
+            box-shadow: 0 0 12px var(--accent-glow);
         }
 
         .side-brand {
