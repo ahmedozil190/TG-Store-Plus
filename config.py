@@ -20,7 +20,7 @@ else:
     DATABASE_URL = os.getenv("DATABASE_URL", "sqlite+aiosqlite:///app.db")
 
 # WebApp URLs
-WEBAPP_URL = os.getenv("WEBAPP_URL", "https://tg-test-plus3414-production.up.railway.app")
+WEBAPP_URL = os.getenv("WEBAPP_URL", "https://web-production-23f85.up.railway.app")
 STORE_URL = f"{WEBAPP_URL}/store?v=3"
 SELLER_URL = f"{WEBAPP_URL}/seller?v=3"
 
