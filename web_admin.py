@@ -2149,11 +2149,12 @@ async def get_sourcing_data(user_id: int, init_data: str):
                 })
 
             # Sourcing settings
-            settings_stmt = select(AppSetting).where(AppSetting.key.in_(["sourcing_log_channel_id", "min_withdraw_trx", "min_withdraw_usdt", "fee_withdraw_trx", "fee_withdraw_usdt"]))
+            settings_stmt = select(AppSetting).where(AppSetting.key.in_(["sourcing_log_channel_id", "sourcing_join_log_channel_id", "min_withdraw_trx", "min_withdraw_usdt", "fee_withdraw_trx", "fee_withdraw_usdt"]))
             settings_res = await session.execute(settings_stmt)
             settings_dict = {s.key: s.value for s in settings_res.scalars().all()}
             
             sourcing_log_channel_id = settings_dict.get("sourcing_log_channel_id", "")
+            sourcing_join_log_channel_id = settings_dict.get("sourcing_join_log_channel_id", "")
             min_withdraw_trx = settings_dict.get("min_withdraw_trx", "4.0")
             min_withdraw_usdt = settings_dict.get("min_withdraw_usdt", "10.0")
             fee_withdraw_trx = settings_dict.get("fee_withdraw_trx", "0.2")
@@ -2168,6 +2169,7 @@ async def get_sourcing_data(user_id: int, init_data: str):
             return {
                 "bot_name": bot_name,
                 "sourcing_log_channel_id": sourcing_log_channel_id,
+                "sourcing_join_log_channel_id": sourcing_join_log_channel_id,
                 "support_username": support_username,
                 "updates_channel": updates_channel,
                 "min_withdraw_trx": min_withdraw_trx,
@@ -2234,6 +2236,9 @@ async def get_admin_store_data(user_id: int, init_data: str):
                 
                 dep_log_ch_obj = (await session.execute(select(AppSetting).where(AppSetting.key == "deposit_log_channel_id"))).scalar_one_or_none()
                 deposit_log_channel_id = dep_log_ch_obj.value if dep_log_ch_obj else ""
+                
+                store_join_log_ch_obj = (await session.execute(select(AppSetting).where(AppSetting.key == "store_join_log_channel_id"))).scalar_one_or_none()
+                store_join_log_channel_id = store_join_log_ch_obj.value if store_join_log_ch_obj else ""
                 
                 if not bn_obj:
                     from config import BOT_TOKEN
@@ -2349,6 +2354,7 @@ async def get_admin_store_data(user_id: int, init_data: str):
             "bot_name": bot_name,
             "purchase_log_channel_id": purchase_log_channel_id,
             "deposit_log_channel_id": deposit_log_channel_id,
+            "store_join_log_channel_id": store_join_log_channel_id,
             "support_username": support_username,
             "updates_channel": updates_channel,
             "stats": {
@@ -2643,7 +2649,7 @@ async def save_support_settings(data: dict):
         async with async_session() as session:
             for k, v in data.items():
                 if k in ["user_id", "init_data"]: continue
-                if k not in ["SUPPORT_USERNAME", "UPDATES_CHANNEL", "PURCHASE_LOG_CHANNEL_ID", "SOURCING_LOG_CHANNEL_ID", "purchase_log_channel_id", "sourcing_log_channel_id", "deposit_log_channel_id"]: continue
+                if k not in ["SUPPORT_USERNAME", "UPDATES_CHANNEL", "PURCHASE_LOG_CHANNEL_ID", "SOURCING_LOG_CHANNEL_ID", "purchase_log_channel_id", "sourcing_log_channel_id", "deposit_log_channel_id", "store_join_log_channel_id", "sourcing_join_log_channel_id"]: continue
                 obj = (await session.execute(select(AppSetting).where(AppSetting.key == k))).scalar_one_or_none()
                 if obj:
                     obj.value = v.strip()

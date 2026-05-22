@@ -2835,6 +2835,15 @@
                     <div class="form-group" style="margin-bottom: 25px;">
                         <label
                             style="font-size: 0.95rem; color: var(--text-primary); font-weight: 600; margin-bottom: 12px; display: block;">
+                            Join Log Channel ID
+                        </label>
+                        <input type="text" id="setting-sourcing-join-log-channel" class="search-input"
+                            style="margin-bottom: 0; padding: 16px; font-size: 1rem; height: auto;"
+                            placeholder="Enter Channel ID">
+                    </div>
+                    <div class="form-group" style="margin-bottom: 25px;">
+                        <label
+                            style="font-size: 0.95rem; color: var(--text-primary); font-weight: 600; margin-bottom: 12px; display: block;">
                             Support ID
                         </label>
                         <input type="text" id="setting-support-username" class="search-input"
@@ -4099,7 +4108,7 @@
 
                 renderPrices(allPrices);
 
-                allUsers = (data.users || []).reverse();
+                allUsers = data.users || [];
                 const ucEl = document.getElementById('user-count');
                 if (ucEl) ucEl.innerText = data.stats.user_count || allUsers.length;
                 const bcEl = document.getElementById('banned-count');
@@ -4107,6 +4116,10 @@
                 if (data.sourcing_log_channel_id) {
                     const slcInput = document.getElementById('setting-sourcing-log-channel');
                     if (slcInput) slcInput.value = data.sourcing_log_channel_id;
+                }
+                if (data.sourcing_join_log_channel_id) {
+                    const sjlcInput = document.getElementById('setting-sourcing-join-log-channel');
+                    if (sjlcInput) sjlcInput.value = data.sourcing_join_log_channel_id;
                 }
                 if (data.min_withdraw_trx) {
                     const trxMin = document.getElementById('setting-min-withdraw-trx');
@@ -5070,6 +5083,7 @@
             const username = document.getElementById('setting-support-username').value;
             const updatesChannel = document.getElementById('setting-updates-channel').value;
             const logChannel = document.getElementById('setting-sourcing-log-channel').value;
+            const sourcingJoinLogChannel = document.getElementById('setting-sourcing-join-log-channel').value;
             const originalText = btn.innerHTML;
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
             btn.disabled = true;
@@ -5079,9 +5093,12 @@
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
+                        user_id: userId,
+                        init_data: initData,
                         SUPPORT_USERNAME: username,
                         UPDATES_CHANNEL: updatesChannel,
-                        sourcing_log_channel_id: logChannel
+                        sourcing_log_channel_id: logChannel,
+                        sourcing_join_log_channel_id: sourcingJoinLogChannel
                     })
                 });
                 const data = await res.json();

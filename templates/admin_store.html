@@ -2570,6 +2570,16 @@
                     <div class="form-group" style="margin-bottom: 25px;">
                         <label
                             style="font-size: 0.95rem; color: var(--text-primary); font-weight: 600; margin-bottom: 12px; display: block;">
+                            Join Log Channel ID
+                        </label>
+                        <input type="text" id="setting-store-join-log-channel" class="search-input"
+                            style="margin-bottom: 0; padding: 16px; font-size: 1rem; height: auto;"
+                            placeholder="Enter Channel ID">
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 25px;">
+                        <label
+                            style="font-size: 0.95rem; color: var(--text-primary); font-weight: 600; margin-bottom: 12px; display: block;">
                             Support ID
                         </label>
                         <input type="text" id="setting-support-username" class="search-input"
@@ -3156,7 +3166,7 @@
                 const uIEl = document.getElementById('userInitial');
                 if (uIEl) uIEl.textContent = uname.charAt(0).toUpperCase();
 
-                allUsers = (data.users || []).reverse();
+                allUsers = data.users || [];
                 allTransactions = data.transactions || [];
 
                 const ucEl = document.getElementById('user-count');
@@ -3175,6 +3185,7 @@
 
                 if (data.purchase_log_channel_id) document.getElementById('setting-log-channel').value = data.purchase_log_channel_id;
                 if (data.deposit_log_channel_id) document.getElementById('setting-deposit-log-channel').value = data.deposit_log_channel_id;
+                if (data.store_join_log_channel_id) document.getElementById('setting-store-join-log-channel').value = data.store_join_log_channel_id;
                 if (data.support_username) document.getElementById('setting-support-username').value = data.support_username;
                 if (data.updates_channel) document.getElementById('setting-updates-channel').value = data.updates_channel;
 
@@ -3238,6 +3249,7 @@
             const updatesChannel = document.getElementById('setting-updates-channel').value;
             const logChannel = document.getElementById('setting-log-channel').value;
             const depositLogChannel = document.getElementById('setting-deposit-log-channel').value;
+            const storeJoinLogChannel = document.getElementById('setting-store-join-log-channel').value;
             const originalText = btn.innerHTML;
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
             btn.disabled = true;
@@ -3252,7 +3264,8 @@
                         SUPPORT_USERNAME: username,
                         UPDATES_CHANNEL: updatesChannel,
                         purchase_log_channel_id: logChannel,
-                        deposit_log_channel_id: depositLogChannel
+                        deposit_log_channel_id: depositLogChannel,
+                        store_join_log_channel_id: storeJoinLogChannel
                     })
                 });
                 const data = await res.json();
