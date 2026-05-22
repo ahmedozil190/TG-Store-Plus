@@ -4108,7 +4108,7 @@
 
                 renderPrices(allPrices);
 
-                allUsers = (data.users || []).sort((a, b) => b.id - a.id);
+                allUsers = (data.users || []).sort((a, b) => (b.join_date || '').localeCompare(a.join_date || ''));
                 const ucEl = document.getElementById('user-count');
                 if (ucEl) ucEl.innerText = data.stats.user_count || allUsers.length;
                 const bcEl = document.getElementById('banned-count');

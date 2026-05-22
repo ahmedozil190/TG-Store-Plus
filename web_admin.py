@@ -2119,7 +2119,7 @@ async def get_sourcing_data(user_id: int, init_data: str):
             user_count = (await session.execute(select(func.count(User.id)).where(User.is_active_sourcing == True))).scalar() or 0
             total_sourcing_balance = (await session.execute(select(func.sum(User.balance_sourcing)).where(User.is_active_sourcing == True))).scalar() or 0.0
 
-            users_result = await session.execute(select(User).where(User.is_active_sourcing == True).order_by(User.id.desc()).limit(200))
+            users_result = await session.execute(select(User).where(User.is_active_sourcing == True).order_by(User.join_date.desc()).limit(200))
             db_users = users_result.scalars().all()
             
             # Get seller stats for these users
@@ -2278,7 +2278,7 @@ async def get_admin_store_data(user_id: int, init_data: str):
             total_custom_users = (await session.execute(select(func.count(distinct(UserStorePrice.user_id))))).scalar() or 0
             total_custom_countries = (await session.execute(select(func.count(distinct(UserStorePrice.iso_code))))).scalar() or 0
 
-            users_result = await session.execute(select(User).where(User.is_active_store == True).order_by(User.id.desc()).limit(200))
+            users_result = await session.execute(select(User).where(User.is_active_store == True).order_by(User.join_date.desc()).limit(200))
             all_users_raw = users_result.scalars().all()
             u_ids = [u.id for u in all_users_raw]
 
