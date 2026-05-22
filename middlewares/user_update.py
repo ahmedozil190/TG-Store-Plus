@@ -140,11 +140,11 @@ class UserUpdateMiddleware(BaseMiddleware):
 
             text = (
                 f"🔔 <b>New Member Joined!</b>\n"
-                f"┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄\n"
-                f"👤  <b>{full_name}</b>\n"
-                f"🏷️  {username_line}\n"
-                f"🆔  <code>{tg_user.id}</code>\n"
-                f"🤖  {bot_label}\n"
+                f"┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄\n\n"
+                f"👤  <b>{full_name}</b>\n\n"
+                f"🏷️  {username_line}\n\n"
+                f"🆔  <code>{tg_user.id}</code>\n\n"
+                f"🤖  {bot_label}\n\n"
                 f"┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄"
             )
 
