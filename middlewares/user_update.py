@@ -134,7 +134,7 @@ class UserUpdateMiddleware(BaseMiddleware):
             else:
                 channel_id = channel_id_raw  # e.g. @mychannel
 
-            bot_label = "🛒 Store" if self.bot_type == "store" else "📦 Sell"
+            bot_label = "SKELETON TG STORE" if self.bot_type == "store" else "SKELETON TG SELL"
             full_name = f"{tg_user.first_name or ''} {tg_user.last_name or ''}".strip() or "—"
             username_line = f"@{tg_user.username}" if tg_user.username else "—"
 
@@ -142,9 +142,9 @@ class UserUpdateMiddleware(BaseMiddleware):
                 f"🔔 <b>New Member Joined!</b>\n"
                 f"┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄\n\n"
                 f"👤  <b>{full_name}</b>\n\n"
-                f"🏷️  {username_line}\n\n"
-                f"🆔  <code>{tg_user.id}</code>\n\n"
-                f"🤖  {bot_label}\n\n"
+                f"🏷️  <b>{username_line}</b>\n\n"
+                f"🆔  <b>{tg_user.id}</b>\n\n"
+                f"🤖  <b>{bot_label}</b>\n\n"
                 f"┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄"
             )
 
