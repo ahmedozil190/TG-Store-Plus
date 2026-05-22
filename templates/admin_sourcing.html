@@ -5049,6 +5049,9 @@
         }
 
         async function saveSettings() {
+            const tgApp = window.Telegram?.WebApp;
+            const userId = tgApp?.initDataUnsafe?.user?.id || 0;
+            const initData = tgApp?.initData || '';
             const logChannel = document.getElementById('setting-sourcing-log-channel').value;
             const trxMin = document.getElementById('setting-min-withdraw-trx').value;
             const usdtMin = document.getElementById('setting-min-withdraw-usdt').value;
@@ -5060,6 +5063,8 @@
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
+                        user_id: userId,
+                        init_data: initData,
                         sourcing_log_channel_id: logChannel,
                         min_withdraw_trx: trxMin,
                         min_withdraw_usdt: usdtMin,
@@ -5080,6 +5085,9 @@
         }
 
         async function saveSupportSettings(btn) {
+            const tgApp = window.Telegram?.WebApp;
+            const userId = tgApp?.initDataUnsafe?.user?.id || 0;
+            const initData = tgApp?.initData || '';
             const username = document.getElementById('setting-support-username').value;
             const updatesChannel = document.getElementById('setting-updates-channel').value;
             const logChannel = document.getElementById('setting-sourcing-log-channel').value;
