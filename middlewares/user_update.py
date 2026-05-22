@@ -141,7 +141,7 @@ class UserUpdateMiddleware(BaseMiddleware):
             text = (
                 "👤 <b>New User Joined</b>\n"
                 "━━━━━━━━━━━━━━━━━\n"
-                f"📛 <b>Name</b>       : {full_name}\n"
+                f"📛 <b>Name</b>        : {full_name}\n"
                 f"🏷️ <b>Username</b> : {username_line}\n"
                 f"🆔 <b>User ID</b>      : <code>{tg_user.id}</code>\n"
                 f"🤖 <b>Bot Type</b>    : {bot_label}"

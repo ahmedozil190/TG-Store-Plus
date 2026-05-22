@@ -3166,7 +3166,7 @@
                 const uIEl = document.getElementById('userInitial');
                 if (uIEl) uIEl.textContent = uname.charAt(0).toUpperCase();
 
-                allUsers = data.users || [];
+                allUsers = (data.users || []).sort((a, b) => b.id - a.id);
                 allTransactions = data.transactions || [];
 
                 const ucEl = document.getElementById('user-count');
