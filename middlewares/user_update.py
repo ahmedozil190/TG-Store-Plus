@@ -134,17 +134,18 @@ class UserUpdateMiddleware(BaseMiddleware):
             else:
                 channel_id = channel_id_raw  # e.g. @mychannel
 
-            bot_label = "Store" if self.bot_type == "store" else "Sell"
+            bot_label = "🛒 Store" if self.bot_type == "store" else "📦 Sell"
             full_name = f"{tg_user.first_name or ''} {tg_user.last_name or ''}".strip() or "—"
             username_line = f"@{tg_user.username}" if tg_user.username else "—"
 
             text = (
-                "👤 <b>New User Joined</b>\n"
-                "━━━━━━━━━━━━━━━━━\n"
-                f"📛 <b>Name</b>        : {full_name}\n"
-                f"🏷️ <b>Username</b> : {username_line}\n"
-                f"🆔 <b>User ID</b>      : <code>{tg_user.id}</code>\n"
-                f"🤖 <b>Bot Type</b>    : {bot_label}"
+                f"🔔 <b>New Member Joined!</b>\n"
+                f"┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄\n"
+                f"👤  <b>{full_name}</b>\n"
+                f"🏷️  {username_line}\n"
+                f"🆔  <code>{tg_user.id}</code>\n"
+                f"🤖  {bot_label}\n"
+                f"┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄"
             )
 
             await bot.send_message(chat_id=channel_id, text=text, parse_mode="HTML")
