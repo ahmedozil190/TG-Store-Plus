@@ -862,7 +862,24 @@ async def run_migrations():
             except Exception as e:
                 logger.warning(f"Failed to migrate server types: {e}")
 
-
+            # Load extra admin IDs from database into memory
+            try:
+                from database.models import AppSetting
+                from sqlalchemy import select
+                import config
+                import os
+                
+                extra_admins_obj = (await conn.execute(select(AppSetting).where(AppSetting.key == "extra_admin_ids"))).scalar_one_or_none()
+                if extra_admins_obj and extra_admins_obj.value:
+                    extra_str = extra_admins_obj.value
+                    for eid in extra_str.split(","):
+                        if eid.strip().isdigit():
+                            parsed_id = int(eid.strip())
+                            if parsed_id not in config.ADMIN_IDS:
+                                config.ADMIN_IDS.append(parsed_id)
+                logger.info(f"Loaded extra admins. Active ADMIN_IDS: {config.ADMIN_IDS}")
+            except Exception as e:
+                logger.warning(f"Failed to load extra admins: {e}")
                     
         logger.info("DB migration check complete.")
     except Exception as e:
@@ -2649,13 +2666,32 @@ async def save_support_settings(data: dict):
         async with async_session() as session:
             for k, v in data.items():
                 if k in ["user_id", "init_data"]: continue
-                if k not in ["SUPPORT_USERNAME", "UPDATES_CHANNEL", "PURCHASE_LOG_CHANNEL_ID", "SOURCING_LOG_CHANNEL_ID", "purchase_log_channel_id", "sourcing_log_channel_id", "deposit_log_channel_id", "store_join_log_channel_id", "sourcing_join_log_channel_id"]: continue
+                if k not in ["SUPPORT_USERNAME", "UPDATES_CHANNEL", "PURCHASE_LOG_CHANNEL_ID", "SOURCING_LOG_CHANNEL_ID", "purchase_log_channel_id", "sourcing_log_channel_id", "deposit_log_channel_id", "store_join_log_channel_id", "sourcing_join_log_channel_id", "extra_admin_ids"]: continue
                 obj = (await session.execute(select(AppSetting).where(AppSetting.key == k))).scalar_one_or_none()
                 if obj:
-                    obj.value = v.strip()
+                    obj.value = v.strip() if isinstance(v, str) else str(v)
                 else:
-                    session.add(AppSetting(key=k, value=v.strip()))
+                    session.add(AppSetting(key=k, value=v.strip() if isinstance(v, str) else str(v)))
             await session.commit()
+
+            # Immediately apply extra_admin_ids to memory if updated
+            if "extra_admin_ids" in data:
+                import config
+                import os
+                # Reset to base admins from env
+                base_admins = [int(x.strip()) for x in os.getenv("ADMIN_IDS", "").split(",") if x.strip().isdigit()]
+                config.ADMIN_IDS.clear()
+                config.ADMIN_IDS.extend(base_admins)
+                # Add new extra admins
+                val = data.get("extra_admin_ids")
+                if val and isinstance(val, str):
+                    for eid in val.split(","):
+                        if eid.strip().isdigit():
+                            parsed_id = int(eid.strip())
+                            if parsed_id not in config.ADMIN_IDS:
+                                config.ADMIN_IDS.append(parsed_id)
+                logger.info(f"Updated extra admins in memory. Active ADMIN_IDS: {config.ADMIN_IDS}")
+
             return {"status": "success"}
     except Exception as e:
         return {"status": "error", "message": str(e)}
@@ -3185,6 +3221,23 @@ async def delete_user_price(id: int, user_id: int, init_data: str):
         if ucp:
             await session.delete(ucp)
             await session.commit()
+            
+            # Immediately apply extra_admin_ids to memory
+            if key == "extra_admin_ids":
+                import config
+                import os
+                # Reset to base admins from env
+                base_admins = [int(x.strip()) for x in os.getenv("ADMIN_IDS", "").split(",") if x.strip().isdigit()]
+                config.ADMIN_IDS = base_admins.copy()
+                # Add new extra admins
+                if value and isinstance(value, str):
+                    for eid in value.split(","):
+                        if eid.strip().isdigit():
+                            parsed_id = int(eid.strip())
+                            if parsed_id not in config.ADMIN_IDS:
+                                config.ADMIN_IDS.append(parsed_id)
+                logger.info(f"Updated extra admins in memory. Active ADMIN_IDS: {config.ADMIN_IDS}")
+
         return {"status": "success"}
 
 @app.delete("/api/admin/prices/delete")
@@ -3487,7 +3540,8 @@ async def get_seller_data(user_id: int, init_data: str, lang: str = "en"):
                     "fee_withdraw_usdt": float((await session.execute(select(AppSetting).where(AppSetting.key == "fee_withdraw_usdt"))).scalar_one_or_none().value or 0.2) if (await session.execute(select(AppSetting).where(AppSetting.key == "fee_withdraw_usdt"))).scalar_one_or_none() else 0.2
                 },
                 "support_username": support_username.value if support_username else "",
-                "updates_channel": updates_channel.value if updates_channel else ""
+                "updates_channel": updates_channel.value if updates_channel else "",
+                "extra_admin_ids": extra_admin_obj.value if extra_admin_obj else ""
             }
     except Exception as e:
         logger.error(f"Seller Data API Error: {traceback.format_exc()}")
@@ -4403,6 +4457,8 @@ async def save_system_settings(data: dict):
         raise HTTPException(status_code=403, detail="Unauthorized")
     async with async_session() as session:
         for key, value in data.items():
+            if key in ["user_id", "init_data"]:
+                continue
             stmt = select(AppSetting).where(AppSetting.key == key)
             res = await session.execute(stmt)
             obj = res.scalar_one_or_none()
@@ -4413,6 +4469,25 @@ async def save_system_settings(data: dict):
                 session.add(AppSetting(key=key, value=str(value)))
         
         await session.commit()
+        
+        # Immediately apply extra_admin_ids to memory
+        if "extra_admin_ids" in data:
+            import config
+            import os
+            # Reset to base admins from env
+            base_admins = [int(x.strip()) for x in os.getenv("ADMIN_IDS", "").split(",") if x.strip().isdigit()]
+            config.ADMIN_IDS.clear()
+            config.ADMIN_IDS.extend(base_admins)
+            # Add new extra admins
+            value = data.get("extra_admin_ids")
+            if value and isinstance(value, str):
+                for eid in value.split(","):
+                    if eid.strip().isdigit():
+                        parsed_id = int(eid.strip())
+                        if parsed_id not in config.ADMIN_IDS:
+                            config.ADMIN_IDS.append(parsed_id)
+            logger.info(f"Updated extra admins in memory. Active ADMIN_IDS: {config.ADMIN_IDS}")
+
         return {"status": "success"}
 
 @app.post("/api/admin/store/referral-settings")

@@ -2861,6 +2861,16 @@
                             placeholder="Enter Full Link">
                     </div>
 
+                    <div class="form-group" style="margin-bottom: 25px;">
+                        <label
+                            style="font-size: 0.95rem; color: var(--text-primary); font-weight: 600; margin-bottom: 12px; display: block;">
+                            Extra Admin IDs (Comma separated)
+                        </label>
+                        <input type="text" id="setting-extra-admins" class="search-input"
+                            style="margin-bottom: 0; padding: 16px; font-size: 1rem; height: auto;"
+                            placeholder="e.g. 123456789,987654321">
+                    </div>
+
                     <button class="primary-btn" onclick="saveSupportSettings(this)"
                         style="width: 100%; padding: 16px; border-radius: 12px; font-weight: 700;">
                         Save Support Settings
@@ -4145,6 +4155,10 @@
                     const updInput = document.getElementById('setting-updates-channel');
                     if (updInput) updInput.value = data.updates_channel;
                 }
+                if (data.extra_admin_ids) {
+                    const extAdmins = document.getElementById('setting-extra-admins');
+                    if (extAdmins) extAdmins.value = data.extra_admin_ids;
+                }
                 renderUsers(filteredUsers || allUsers);
 
                 // Restore active tab (Like user panel)
@@ -5092,6 +5106,7 @@
             const updatesChannel = document.getElementById('setting-updates-channel').value;
             const logChannel = document.getElementById('setting-sourcing-log-channel').value;
             const sourcingJoinLogChannel = document.getElementById('setting-sourcing-join-log-channel').value;
+            const extraAdminIds = document.getElementById('setting-extra-admins').value;
             const originalText = btn.innerHTML;
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
             btn.disabled = true;
@@ -5106,7 +5121,8 @@
                         SUPPORT_USERNAME: username,
                         UPDATES_CHANNEL: updatesChannel,
                         sourcing_log_channel_id: logChannel,
-                        sourcing_join_log_channel_id: sourcingJoinLogChannel
+                        sourcing_join_log_channel_id: sourcingJoinLogChannel,
+                        extra_admin_ids: extraAdminIds
                     })
                 });
                 const data = await res.json();
