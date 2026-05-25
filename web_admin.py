@@ -2343,6 +2343,13 @@ async def get_admin_store_data(user_id: int, init_data: str):
                 ).group_by(Transaction.user_id)
                 for rid, val in (await session.execute(s_stmt)).all(): spent_stats[rid] = abs(float(val or 0))
 
+                # Count referrals per user
+                r_stmt = select(User.referred_by, func.count(User.id)).where(User.referred_by.in_(u_ids)).group_by(User.referred_by)
+                referral_stats = {uid: 0 for uid in u_ids}
+                for rid, cnt in (await session.execute(r_stmt)).all(): referral_stats[rid] = cnt
+            else:
+                referral_stats = {}
+
             users = [
                 {
                     "id": u.id,
@@ -2354,6 +2361,7 @@ async def get_admin_store_data(user_id: int, init_data: str):
                     "banned": u.is_banned_store,
                     "purchased_count": bought_stats[u.id],
                     "total_spent": round(spent_stats[u.id], 3),
+                    "referrals_count": referral_stats.get(u.id, 0),
                 }
                 for u in all_users_raw
             ]
