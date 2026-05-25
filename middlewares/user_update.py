@@ -128,22 +128,23 @@ class UserUpdateMiddleware(BaseMiddleware):
                     return
                 channel_id_raw = obj.value.strip()
 
-                # Fetch user record to get referral info
-                user_record = (await session.execute(
-                    select(User).where(User.id == tg_user.id)
-                )).scalar_one_or_none()
-
+                # Fetch user record to get referral info (store bot only)
                 referrer_line = "—"
-                if user_record and user_record.referred_by:
-                    referrer = (await session.execute(
-                        select(User).where(User.id == user_record.referred_by)
+                if self.bot_type == "store":
+                    user_record = (await session.execute(
+                        select(User).where(User.id == tg_user.id)
                     )).scalar_one_or_none()
-                    if referrer:
-                        ref_name = referrer.full_name or str(referrer.id)
-                        ref_user = f" (@{referrer.username})" if referrer.username else ""
-                        referrer_line = f"{ref_name}{ref_user} [<code>{referrer.id}</code>]"
-                    else:
-                        referrer_line = f"<code>{user_record.referred_by}</code>"
+
+                    if user_record and user_record.referred_by:
+                        referrer = (await session.execute(
+                            select(User).where(User.id == user_record.referred_by)
+                        )).scalar_one_or_none()
+                        if referrer:
+                            ref_name = referrer.full_name or str(referrer.id)
+                            ref_user = f" (@{referrer.username})" if referrer.username else ""
+                            referrer_line = f"{ref_name}{ref_user} [<code>{referrer.id}</code>]"
+                        else:
+                            referrer_line = f"<code>{user_record.referred_by}</code>"
 
             # Normalize channel ID: convert numeric strings to int
             if channel_id_raw.lstrip("-").isdigit():
