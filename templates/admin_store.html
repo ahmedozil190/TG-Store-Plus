@@ -1758,6 +1758,7 @@
                 opacity: 0;
             }
         }
+
         /* Copy Toast */
         .copy-toast-container {
             position: fixed;
@@ -1771,6 +1772,7 @@
             width: 100%;
             align-items: flex-end;
         }
+
         .copy-toast {
             background: var(--bg-elevated);
             backdrop-filter: blur(12px);
@@ -1787,9 +1789,11 @@
             transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
             pointer-events: auto;
         }
+
         .copy-toast.show {
             transform: translateX(0);
         }
+
         .copy-toast-icon {
             width: 44px;
             height: 44px;
@@ -1800,18 +1804,24 @@
             flex-shrink: 0;
             font-size: 1.1rem;
         }
-        .copy-toast-content { flex: 1; }
+
+        .copy-toast-content {
+            flex: 1;
+        }
+
         .copy-toast-title {
             font-weight: 800;
             font-size: 1rem;
             color: var(--text-p);
             margin-bottom: 2px;
         }
+
         .copy-toast-desc {
             font-size: 0.85rem;
             color: var(--text-s);
             font-weight: 500;
         }
+
         .copy-toast-close {
             color: var(--text-s);
             cursor: pointer;
@@ -1820,7 +1830,10 @@
             opacity: 0.5;
             transition: 0.2s;
         }
-        .copy-toast-close:hover { opacity: 1; }
+
+        .copy-toast-close:hover {
+            opacity: 1;
+        }
     </style>
 </head>
 
@@ -2600,7 +2613,7 @@
                     <div class="form-group" style="margin-bottom: 25px;">
                         <label
                             style="font-size: 0.95rem; color: var(--text-primary); font-weight: 600; margin-bottom: 12px; display: block;">
-                            Extra Admin IDs (Comma separated)
+                            Extra Admin IDs
                         </label>
                         <input type="text" id="setting-extra-admins" class="search-input"
                             style="margin-bottom: 0; padding: 16px; font-size: 1rem; height: auto;"
