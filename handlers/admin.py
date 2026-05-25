@@ -15,7 +15,8 @@ from states.admin_state import AdminState
 router = Router()
 
 def is_admin(user_id: int) -> bool:
-    return user_id in ADMIN_IDS
+    from config import STORE_ADMIN_IDS
+    return user_id in STORE_ADMIN_IDS
 
 @router.message(Command("id"))
 async def cmd_id(message: Message):

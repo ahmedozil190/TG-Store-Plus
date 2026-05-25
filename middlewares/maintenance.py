@@ -35,7 +35,9 @@ class MaintenanceMiddleware(BaseMiddleware):
                     user_id = event.inline_query.from_user.id
 
             # Check if user is admin
-            is_admin = user_id and user_id in ADMIN_IDS
+            import config
+            admin_list = config.STORE_ADMIN_IDS if self.bot_type == "store" else config.SOURCING_ADMIN_IDS
+            is_admin = user_id and user_id in admin_list
             
             async with async_session() as session:
                 # Use target key based on bot type

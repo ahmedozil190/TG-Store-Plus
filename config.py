@@ -9,6 +9,8 @@ API_ID = os.getenv("API_ID", "0")
 API_ID = int(API_ID) if API_ID.isdigit() else 0
 API_HASH = os.getenv("API_HASH", "")
 ADMIN_IDS = [int(x.strip()) for x in os.getenv("ADMIN_IDS", "").split(",") if x.strip().isdigit()]
+STORE_ADMIN_IDS = ADMIN_IDS.copy()
+SOURCING_ADMIN_IDS = ADMIN_IDS.copy()
 
 # Database
 # Priority: /app/data (User defined volume) > /data (Railway default) > local

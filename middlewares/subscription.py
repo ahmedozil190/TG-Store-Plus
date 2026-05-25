@@ -44,7 +44,9 @@ class SubscriptionMiddleware(BaseMiddleware):
             bot: Bot = data.get("bot")
             
             # Admins bypass subscription check
-            if user_id in ADMIN_IDS:
+            import config
+            admin_list = config.STORE_ADMIN_IDS if self.bot_type == "store" else config.SOURCING_ADMIN_IDS
+            if user_id in admin_list:
                 return await handler(event, data)
 
             async with async_session() as session:

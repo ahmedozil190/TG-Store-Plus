@@ -278,11 +278,20 @@ def verify_telegram_auth(init_data: str, bot_token: str, expected_user_id: int) 
         logger.error(f"Auth Verification Exception: {e}")
         return False
 
-def verify_admin_auth_multi(init_data: str, user_id: int) -> bool:
-    """Helper to verify admin auth against both main and seller bot tokens."""
-    from config import BOT_TOKEN, SELLER_BOT_TOKEN, ADMIN_IDS
+def verify_admin_auth_multi(init_data: str, user_id: int, bot_type: str = "any") -> bool:
+    """Helper to verify admin auth against bot-specific or any admin IDs."""
+    import config
+    from config import BOT_TOKEN, SELLER_BOT_TOKEN
     if not init_data or not user_id: return False
-    if user_id not in ADMIN_IDS: return False
+    
+    if bot_type == "store":
+        admin_list = config.STORE_ADMIN_IDS
+    elif bot_type == "sourcing":
+        admin_list = config.SOURCING_ADMIN_IDS
+    else:
+        admin_list = list(set(config.STORE_ADMIN_IDS + config.SOURCING_ADMIN_IDS))
+        
+    if user_id not in admin_list: return False
     # Try main bot token first
     if verify_telegram_auth(init_data, BOT_TOKEN, user_id): return True
     # Fallback to seller bot token
@@ -291,12 +300,14 @@ def verify_admin_auth_multi(init_data: str, user_id: int) -> bool:
 
 def verify_user_auth_multi(init_data: str, user_id: int) -> bool:
     """Helper to verify user auth (any user) against seller bot token, or admin against main bot token."""
-    from config import BOT_TOKEN, SELLER_BOT_TOKEN, ADMIN_IDS
+    import config
+    from config import BOT_TOKEN, SELLER_BOT_TOKEN
     if not init_data or not user_id: return False
     # 1. Standard: Seller Bot Token (Any user)
     if verify_telegram_auth(init_data, SELLER_BOT_TOKEN, user_id): return True
-    # 2. Admin Bypass: Main Bot Token (Only if admin)
-    if user_id in ADMIN_IDS:
+    # 2. Admin Bypass: Main Bot Token (Only if admin in either bot)
+    all_admins = list(set(config.STORE_ADMIN_IDS + config.SOURCING_ADMIN_IDS))
+    if user_id in all_admins:
         if verify_telegram_auth(init_data, BOT_TOKEN, user_id): return True
     return False
 
@@ -869,15 +880,27 @@ async def run_migrations():
                 import config
                 import os
                 
+                # 1. Load Store Extra Admins
                 extra_admins_obj = (await conn.execute(select(AppSetting).where(AppSetting.key == "extra_admin_ids"))).scalar_one_or_none()
                 if extra_admins_obj and extra_admins_obj.value:
                     extra_str = extra_admins_obj.value
                     for eid in extra_str.split(","):
                         if eid.strip().isdigit():
                             parsed_id = int(eid.strip())
-                            if parsed_id not in config.ADMIN_IDS:
-                                config.ADMIN_IDS.append(parsed_id)
-                logger.info(f"Loaded extra admins. Active ADMIN_IDS: {config.ADMIN_IDS}")
+                            if parsed_id not in config.STORE_ADMIN_IDS:
+                                config.STORE_ADMIN_IDS.append(parsed_id)
+                                
+                # 2. Load Sourcing Extra Admins
+                sourcing_admins_obj = (await conn.execute(select(AppSetting).where(AppSetting.key == "sourcing_extra_admin_ids"))).scalar_one_or_none()
+                if sourcing_admins_obj and sourcing_admins_obj.value:
+                    sourcing_str = sourcing_admins_obj.value
+                    for eid in sourcing_str.split(","):
+                        if eid.strip().isdigit():
+                            parsed_id = int(eid.strip())
+                            if parsed_id not in config.SOURCING_ADMIN_IDS:
+                                config.SOURCING_ADMIN_IDS.append(parsed_id)
+                                
+                logger.info(f"Loaded extra admins. Active STORE_ADMIN_IDS: {config.STORE_ADMIN_IDS} | Active SOURCING_ADMIN_IDS: {config.SOURCING_ADMIN_IDS}")
             except Exception as e:
                 logger.warning(f"Failed to load extra admins: {e}")
                     
@@ -947,8 +970,8 @@ class UserSync(AdminAuthRequest):
 @app.get("/admin/sourcing", response_class=HTMLResponse)
 async def admin_sourcing(request: Request):
     try:
-        from config import ADMIN_IDS
-        return templates.TemplateResponse(request=request, name="admin_sourcing.html", context={"ADMIN_IDS": ADMIN_IDS})
+        import config
+        return templates.TemplateResponse(request=request, name="admin_sourcing.html", context={"ADMIN_IDS": config.SOURCING_ADMIN_IDS})
     except Exception as e:
         logger.error(f"Error rendering sourcing dashboard: {e}")
         return HTMLResponse(content=f"<h1>Error</h1><pre>{e}</pre>", status_code=500)
@@ -956,8 +979,8 @@ async def admin_sourcing(request: Request):
 @app.get("/admin/store", response_class=HTMLResponse)
 async def admin_store(request: Request):
     try:
-        from config import ADMIN_IDS
-        return templates.TemplateResponse(request=request, name="admin_store.html", context={"ADMIN_IDS": ADMIN_IDS})
+        import config
+        return templates.TemplateResponse(request=request, name="admin_store.html", context={"ADMIN_IDS": config.STORE_ADMIN_IDS})
     except Exception as e:
         logger.error(f"Error rendering store dashboard: {e}")
     return templates.TemplateResponse(request=request, name="admin_store.html", context={"ADMIN_IDS": []})
@@ -2166,7 +2189,7 @@ async def get_sourcing_data(user_id: int, init_data: str):
                 })
 
             # Sourcing settings
-            settings_stmt = select(AppSetting).where(AppSetting.key.in_(["sourcing_log_channel_id", "sourcing_join_log_channel_id", "min_withdraw_trx", "min_withdraw_usdt", "fee_withdraw_trx", "fee_withdraw_usdt"]))
+            settings_stmt = select(AppSetting).where(AppSetting.key.in_(["sourcing_log_channel_id", "sourcing_join_log_channel_id", "min_withdraw_trx", "min_withdraw_usdt", "fee_withdraw_trx", "fee_withdraw_usdt", "sourcing_extra_admin_ids"]))
             settings_res = await session.execute(settings_stmt)
             settings_dict = {s.key: s.value for s in settings_res.scalars().all()}
             
@@ -2176,6 +2199,7 @@ async def get_sourcing_data(user_id: int, init_data: str):
             min_withdraw_usdt = settings_dict.get("min_withdraw_usdt", "10.0")
             fee_withdraw_trx = settings_dict.get("fee_withdraw_trx", "0.2")
             fee_withdraw_usdt = settings_dict.get("fee_withdraw_usdt", "0.2")
+            sourcing_extra_admin_ids = settings_dict.get("sourcing_extra_admin_ids", "")
 
             # Support & Channel settings
             support_username_obj = (await session.execute(select(AppSetting).where(AppSetting.key == "SUPPORT_USERNAME"))).scalar_one_or_none()
@@ -2189,6 +2213,7 @@ async def get_sourcing_data(user_id: int, init_data: str):
                 "sourcing_join_log_channel_id": sourcing_join_log_channel_id,
                 "support_username": support_username,
                 "updates_channel": updates_channel,
+                "extra_admin_ids": sourcing_extra_admin_ids,
                 "min_withdraw_trx": min_withdraw_trx,
                 "min_withdraw_usdt": min_withdraw_usdt,
                 "fee_withdraw_trx": fee_withdraw_trx,
@@ -2256,6 +2281,9 @@ async def get_admin_store_data(user_id: int, init_data: str):
                 
                 store_join_log_ch_obj = (await session.execute(select(AppSetting).where(AppSetting.key == "store_join_log_channel_id"))).scalar_one_or_none()
                 store_join_log_channel_id = store_join_log_ch_obj.value if store_join_log_ch_obj else ""
+                
+                extra_admins_obj = (await session.execute(select(AppSetting).where(AppSetting.key == "extra_admin_ids"))).scalar_one_or_none()
+                store_extra_admin_ids = extra_admins_obj.value if extra_admins_obj else ""
                 
                 if not bn_obj:
                     from config import BOT_TOKEN
@@ -2374,6 +2402,7 @@ async def get_admin_store_data(user_id: int, init_data: str):
             "store_join_log_channel_id": store_join_log_channel_id,
             "support_username": support_username,
             "updates_channel": updates_channel,
+            "extra_admin_ids": store_extra_admin_ids,
             "stats": {
                 "user_count": user_count,
                 "banned_users": banned_users,
@@ -2392,9 +2421,7 @@ async def get_admin_store_data(user_id: int, init_data: str):
             },
             "users": users,
             "transactions": transactions,
-            "prices": prices,
-            "support_username": (await session.execute(select(AppSetting).where(AppSetting.key == "SUPPORT_USERNAME"))).scalar_one_or_none().value if (await session.execute(select(AppSetting).where(AppSetting.key == "SUPPORT_USERNAME"))).scalar_one_or_none() else "",
-            "updates_channel": (await session.execute(select(AppSetting).where(AppSetting.key == "UPDATES_CHANNEL"))).scalar_one_or_none().value if (await session.execute(select(AppSetting).where(AppSetting.key == "UPDATES_CHANNEL"))).scalar_one_or_none() else ""
+            "prices": prices
         }
     except Exception as e:
         logger.error(f"Store Admin Data Error: {e}")
@@ -2656,17 +2683,21 @@ async def save_referral_settings(req: ReferralSettingsSubmit):
 
 @app.post("/api/admin/support/settings")
 async def save_support_settings(data: dict):
-    # data: {user_id, init_data, SUPPORT_USERNAME, ...}
-    from config import BOT_TOKEN, ADMIN_IDS
     u_id = data.get("user_id")
     i_data = data.get("init_data")
     if not verify_admin_auth_multi(i_data, u_id):
         raise HTTPException(status_code=403, detail="Unauthorized")
     try:
         async with async_session() as session:
+            allowed_keys = [
+                "SUPPORT_USERNAME", "UPDATES_CHANNEL", "PURCHASE_LOG_CHANNEL_ID",
+                "SOURCING_LOG_CHANNEL_ID", "purchase_log_channel_id", "sourcing_log_channel_id",
+                "deposit_log_channel_id", "store_join_log_channel_id", "sourcing_join_log_channel_id",
+                "extra_admin_ids", "sourcing_extra_admin_ids"
+            ]
             for k, v in data.items():
                 if k in ["user_id", "init_data"]: continue
-                if k not in ["SUPPORT_USERNAME", "UPDATES_CHANNEL", "PURCHASE_LOG_CHANNEL_ID", "SOURCING_LOG_CHANNEL_ID", "purchase_log_channel_id", "sourcing_log_channel_id", "deposit_log_channel_id", "store_join_log_channel_id", "sourcing_join_log_channel_id", "extra_admin_ids"]: continue
+                if k not in allowed_keys: continue
                 obj = (await session.execute(select(AppSetting).where(AppSetting.key == k))).scalar_one_or_none()
                 if obj:
                     obj.value = v.strip() if isinstance(v, str) else str(v)
@@ -2674,23 +2705,34 @@ async def save_support_settings(data: dict):
                     session.add(AppSetting(key=k, value=v.strip() if isinstance(v, str) else str(v)))
             await session.commit()
 
-            # Immediately apply extra_admin_ids to memory if updated
+            import config, os
+            base_admins = [int(x.strip()) for x in os.getenv("ADMIN_IDS", "").split(",") if x.strip().isdigit()]
+
+            # Update STORE_ADMIN_IDS if extra_admin_ids changed
             if "extra_admin_ids" in data:
-                import config
-                import os
-                # Reset to base admins from env
-                base_admins = [int(x.strip()) for x in os.getenv("ADMIN_IDS", "").split(",") if x.strip().isdigit()]
-                config.ADMIN_IDS.clear()
-                config.ADMIN_IDS.extend(base_admins)
-                # Add new extra admins
-                val = data.get("extra_admin_ids")
+                config.STORE_ADMIN_IDS.clear()
+                config.STORE_ADMIN_IDS.extend(base_admins)
+                val = data.get("extra_admin_ids", "")
                 if val and isinstance(val, str):
                     for eid in val.split(","):
                         if eid.strip().isdigit():
-                            parsed_id = int(eid.strip())
-                            if parsed_id not in config.ADMIN_IDS:
-                                config.ADMIN_IDS.append(parsed_id)
-                logger.info(f"Updated extra admins in memory. Active ADMIN_IDS: {config.ADMIN_IDS}")
+                            pid = int(eid.strip())
+                            if pid not in config.STORE_ADMIN_IDS:
+                                config.STORE_ADMIN_IDS.append(pid)
+                logger.info(f"Updated STORE_ADMIN_IDS: {config.STORE_ADMIN_IDS}")
+
+            # Update SOURCING_ADMIN_IDS if sourcing_extra_admin_ids changed
+            if "sourcing_extra_admin_ids" in data:
+                config.SOURCING_ADMIN_IDS.clear()
+                config.SOURCING_ADMIN_IDS.extend(base_admins)
+                val = data.get("sourcing_extra_admin_ids", "")
+                if val and isinstance(val, str):
+                    for eid in val.split(","):
+                        if eid.strip().isdigit():
+                            pid = int(eid.strip())
+                            if pid not in config.SOURCING_ADMIN_IDS:
+                                config.SOURCING_ADMIN_IDS.append(pid)
+                logger.info(f"Updated SOURCING_ADMIN_IDS: {config.SOURCING_ADMIN_IDS}")
 
             return {"status": "success"}
     except Exception as e:
@@ -3221,22 +3263,6 @@ async def delete_user_price(id: int, user_id: int, init_data: str):
         if ucp:
             await session.delete(ucp)
             await session.commit()
-            
-            # Immediately apply extra_admin_ids to memory
-            if key == "extra_admin_ids":
-                import config
-                import os
-                # Reset to base admins from env
-                base_admins = [int(x.strip()) for x in os.getenv("ADMIN_IDS", "").split(",") if x.strip().isdigit()]
-                config.ADMIN_IDS = base_admins.copy()
-                # Add new extra admins
-                if value and isinstance(value, str):
-                    for eid in value.split(","):
-                        if eid.strip().isdigit():
-                            parsed_id = int(eid.strip())
-                            if parsed_id not in config.ADMIN_IDS:
-                                config.ADMIN_IDS.append(parsed_id)
-                logger.info(f"Updated extra admins in memory. Active ADMIN_IDS: {config.ADMIN_IDS}")
 
         return {"status": "success"}
 
@@ -4472,21 +4498,18 @@ async def save_system_settings(data: dict):
         
         # Immediately apply extra_admin_ids to memory
         if "extra_admin_ids" in data:
-            import config
-            import os
-            # Reset to base admins from env
+            import config, os
             base_admins = [int(x.strip()) for x in os.getenv("ADMIN_IDS", "").split(",") if x.strip().isdigit()]
-            config.ADMIN_IDS.clear()
-            config.ADMIN_IDS.extend(base_admins)
-            # Add new extra admins
+            config.STORE_ADMIN_IDS.clear()
+            config.STORE_ADMIN_IDS.extend(base_admins)
             value = data.get("extra_admin_ids")
             if value and isinstance(value, str):
                 for eid in value.split(","):
                     if eid.strip().isdigit():
                         parsed_id = int(eid.strip())
-                        if parsed_id not in config.ADMIN_IDS:
-                            config.ADMIN_IDS.append(parsed_id)
-            logger.info(f"Updated extra admins in memory. Active ADMIN_IDS: {config.ADMIN_IDS}")
+                        if parsed_id not in config.STORE_ADMIN_IDS:
+                            config.STORE_ADMIN_IDS.append(parsed_id)
+            logger.info(f"Updated STORE_ADMIN_IDS: {config.STORE_ADMIN_IDS}")
 
         return {"status": "success"}
 
