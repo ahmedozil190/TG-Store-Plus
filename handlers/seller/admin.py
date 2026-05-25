@@ -5,14 +5,17 @@ from database.engine import async_session
 from database.models import CountryPrice
 from sqlalchemy.future import select
 from sqlalchemy import delete
-from config import ADMIN_IDS
 
 router = Router()
+
+def is_sourcing_admin(user_id: int) -> bool:
+    import config
+    return user_id in config.SOURCING_ADMIN_IDS
 
 @router.message(Command("addcountry"))
 async def admin_add_country(message: Message):
     # Check if user is admin
-    if message.from_user.id not in ADMIN_IDS:
+    if not is_sourcing_admin(message.from_user.id):
         return
 
     # Usage: /addcountry  code  name  buy_price  sell_price  delay
@@ -62,7 +65,7 @@ async def admin_add_country(message: Message):
 
 @router.message(Command("admin"))
 async def admin_dashboard_cmd(message: Message):
-    if message.from_user.id not in ADMIN_IDS:
+    if not is_sourcing_admin(message.from_user.id):
         return
         
     import os
@@ -79,7 +82,7 @@ async def admin_dashboard_cmd(message: Message):
 @router.message(Command("manage_countries"))
 @router.message(Command("sourcing_stats"))
 async def admin_manage_countries(message: Message):
-    if message.from_user.id not in ADMIN_IDS:
+    if not is_sourcing_admin(message.from_user.id):
         return
         
     async with async_session() as session:
@@ -105,7 +108,7 @@ async def admin_manage_countries(message: Message):
 # Confirmation Callback
 @router.callback_query(F.data.startswith("del_cp_cf_"))
 async def callback_delete_country_confirm(call: CallbackQuery):
-    if call.from_user.id not in ADMIN_IDS: return
+    if not is_sourcing_admin(call.from_user.id): return
     cp_id = int(call.data.split("_")[3])
     
     async with async_session() as session:
@@ -126,7 +129,7 @@ async def callback_delete_country_confirm(call: CallbackQuery):
 # Execution Callback
 @router.callback_query(F.data.startswith("del_cp_ex_"))
 async def callback_delete_country_execute(call: CallbackQuery):
-    if call.from_user.id not in ADMIN_IDS: return
+    if not is_sourcing_admin(call.from_user.id): return
     cp_id = int(call.data.split("_")[3])
     
     async with async_session() as session:
@@ -144,6 +147,6 @@ async def callback_delete_country_execute(call: CallbackQuery):
 
 @router.callback_query(F.data == "manage_countries_back")
 async def callback_manage_countries_back(call: CallbackQuery):
-    if call.from_user.id not in ADMIN_IDS: return
+    if not is_sourcing_admin(call.from_user.id): return
     await admin_manage_countries(call.message)
     await call.message.delete()
