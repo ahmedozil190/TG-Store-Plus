@@ -141,8 +141,8 @@ class UserUpdateMiddleware(BaseMiddleware):
                         )).scalar_one_or_none()
                         if referrer:
                             ref_name = referrer.full_name or str(referrer.id)
-                            ref_user = f" (@{referrer.username})" if referrer.username else ""
-                            referrer_line = f"{ref_name}{ref_user} [<code>{referrer.id}</code>]"
+                            ref_user = f" — @{referrer.username}" if referrer.username else ""
+                            referrer_line = f"{ref_name}{ref_user} — <code>{referrer.id}</code>"
                         else:
                             referrer_line = f"<code>{user_record.referred_by}</code>"
 
