@@ -3416,7 +3416,7 @@ async def get_seller_data(user_id: int, init_data: str, lang: str = "en"):
 
             if user_id:
                 user = await session.get(User, user_id)
-                if user and user.is_banned_sourcing and user_id not in ADMIN_IDS:
+                if user and user.is_banned_sourcing and user_id not in SOURCING_ADMIN_IDS:
                     return {
                         "is_banned": True,
                         "support_username": support_username.value if support_username else "",
