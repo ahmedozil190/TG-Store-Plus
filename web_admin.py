@@ -3401,12 +3401,13 @@ async def get_seller_data(user_id: int, init_data: str, lang: str = "en"):
             mnt_obj = (await session.execute(select(AppSetting).where(AppSetting.key == "SOURCING_UNDER_MAINTENANCE"))).scalar_one_or_none()
             maintenance_mode = (mnt_obj.value.lower() == "true") if mnt_obj else False
             
-            from config import ADMIN_IDS
+            from config import SOURCING_ADMIN_IDS
             # Support & Channel settings
             support_username = (await session.execute(select(AppSetting).where(AppSetting.key == "SUPPORT_USERNAME"))).scalar_one_or_none()
             updates_channel = (await session.execute(select(AppSetting).where(AppSetting.key == "UPDATES_CHANNEL"))).scalar_one_or_none()
+            extra_admin_obj = (await session.execute(select(AppSetting).where(AppSetting.key == "sourcing_extra_admin_ids"))).scalar_one_or_none()
 
-            if maintenance_mode and user_id not in ADMIN_IDS:
+            if maintenance_mode and user_id not in SOURCING_ADMIN_IDS:
                 return {
                     "maintenance_sourcing": True,
                     "support_username": support_username.value if support_username else "",
