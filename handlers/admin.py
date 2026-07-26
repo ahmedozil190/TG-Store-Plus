@@ -29,7 +29,7 @@ async def cmd_admin(message: Message, state: FSMContext):
         
     await state.clear()
         
-    web_url = os.getenv("WEB_URL", "http://127.0.0.1:8000").rstrip("/")
+    web_url = os.getenv("WEBAPP_URL", os.getenv("WEB_URL", "http://127.0.0.1:8000")).rstrip("/")
     from aiogram.types import WebAppInfo
     keyboard = InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(text="Open", web_app=WebAppInfo(url=f"{web_url}/admin/store"))]
